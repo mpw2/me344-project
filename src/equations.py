@@ -27,14 +27,15 @@ def compute_rhs_rhoU(Rho,U,P,rhs_rhoU):
 
 	rhs_rhoU[1:nx-1] += term1 + term2 + term3
 
-	def compute_rhs_Et(Et,U,P,rhs_Et):
+def compute_rhs_Et(Et,U,P,rhs_Et):
 
-		term1 = np.array([nx-2,1])
+	term1 = np.array([nx-2,1])
+	term2 = np.array([nx-2,1])
 
-		for ii in range(1,nx-1):
-			term1[ii] = U[ii] * ( (Et[ii+1] - Et[ii-1]) / (xg[ii+1] - xg[ii-1]) + (P[ii+1] - P[ii-1]) / (xg[ii+1] - xg[ii-1]) ) +\
-			(Et[ii] + P[ii]) * (U[ii+1] - U[ii-1]) / (xg[ii+1] - xg[ii-1]) # d/dx ((Et + p) * u)
-			term2[ii] = 2 * mu * ( ((U[ii+1] - U[ii-1]) / (xg[ii+1] - xg[ii-1]))**2 +  U[ii] * \
-			(U[ii+1] - 2 * U[ii] + U[ii-1]) / (xg[ii+1] - xg[ii-1])**2 ) # d/dx (u * tau_xx)
+	for ii in range(1,nx-1):
+		term1[ii] = U[ii] * ( (Et[ii+1] - Et[ii-1]) / (xg[ii+1] - xg[ii-1]) + (P[ii+1] - P[ii-1]) / (xg[ii+1] - xg[ii-1]) ) +\
+		(Et[ii] + P[ii]) * (U[ii+1] - U[ii-1]) / (xg[ii+1] - xg[ii-1]) # d/dx ((Et + p) * u)
+		term2[ii] = 2 * mu * ( ((U[ii+1] - U[ii-1]) / (xg[ii+1] - xg[ii-1]))**2 +  U[ii] * \
+		(U[ii+1] - 2 * U[ii] + U[ii-1]) / (xg[ii+1] - xg[ii-1])**2 ) # d/dx (u * tau_xx)
 
-		rhos_Et += term1 + term2
+	rhos_Et += term1 + term2
