@@ -24,6 +24,39 @@ def compute_rhs_rho(Rho,U,rhs_rho,dir):
 
 	return rhs_rho
 
+# dir_id: ( 0 - Forward, 1 - Backward, 2 - Central )
+def compute_x_deriv(phi, x, y, dir_id):
+	nx = np.length(x)
+	ny = np.length(y)
+	lo_x = 1
+	hi_x = nx-1
+	lo_y = 1
+	hi_y = ny-1
+	dphi = np.zeros((nx-2,ny-2))
+	if dir_id == 0:
+		dphi = (phi[lo_x+1:hi_x+1,lo_y:hi_y] - phi[lo_x:hi_x, lo_y:hi_y]) / (x[lo_x+1:hi_x+1,lo_y:hi_y] - x[lo_x:hi_x,lo_y:hi_y)] 
+	if dir_id = 1:
+		dphi = (phi[lo_x:hi_x,lo_y:hi_y] - phi[lo_x-1:hi_x-1, lo_y:hi_y]) / (x[lo_x:hi_x,lo_y:hi_y] - x[lo_x-1:hi_x-,lo_y:hi_y1]) 
+	if dir_id = 2:
+		dphi = (phi[lo_x+1:hi_x+1, lo_y:hi_y] - phi[lo_x-1:hi_x-1, lo_y:hi_y]) / (x[lo_x+1:hi_x+1,lo_y:hi_y] - x[lo_x-1:hi_x-1,lo_y:hi_y]) 
+	return dphi	
+
+def compute_y_deriv(phi, x, y, dir_id):
+	nx = np.length(x)
+	ny = np.length(y)
+	lo_x = 1
+	hi_x = nx-1
+	lo_y = 1
+	hi_y = ny-1
+	dphi = np.zeros((nx-2,ny-2))
+	if dir_id == 0:
+		dphi = (phi[lo_x:hi_x,lo_y+1:hi_y+1] - phi[lo_x:hi_x, lo_y:hi_y]) / (y[lo_x:hi_x, lo_y+1:hi_y+1] - y[lo_x:hi_x, lo_y:hi_y]) 
+	if dir_id = 1:
+		dphi = (phi[lo_x:hi_x,lo_y:hi_y] - phi[lo_x:hi_x, lo_y-1:hi_y-1]) / (y[lo_x:hi_x, lo_y:hi_y] - y[lo_x:hi_x, lo_y-1:hi_y-1]) 
+	if dir_id = 2:
+		dphi = (phi[lo_x:hi_x, lo_y+1:hi_y+1] - phi[lo_x:hi_x, lo_y+1:hi_y+1]) / (y[lo_x:hi_x, lo_y+1:hi_y+1] - y[lo_x:hi_x, lo_y-1:hi_y-1]) 
+	return dphi	
+
 def compute_rhs_rhoU(Rho,U,P,rhs_rhoU,dir):
 
 	term1 = np.array([nx-2,1])
@@ -74,6 +107,11 @@ def Prim2Con(Rho,U,P):
 	return Rho, rhoU, Et
 
 def Tauxx(U,step):
+
+	lo = 1
+	hi = nx-1
+
+	(U[lo+1:hi+1, ;, 1] - U[lo:hi,:,1]) / (xg[] - xg[])
 
 	tau_xx = np.array([nx,1])
 	for ii in range(1,nx-1):
