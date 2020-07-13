@@ -5,7 +5,7 @@ import numpy as np
 mu = None
 
 nx = None
-xg = None
+xg = None 
 
 
 
