@@ -1,5 +1,7 @@
-import global
+import common
 
+#------------------------------------------
+# 
 def read_input_parameters():
     # Read in from user input file
     
@@ -18,14 +20,18 @@ def init_flow():
     
     if fin_path is None:
         # Default flow field initialization
+        Rho[:,:] = Rho_ref
+        U[:,:] = 0
+        V[:,:] = 0
+        P[:,:] = Patm 
     else:
         # Use input data file
         read_input_data()
 
 #-------------------------------------------
-# Read data from intput file
+# Read data from input file
 def read_input_data():
-    
+   raise Exception("Not implemented") 
     
     
     
@@ -42,7 +48,8 @@ def output_data():
     
     arr=bytearray(nx,ny)
     
-    arr=bytearray(Q)
+    ConsToPrim(Q,gamma)
+    arr=bytearray()
     f.write(arr)
 
     # Close the output file

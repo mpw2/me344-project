@@ -1,10 +1,5 @@
-import numpy as numpy
-from global import xg
-from global import nx 
-from global import mu
-from global import gamma
-from global import nvars
 
+import common
 
 # dir_id: ( 0 - Forward, 1 - Backward, 2 - Central )
 # returns matrix of the same size as phi
@@ -49,12 +44,12 @@ def compute_y_deriv(phi, x, y, dir_id):
 	return dphi	
 
 def ConsToPrim(Q,gamma):
-	Rho = Q[:,:,0]
-	U = Q[:,:,1] / Q[:,:,0]
-	V = Q[:,:,2] / Q[:,:,0]
-	P = (gamma - 1) * (Q[:,:,3] - 1 / 2 / Q[:,:,0] * (Q[:,:,1] + Q[:,:,2])**2)
+        Rho_ = Q[:,:,0]
+	U_ = Q[:,:,1] / Q[:,:,0]
+	V_ = Q[:,:,2] / Q[:,:,0]
+	P_ = (gamma - 1) * (Q[:,:,3] - 1 / 2 / Q[:,:,0] * (Q[:,:,1] + Q[:,:,2])**2)
 
-	return Rho, U, V, P
+	return Rho_, U_, V_, P_
 
 def PrimToCons(Rho,U,V,P):
 	rhoU = Rho * U
