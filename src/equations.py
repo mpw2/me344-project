@@ -156,24 +156,31 @@ def compRHS(Q,x,y,step):
 	lo_y = 1
 	hi_y = ny-1
 
+	dEdx = np.zeros((nx,ny,nvars))
+	dFdx = np.zeros((nx,ny,nvars))
+
 
 	# format of Q[x,y,0-3] 
 	if step == 'predictor':
 		E = compE(Q,x,y,mu,gamma,step)
 		F = compF(Q,x,y,mu,gamma,step)
 
-		dEdx = compute_x_deriv(E,x,y,0)
-		dFdy = compute_y_deriv(F,x,y,0)
+		for ii in range(nvars):
+			dEdx[:,:,ii] = compute_x_deriv(E[:,:,ii],x,y,0)
+			dFdy[:,:,ii] = compute_y_deriv(F[:,:,ii],x,y,0)
 
 		rhs = -1 * (dEdx + dFdy)
+
 	elif step == 'corrector':
 		E = compE(Q,x,y,mu,gamma,step)
 		F = compF(Q,x,y,mu,gamma,step)
 
-		dEdx = compute_x_deriv(E,x,y,1)
-		dFdy = compute_y_deriv(F,x,y,1)
+		for ii in range(nvars):
+			dEdx[:,:,ii] = compute_x_deriv(E[:,:,ii],x,y,1)
+			dFdy[:,:,ii] = compute_y_deriv(F[:,:,ii],x,y,1)
 
 		rhs = -1 * (dEdx + dFdy)
+		
 	else:
 		raise Exception('Invalid step')
 
