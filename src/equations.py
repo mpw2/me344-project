@@ -7,6 +7,7 @@ from global import nvars
 
 
 # dir_id: ( 0 - Forward, 1 - Backward, 2 - Central )
+# returns matrix of the same size as phi
 def compute_x_deriv(phi, x, y, dir_id):
 	nx = np.shape(x,0)
 	ny = np.shape(y,1)
@@ -14,13 +15,17 @@ def compute_x_deriv(phi, x, y, dir_id):
 	hi_x = nx-1
 	lo_y = 1
 	hi_y = ny-1
-	dphi = np.zeros((nx-2,ny-2))
+	dphi = np.zeros((nx,ny))
 	if dir_id == 0:
-		dphi = (phi[lo_x+1:hi_x+1,lo_y:hi_y] - phi[lo_x:hi_x, lo_y:hi_y]) / (x[lo_x+1:hi_x+1,lo_y:hi_y] - x[lo_x:hi_x,lo_y:hi_y])
+		dphi[nx,:] = (phi[nx,:] - phi[nx-1,:]) / (x[nx,:] - x[nx-1,:])
+		dphi[0:hi_x,:] = (phi[0+1:hi_x+1,:] - phi[0:hi_x, :]) / (x[0+1:hi_x+1,:] - x[0:hi_x,:])
 	if dir_id = 1:
-		dphi = (phi[lo_x:hi_x,lo_y:hi_y] - phi[lo_x-1:hi_x-1, lo_y:hi_y]) / (x[lo_x:hi_x,lo_y:hi_y] - x[lo_x-1:hi_x-,lo_y:hi_y1]) 
+		dphi[0,:] = (phi[1,:] - phi[0,:]) / (x[1,:] - x[0,:])
+		dphi[lo_x:nx,:] = (phi[lo_x:hi_x,:] - phi[lo_x-1:hi_x-1, :]) / (x[lo_x:hi_x,:] - x[lo_x-1:hi_x-1,:]) 
 	if dir_id = 2:
-		dphi = (phi[lo_x+1:hi_x+1, lo_y:hi_y] - phi[lo_x-1:hi_x-1, lo_y:hi_y]) / (x[lo_x+1:hi_x+1,lo_y:hi_y] - x[lo_x-1:hi_x-1,lo_y:hi_y]) 
+		dphi[0,:] = (phi[1,:] - phi[0,:]) / (x[1,:] - x[0,:])
+		dphi[nx,:] = (phi[nx,:] - phi[nx-1,:]) / (x[nx,:] - x[nx-1,:])
+		dphi[lo_x:hi_x,:] = (phi[lo_x+1:hi_x+1, :] - phi[lo_x-1:hi_x-1, :]) / (x[lo_x+1:hi_x+1,:] - x[lo_x-1:hi_x-1,:]) 
 	return dphi	
 
 def compute_y_deriv(phi, x, y, dir_id):
@@ -30,13 +35,17 @@ def compute_y_deriv(phi, x, y, dir_id):
 	hi_x = nx-1
 	lo_y = 1
 	hi_y = ny-1
-	dphi = np.zeros((nx-2,ny-2))
+	dphi = np.zeros((nx,ny))
 	if dir_id == 0:
-		dphi = (phi[lo_x:hi_x,lo_y+1:hi_y+1] - phi[lo_x:hi_x, lo_y:hi_y]) / (y[lo_x:hi_x, lo_y+1:hi_y+1] - y[lo_x:hi_x, lo_y:hi_y]) 
+		dphi[:,ny] = (phi[:,ny] - phi[:,ny-1]) / (y[:,ny] - y[:,ny-1])
+		dphi[:,0:hi_y] = (phi[:,0+1:hi_y+1] - phi[:, 0:hi_y]) / (y[:, 0:hi_y+1] - y[:, 0:hi_y]) 
 	if dir_id = 1:
-		dphi = (phi[lo_x:hi_x,lo_y:hi_y] - phi[lo_x:hi_x, lo_y-1:hi_y-1]) / (y[lo_x:hi_x, lo_y:hi_y] - y[lo_x:hi_x, lo_y-1:hi_y-1]) 
+		dphi[:,0] = (phi[:,1] - phi[:,0]) / (y[:,1] - y[:,0])
+		dphi[:,lo_y:ny] = (phi[:,lo_y:ny] - phi[:, lo_y-1:ny-1]) / (y[:, lo_y:ny] - y[:, lo_y-1:ny-1]) 
 	if dir_id = 2:
-		dphi = (phi[lo_x:hi_x, lo_y+1:hi_y+1] - phi[lo_x:hi_x, lo_y+1:hi_y+1]) / (y[lo_x:hi_x, lo_y+1:hi_y+1] - y[lo_x:hi_x, lo_y-1:hi_y-1]) 
+		dphi[:,0] = (phi[:,1] - phi[:,0]) / (y[:,1] - y[:,0])
+		dphi[:,ny] = (phi[:,ny] - phi[:,ny-1]) / (y[:,ny] - y[:,ny-1])
+		dphi[:,lo_y:hi_y] = (phi[:, lo_y+1:hi_y+1] - phi[: lo_y+1:hi_y+1]) / (y[:, lo_y+1:hi_y+1] - y[:, lo_y-1:hi_y-1]) 
 	return dphi	
 
 def ConsToPrim(Q,gamma):
@@ -79,13 +88,15 @@ def Tauyy(V,x,y,mu,step):
 	return tau_yy
 
 def Tauxy(U,V,x,y,mu,flux,step):
+	nx = np.shape(x,0)
+	ny = np.shape(y,1)
+	tau_xy = np.zeros((nx,ny))
 
 	if step == 'predictor':
-
 		if flux == 0:
-			tau_xy = mu * (compute_y_deriv(U,x,y,2) + compute_x_deriv(V,x,y,1))
+			tau_xy[1:nx-1] = mu * (compute_y_deriv(U,x,y,2) + compute_x_deriv(V,x,y,1))
 		elif flux == 1:
-			tau_xy = mu * (compute_y_deriv(U,x,y,2) + compute_x_deriv(V,x,y,0))
+			tau_xy[1:nx-1] = mu * (compute_y_deriv(U,x,y,2) + compute_x_deriv(V,x,y,0))
 		else:
 			raise Exception('Invalid Flux Direction')
 
