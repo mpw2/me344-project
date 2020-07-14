@@ -148,7 +148,7 @@ def compF(Q,x,y,mu,gamma,step):
 
 	return F
 
-def compRHS(Q,x,y,dt,mu,gamma,step):
+def compRHS(Q,x,y,step):
 	nx = np.shape(x,0)
 	ny = np.shape(y,1)
 	lo_x = 1
