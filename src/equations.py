@@ -87,24 +87,24 @@ def Tauyy(V,x,y,mu,step):
 
 	return tau_yy
 
-def Tauxy(U,V,x,y,mu,flux,step):
+def Tauxy(U,V,x,y,mu,flux_dir,step):
 	nx = np.shape(x,0)
 	ny = np.shape(y,1)
 	tau_xy = np.zeros((nx,ny))
 
 	if step == 'predictor':
-		if flux == 0:
+		if flux_dir == 0:
 			tau_xy[1:nx-1] = mu * (compute_y_deriv(U,x,y,2) + compute_x_deriv(V,x,y,1))
-		elif flux == 1:
+		elif flux_dir == 1:
 			tau_xy[1:nx-1] = mu * (compute_y_deriv(U,x,y,2) + compute_x_deriv(V,x,y,0))
 		else:
 			raise Exception('Invalid Flux Direction')
 
 	elif step == 'corrector':
 
-		if flux == 0:
+		if flux_dir == 0:
 			tau_xy = mu * (compute_y_deriv(U,x,y,1) + compute_x_deriv(V,x,y,2))
-		elif flux == 1:
+		elif flux_dir == 1:
 			tau_xy = mu * (compute_y_deriv(U,x,y,0) + compute_x_deriv(V,x,y,2))
 		else:
 			raise Exception('Invalid Flux Direction')
