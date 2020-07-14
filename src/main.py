@@ -12,7 +12,7 @@
 
 def main():
    # Read user input file
-   read_input()
+   read_input_parameters()
    
    # Initialize data structures
    initialize()

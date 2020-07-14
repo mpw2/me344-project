@@ -1,6 +1,15 @@
 
 import numpy as np
 
+import boundary_conditions.py
+import equations.py
+import initialization.py
+import input_output.py
+import main.py
+import monitor.py
+import mpi.py 
+import time_integration.py
+
 # input/output parameters
 fout_path = None
 fin_path = None
