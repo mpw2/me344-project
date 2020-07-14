@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 #------------------------------------------------
 #
 # Finite Volume Jet Code
@@ -7,7 +9,6 @@
 # ... Solver details
 #
 #------------------------------------------------
-
 
 def main():
    # Read user input file

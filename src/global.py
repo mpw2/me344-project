@@ -1,6 +1,11 @@
 
 import numpy as np
 
+# input/output parameters
+fout_path = None
+fin_path = None
+fparam_path = None
+
 # physical parameters
 mu = None  # dynamic viscosity
 gamma = None # cp/cv ratio
