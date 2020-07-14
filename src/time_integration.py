@@ -4,7 +4,6 @@ import global
 def compute_timestep_maccormack():
     Qo = Q.copy()
     
-    compute_dt()
     
     k1 = compRHS(Q,x,y,'predictor')
     Q[1:nx-1,1:ny-1,:] = Q[1:nx-1,1:ny-1,:] + dt*k1

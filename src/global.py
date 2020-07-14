@@ -2,16 +2,16 @@
 import numpy as np
 
 # physical parameters
-mu = None  # viscosity
-gamma = None #  
-Ma = None
-Re = None
-Pr = None
-R_g = None
-k = None
-Rho_ref = None
+mu = None  # dynamic viscosity
+gamma = None # cp/cv ratio
+Ma = None # Mach number
+Re = None # Reynolds number
+Pr = None # Prandtl number
+R_g = None # gas constant
+k = None # heat transfer coefficient
+Rho_ref = None # reference density
 
-
+# grid parameters
 nx = None
 ny = None
 
@@ -20,17 +20,20 @@ Ly = None
 xg = None 
 yg = None
 
-
+# tiemstep parameters
+CFL_ref = None
 dt = None
 
-Q = None
-Rho = None
-U = None
-V = None
-E_t = None
+# variable arrays
+Q = None  # conserved variable vector
+Rho = None # density
+U = None # streamwise velocity
+V = None # normal velocity
+P = None # pressure
+E_t = None # total energy
 
 # constants
-nvars = 4
+nvars = 4 # number of transported variables
 
 
 
