@@ -94,9 +94,9 @@ def Tauxy(U,V,x,y,mu,flux_dir,step):
 
 	if step == 'predictor':
 		if flux_dir == 0:
-			tau_xy[1:nx-1] = mu * (compute_y_deriv(U,x,y,2) + compute_x_deriv(V,x,y,1))
+			tau_xy = mu * (compute_y_deriv(U,x,y,2) + compute_x_deriv(V,x,y,1))
 		elif flux_dir == 1:
-			tau_xy[1:nx-1] = mu * (compute_y_deriv(U,x,y,2) + compute_x_deriv(V,x,y,0))
+			tau_xy = mu * (compute_y_deriv(U,x,y,2) + compute_x_deriv(V,x,y,0))
 		else:
 			raise Exception('Invalid Flux Direction')
 
