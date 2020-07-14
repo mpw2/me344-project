@@ -163,7 +163,7 @@ def compRHS(Q,x,y,step):
 		F = compF(Q,x,y,mu,gamma,step)
 
 		dEdx = compute_x_deriv(E,x,y,0)
-		dFdy = compute_y_deriv(F,x,y,1)
+		dFdy = compute_y_deriv(F,x,y,0)
 
 		rhs = -1 * (dEdx + dFdy)
 	elif step == 'corrector':
@@ -171,7 +171,7 @@ def compRHS(Q,x,y,step):
 		F = compF(Q,x,y,mu,gamma,step)
 
 		dEdx = compute_x_deriv(E,x,y,1)
-		dFdy = compute_y_deriv(F,x,y,0)
+		dFdy = compute_y_deriv(F,x,y,1)
 
 		rhs = -1 * (dEdx + dFdy)
 	else:
