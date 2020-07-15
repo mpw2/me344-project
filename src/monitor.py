@@ -20,8 +20,8 @@ def output_monitor():
     
     print('')
     
-    print('Max  Rho, U, V, P : {0:10.4e}, {0:10.4e}, {0:10.4e}, {0:10.4e}'.format(Rho_max,U_max,V_max,P_max))
-    print('Mean Rho, U, V, P : {0:10.4e}, {0:10.4e}, {0:10.4e}, {0:10.4e}'.format(Rho_mean,U_mean,V_mean,P_mean))
+    print('Max  Rho, U, V, P : {0:10.4e}, {1:10.4e}, {2:10.4e}, {3:10.4e}'.format(Rho_max,U_max,V_max,P_max))
+    print('Mean Rho, U, V, P : {0:10.4e}, {1:10.4e}, {2:10.4e}, {3:10.4e}'.format(Rho_mean,U_mean,V_mean,P_mean))
     
     print('')
 

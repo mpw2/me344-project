@@ -27,9 +27,11 @@ def main():
    
    # Initialize data structures
    initialize()
-   
+
+   output_monitor()
+ 
    # Start time integration loop
-   for tstep in range(g.nsteps):
+   for tstep in range(1,g.nsteps+1):
         g.tstep = tstep
 
         # compute timestep size
