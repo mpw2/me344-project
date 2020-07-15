@@ -25,6 +25,7 @@ R_g = None # gas constant
 k = None # heat transfer coefficient
 Rho_ref = None # reference density
 Patm = None # atmospheric pressure
+Ujet = None # jet velocity
 
 # domain parameters
 Lx = None
