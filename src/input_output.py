@@ -83,10 +83,6 @@ def init_flow():
 def read_input_data():
    raise Exception("Not implemented") 
     
-    
-    
-    
-
 
 
 #-------------------------------------------
@@ -103,12 +99,4 @@ def output_data():
 
     # Close the output file
     f.close()
-    
-    
-    
-    
-    
-    
-    
-    
-    
+     
