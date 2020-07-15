@@ -1,5 +1,6 @@
 import common as g
 import numpy as np
+import input_output as io
 
 def initialize():
 
@@ -12,6 +13,10 @@ def initialize():
     g.V = np.zeros((g.nx+1,g.ny+1))
     g.P = np.zeros((g.nx+1,g.ny+1))
 
+    # Time variables
+    g.t = 0.0
+    g.tstep = 0
+    
     # Build the grid
     xg_temp = np.linspace(0,g.Lx,g.nx+1)
     if ( g.ny % 2 == 1 ):
@@ -25,18 +30,9 @@ def initialize():
     g.yg[0,:] = yg_temp
     
 
+    g.Rho_inf = g.P_inf / (g.R_g * g.T_inf)
+    g.Rho_jet = g.P_jet / (g.R_g * g.T_jet)
 
-
-
-
-
-
-
-
-
-
-
-
-
+    io.init_flow()
 
 

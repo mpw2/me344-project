@@ -29,8 +29,9 @@ def main():
    initialize()
    
    # Start time integration loop
-   for n in range(g.nsteps):
-        
+   for tstep in range(g.nsteps):
+        g.tstep = tstep
+
         # compute timestep size
         compute_dt()
         
@@ -39,11 +40,11 @@ def main():
         
         
         # output to monitor
-        if ( n % g.nmonitor == 0 ):
+        if ( tstep % g.nmonitor == 0 ):
             output_monitor()
         
         # output to data file
-        if ( n % g.nsave == 0 ):
+        if ( tstep % g.nsave == 0 ):
             output_data()
     
     

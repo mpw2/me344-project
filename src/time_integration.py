@@ -3,6 +3,8 @@ from equations import *
 from boundary_conditions import *
 
 def compute_timestep_maccormack():
+    g.t = g.t + g.dt
+
     Qo = g.Q.copy()
     
     k1 = compRHS(g.Q,g.xg,g.yg,'predictor')
@@ -19,7 +21,7 @@ def compute_timestep_maccormack():
 
 def compute_dt():
     
-    Rho_,U_,V_,P_ = ConsToPrim(g.Q,g.gamma)
+    Rho_,U_,V_,P_ = ConsToPrim(g.Q)
     a0 = np.sqrt( g.gamma*g.P/g.Rho )
     
     Ur = np.abs(U_ + a0)

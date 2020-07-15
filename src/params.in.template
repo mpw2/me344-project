@@ -1,6 +1,6 @@
 # FLUID PROPERTIES
-# mu, gamma, Pr, R_g, k, Rho_ref, P_ref
-1.5e-6, 1.4, 0.71, 287, 1, 1.2, 1e5
+# mu, gamma, Pr, R_g, k
+1.5e-6, 1.4, 0.71, 287, 0.0262
 
 # DOMAIN SPECIFICATION
 # Lx, Ly

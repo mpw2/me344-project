@@ -17,8 +17,6 @@ gamma = None # cp/cv ratio
 Pr = None # Prandtl number
 R_g = None # gas constant
 k = None # heat transfer coefficient
-Rho_ref = None # reference density
-P_ref = None # reference pressure
 
 # domain parameters
 Lx = None
@@ -30,12 +28,14 @@ U_jet = None # jet inlet streamwise velocity
 V_jet = None # jet inlet normal velocity
 P_jet = None # jet inlet pressure
 T_jet = None # jet inlet temperature
+Rho_jet = None #
 
 # ambient conditions
 U_inf = None
 V_inf = None
-P_inf = None
+P_inf = None # reference pressure
 T_inf = None
+Rho_inf = None # reference density
 
 # grid parameters
 nx = None
@@ -46,6 +46,8 @@ yg = None
 # timestep parameters
 CFL_ref = None
 dt = None
+t = None
+tstep = None
 
 # variable arrays
 Q = None  # conserved variable vector

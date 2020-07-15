@@ -17,15 +17,15 @@ def compute_x_deriv(phi, x, y, dir_id):
     ny = y.shape[1]-1
     dphi = np.zeros((nx+1,ny+1))
     if dir_id == 0:
-        dphi[    nx, :] = (phi[  nx, :] - phi[  nx-1, :]) ./ (x[  nx, :] - x[  nx-1, :])
-        dphi[0:nx-1, :] = (phi[1:nx, :] - phi[0:nx-1, :]) ./ (x[1:nx, :] - x[0:nx-1, :])
+        dphi[    nx, :] = (phi[  nx, :] - phi[  nx-1, :]) / (x[  nx, :] - x[  nx-1, :])
+        dphi[0:nx-1, :] = (phi[1:nx, :] - phi[0:nx-1, :]) / (x[1:nx, :] - x[0:nx-1, :])
     if dir_id == 1:
-        dphi[     0, :] = (phi[   1, :] - phi[     0, :]) ./ (x[   1, :] - x[     0, :])
-        dphi[  1:nx, :] = (phi[1:nx, :] - phi[0:nx-1, :]) ./ (x[1:nx, :] - x[0:nx-1, :]) 
+        dphi[     0, :] = (phi[   1, :] - phi[     0, :]) / (x[   1, :] - x[     0, :])
+        dphi[  1:nx, :] = (phi[1:nx, :] - phi[0:nx-1, :]) / (x[1:nx, :] - x[0:nx-1, :]) 
     if dir_id == 2:
-        dphi[     0, :] = (phi[   1, :] - phi[     0, :]) ./ (x[   1, :] - x[     0, :])
-        dphi[    nx, :] = (phi[  nx, :] - phi[  nx-1, :]) ./ (x[  nx, :] - x[  nx-1, :])
-        dphi[1:nx-1, :] = (phi[2:nx, :] - phi[0:nx-2, :]) ./ (x[2:nx, :] - x[0:nx-2, :]) 
+        dphi[     0, :] = (phi[   1, :] - phi[     0, :]) / (x[   1, :] - x[     0, :])
+        dphi[    nx, :] = (phi[  nx, :] - phi[  nx-1, :]) / (x[  nx, :] - x[  nx-1, :])
+        dphi[1:nx-1, :] = (phi[2:nx, :] - phi[0:nx-2, :]) / (x[2:nx, :] - x[0:nx-2, :]) 
     return dphi    
 
 # ---------------------------------------------------
@@ -44,29 +44,29 @@ def compute_y_deriv(phi, x, y, dir_id):
     ny = y.shape[1]-1
     dphi = np.zeros((nx+1,ny+1))
     if dir_id == 0:
-        dphi[:,     ny] = (phi[:,   ny] - phi[:,   ny-1]) ./ (y[:,   ny] - y[:,   ny-1])
-        dphi[:, 0:ny-1] = (phi[:, 1:ny] - phi[:, 0:ny-1]) ./ (y[:, 1:ny] - y[:, 0:ny-1]) 
+        dphi[:,     ny] = (phi[:,   ny] - phi[:,   ny-1]) / (y[:,   ny] - y[:,   ny-1])
+        dphi[:, 0:ny-1] = (phi[:, 1:ny] - phi[:, 0:ny-1]) / (y[:, 1:ny] - y[:, 0:ny-1]) 
     if dir_id == 1:
-        dphi[:,      0] = (phi[:,    1] - phi[:,      0]) ./ (y[:,    1] - y[:,      0])
-        dphi[:,   1:ny] = (phi[:, 1:ny] - phi[:, 0:ny-1]) ./ (y[:, 1:ny] - y[:, 0:ny-1]) 
+        dphi[:,      0] = (phi[:,    1] - phi[:,      0]) / (y[:,    1] - y[:,      0])
+        dphi[:,   1:ny] = (phi[:, 1:ny] - phi[:, 0:ny-1]) / (y[:, 1:ny] - y[:, 0:ny-1]) 
     if dir_id == 2:
-        dphi[:,      0] = (phi[:,    1] - phi[:,      0]) ./ (y[:,    1] - y[:,      0])
-        dphi[:,     ny] = (phi[:,   ny] - phi[:,   ny-1]) ./ (y[:,   ny] - y[:,   ny-1])
-        dphi[:, 1:ny-1] = (phi[:, 2:ny] - phi[:, 0:ny-2]) ./ (y[:, 2:ny] - y[:, 0:ny-2]) 
+        dphi[:,      0] = (phi[:,    1] - phi[:,      0]) / (y[:,    1] - y[:,      0])
+        dphi[:,     ny] = (phi[:,   ny] - phi[:,   ny-1]) / (y[:,   ny] - y[:,   ny-1])
+        dphi[:, 1:ny-1] = (phi[:, 2:ny] - phi[:, 0:ny-2]) / (y[:, 2:ny] - y[:, 0:ny-2]) 
     return dphi    
 
-def ConsToPrim(Q,gamma):
-    Rho_ = Q[:,:,0]
-    U_ = Q[:,:,1] ./ Q[:,:,0]
-    V_ = Q[:,:,2] ./ Q[:,:,0]
-    P_ = (gamma - 1) * (Q[:,:,3] - 0.5 ./ Q[:,:,0] * (Q[:,:,1] + Q[:,:,2])**2)
+def ConsToPrim(Q):
+    Rho_ = np.squeeze(Q[:,:,0])
+    U_ = np.squeeze(Q[:,:,1] / Q[:,:,0])
+    V_ = np.squeeze(Q[:,:,2] / Q[:,:,0])
+    P_ = np.squeeze((g.gamma - 1) * (Q[:,:,3] - 0.5 / Q[:,:,0] * (Q[:,:,1] + Q[:,:,2])**2))
 
     return Rho_, U_, V_, P_
 
 def PrimToCons(Rho,U,V,P):
     rhoU_ = Rho * U
     rhoV_ = Rho * V
-    Et_ = P / (gamma - 1) + 0.5 * Rho * (U**2 + V**2)
+    Et_ = P / (g.gamma - 1) + 0.5 * Rho * (U**2 + V**2)
 
     return Rho, rhoU_, rhoV_, Et_
 
@@ -145,7 +145,7 @@ def compE(Q,x,y,Rgas,mu,kappa,gamma,step):
     ny = y.shape[1]
     E = np.zeros([nx,ny,g.NVARS])
 
-    Rho, U, V, P = ConsToPrim(Q,gamma)
+    Rho, U, V, P = ConsToPrim(Q)
 
     T = P / (Rho * Rgas)
 
@@ -165,7 +165,7 @@ def compF(Q,x,y,Rgas,mu,kappa,gamma,step):
     ny = y.shape[1]
     F = np.zeros([nx,ny,g.NVARS])
 
-    Rho, U, V, P = ConsToPrim(Q,gamma)
+    Rho, U, V, P = ConsToPrim(Q)
 
     T = P / (Rho * Rgas)
 

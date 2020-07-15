@@ -1,4 +1,5 @@
 import common as g
+import equations as eq
 import sys
 
 #------------------------------------------
@@ -17,8 +18,8 @@ def read_input_parameters():
 
     # Read fluid properties
     li = 0
-    g.mu, g.gamma, g.Pr, g.R_g, g.k, \
-        g.Rho_ref, g.P_ref = map(float,lines[li].split(','))
+    g.mu, g.gamma, g.Pr, g.R_g, g.k, = \
+        map(float,lines[li].split(','))
     # Read domain specification
     li = 1
     g.Lx, g.Ly = map(float,lines[li].split(','))
@@ -45,9 +46,9 @@ def read_input_parameters():
     
     # Read input/output parameters
     li = 7
-    g.fin_path = lines[li].replace('\'','')
+    g.fin_path = lines[li].replace('\'','').strip()
     li = 8
-    g.fout_path = lines[li].replace('\'','') 
+    g.fout_path = lines[li].replace('\'','').strip()
    
     print('Input data file: {:s}'.format(g.fin_path))
     print('Output data file: {:s}'.format(g.fout_path))
@@ -62,15 +63,20 @@ def read_input_parameters():
 # Initialize flow field
 def init_flow():
     
-    if fin_path is None:
-        # Default flow field initialization
-        Rho[:,:] = Rho_ref
-        U[:,:] = 0
-        V[:,:] = 0
-        P[:,:] = Patm 
-    else:
+    if g.fin_path:
         # Use input data file
         read_input_data()
+    else:
+        # Default flow field initialization
+        g.Rho[:,:] = g.Rho_inf
+        g.U[:,:] = 0
+        g.V[:,:] = 0
+        g.P[:,:] = g.P_inf
+        Rho_,RhoU_,RhoV_,E_ = eq.PrimToCons(g.Rho,g.U,g.V,g.P)
+        g.Q[:,:,0] = Rho_
+        g.Q[:,:,1] = RhoU_
+        g.Q[:,:,2] = RhoV_
+        g.Q[:,:,3] = E_
 
 #-------------------------------------------
 # Read data from input file
@@ -88,10 +94,10 @@ def read_input_data():
 def output_data():
     
     # Open the output file
-    f = open(g.fout_path,"wb")
+    fout_path = g.fout_path + '.' + str(g.tstep)
+    f = open(fout_path,"wb")
     
-    
-    ConsToPrim(g.Q,g.gamma)
+    eq.ConsToPrim(g.Q)
     arr=bytearray(g.Q)
     f.write(arr)
 
