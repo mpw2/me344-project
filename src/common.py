@@ -25,9 +25,14 @@ Lx = None
 Ly = None
 
 # inlet conditions
-Ujet = None # jet inlet velocity
 jet_height = None # extent of jet in y-dim
-Pjet = None # jet inlet pressure
+U_jet = None # jet inlet streamwise velocity
+V_jet = None # jet inlet normal velocity
+P_jet = None # jet inlet pressure
+T_jet = None # jet inlet temperature
+
+# ambient conditions
+
 
 # grid parameters
 nx = None

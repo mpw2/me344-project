@@ -1,46 +1,58 @@
 import common as g
 import numpy as np
 
-# dir_id: ( 0 - Forward, 1 - Backward, 2 - Central )
-# returns matrix of the same size as phi
+# ---------------------------------------------------
+# Compute Finite Difference in y direction
+#
+# Input:
+#     phi    : quantity
+#     x      : x-dir grid
+#     y      : y-dir grid
+#     dir_id : 0 - Forward, 1 - Backward, 2 - Central
+# Output:
+#     d(phi)/dy : same dimensions as phi
+# ---------------------------------------------------
 def compute_x_deriv(phi, x, y, dir_id):
-    nx = np.shape(x,0)
-    ny = np.shape(y,1)
-    lo_x = 1
-    hi_x = nx-1
-    lo_y = 1
-    hi_y = ny-1
-    dphi = np.zeros((nx,ny))
+    nx = x.shape[0]-1
+    ny = y.shape[1]-1
+    dphi = np.zeros((nx+1,ny+1))
     if dir_id == 0:
-        dphi[nx,:] = (phi[nx,:] - phi[nx-1,:]) / (x[nx] - x[nx-1])
-        dphi[0:hi_x,:] = (phi[0+1:hi_x+1,:] - phi[0:hi_x]) / (x[1:hi_x+1,:] - x[0:hi_x])
+        dphi[    nx, :] = (phi[  nx, :] - phi[  nx-1, :]) / (x[  nx, :] - x[  nx-1, :])
+        dphi[0:nx-1, :] = (phi[1:nx, :] - phi[0:nx-1, :]) / (x[1:nx, :] - x[0:nx-1, :])
     if dir_id == 1:
-        dphi[0,:] = (phi[1,:] - phi[0,:]) / (x[1] - x[0])
-        dphi[lo_x:nx,:] = (phi[lo_x:hi_x,:] - phi[lo_x-1:hi_x-1, :]) / (x[lo_x:hi_x] - x[lo_x-1:hi_x-1]) 
+        dphi[     0, :] = (phi[   1, :] - phi[     0, :]) / (x[   1, :] - x[     0, :])
+        dphi[  1:nx, :] = (phi[1:nx, :] - phi[0:nx-1, :]) / (x[1:nx, :] - x[0:nx-1, :]) 
     if dir_id == 2:
-        dphi[0,:] = (phi[1,:] - phi[0,:]) / (x[1,:] - x[0,:])
-        dphi[nx,:] = (phi[nx,:] - phi[nx-1,:]) / (x[nx,:] - x[nx-1,:])
-        dphi[lo_x:hi_x,:] = (phi[lo_x+1:hi_x+1, :] - phi[lo_x-1:hi_x-1, :]) / (x[lo_x+1:hi_x+1] - x[lo_x-1:hi_x-1]) 
+        dphi[     0, :] = (phi[   1, :] - phi[     0, :]) / (x[   1, :] - x[     0, :])
+        dphi[    nx, :] = (phi[  nx, :] - phi[  nx-1, :]) / (x[  nx, :] - x[  nx-1, :])
+        dphi[1:nx-1, :] = (phi[2:nx, :] - phi[0:nx-2, :]) / (x[2:nx, :] - x[0:nx-2, :]) 
     return dphi    
 
+# ---------------------------------------------------
+# Compute Finite Difference in y direction
+#
+# Input:
+#     phi    : quantity
+#     x      : x-dir grid
+#     y      : y-dir grid
+#     dir_id : 0 - Forward, 1 - Backward, 2 - Central
+# Output:
+#     d(phi)/dy : same dimensions as phi
+# ---------------------------------------------------
 def compute_y_deriv(phi, x, y, dir_id):
-    nx = np.shape(x,0)
-    ny = np.shape(y,0)
-    lo_x = 1
-    hi_x = nx-1
-    lo_y = 1
-    hi_y = ny-1
-    dphi = np.zeros((nx,ny))
+    nx = x.shape[0]-1
+    ny = y.shape[1]-1
+    dphi = np.zeros((nx+1,ny+1))
     if dir_id == 0:
-        dphi[:,ny] = (phi[:,ny] - phi[ny-1]) / (y[ny] - y[ny-1])
-        dphi[:,0:hi_y] = (phi[:,0+1:hi_y+1] - phi[:, 0:hi_y]) / (y[0:hi_y+1] - y[0:hi_y]) 
+        dphi[:,     ny] = (phi[:,   ny] - phi[:,   ny-1]) / (y[:,   ny] - y[:,   ny-1])
+        dphi[:, 0:ny-1] = (phi[:, 1:ny] - phi[:, 0:ny-1]) / (y[:, 1:ny] - y[:, 0:ny-1]) 
     if dir_id == 1:
-        dphi[:,0] = (phi[:,1] - phi[:,0]) / (y[1] - y[0])
-        dphi[:,lo_y:ny] = (phi[:,lo_y:ny] - phi[:, lo_y-1:ny-1]) / (y[lo_y:ny] - y[lo_y-1:ny-1]) 
+        dphi[:,      0] = (phi[:,    1] - phi[:,      0]) / (y[:,    1] - y[:,      0])
+        dphi[:,   1:ny] = (phi[:, 1:ny] - phi[:, 0:ny-1]) / (y[:, 1:ny] - y[:, 0:ny-1]) 
     if dir_id == 2:
-        dphi[:,0] = (phi[:,1] - phi[:,0]) / (y[1] - y[0])
-        dphi[:,ny] = (phi[:,ny] - phi[:,ny-1]) / (y[ny] - y[ny-1])
-        dphi[:,lo_y:hi_y] = (phi[:, lo_y+1:hi_y+1] - phi[: lo_y+1:hi_y+1]) / (y[lo_y+1:hi_y+1] - y[lo_y-1:hi_y-1]) 
+        dphi[:,      0] = (phi[:,    1] - phi[:,      0]) / (y[:,    1] - y[:,      0])
+        dphi[:,     ny] = (phi[:,   ny] - phi[:,   ny-1]) / (y[:,   ny] - y[:,   ny-1])
+        dphi[:, 1:ny-1] = (phi[:, 2:ny] - phi[:, 0:ny-2]) / (y[:, 2:ny] - y[:, 0:ny-2]) 
     return dphi    
 
 def ConsToPrim(Q,gamma):
@@ -129,9 +141,9 @@ def Tauxy(U,V,x,y,mu,flux_dir,step):
     return tau_xy
 
 def compE(Q,x,y,Rgas,mu,kappa,gamma,step):
-    nx = np.shape(x,0)
-    ny = np.shape(y,1)
-    E = np.zeros([nx,ny,NVARS])
+    nx = x.shape[0]
+    ny = y.shape[1]
+    E = np.zeros([nx,ny,g.NVARS])
 
     Rho, U, V, P = ConsToPrim(Q,gamma)
 
@@ -149,9 +161,9 @@ def compE(Q,x,y,Rgas,mu,kappa,gamma,step):
     return E
 
 def compF(Q,x,y,Rgas,mu,kappa,gamma,step):
-    nx = np.shape(x,0)
-    ny = np.shape(y,0)
-    F = np.zeros([nx,ny,NVARS])
+    nx = x.shape[0]
+    ny = y.shape[1]
+    F = np.zeros([nx,ny,g.NVARS])
 
     Rho, U, V, P = ConsToPrim(Q,gamma)
 
@@ -169,42 +181,35 @@ def compF(Q,x,y,Rgas,mu,kappa,gamma,step):
     return F
 
 def compRHS(Q,x,y,step):
-    nx = np.shape(x,0)
-    ny = np.shape(y,1)
-    lo_x = 1
-    hi_x = nx-1
-    lo_y = 1
-    hi_y = ny-1
+    nx = x.shape[0]
+    ny = y.shape[1]
 
-    dEdx = np.zeros((nx,ny,NVARS))
-    dFdx = np.zeros((nx,ny,NVARS))
+    dEdx = np.zeros((nx,ny,g.NVARS))
+    dFdy = np.zeros((nx,ny,g.NVARS))
 
-
+    E = compE(Q, x, y, g.R_g, g.mu, g.k, g.gamma, step)
+    F = compF(Q, x, y, g.R_g, g.mu, g.k, g.gamma, step)
+    
+    dir_id = None
+    
     # format of Q[x,y,0-3] 
     if step == 'predictor':
-        E = compE(Q,x,y,mu,gamma,step)
-        F = compF(Q,x,y,mu,gamma,step)
-
-        for ii in range(NVARS):
-            dEdx[:,:,ii] = compute_x_deriv(E[:,:,ii],x,y,0)
-            dFdy[:,:,ii] = compute_y_deriv(F[:,:,ii],x,y,0)
-
-        rhs = -1 * (dEdx + dFdy)
-
+        dir_id = 0
     elif step == 'corrector':
-        E = compE(Q,x,y,mu,gamma,step)
-        F = compF(Q,x,y,mu,gamma,step)
-
-        for ii in range(NVARS):
-            dEdx[:,:,ii] = compute_x_deriv(E[:,:,ii],x,y,1)
-            dFdy[:,:,ii] = compute_y_deriv(F[:,:,ii],x,y,1)
-
-        rhs = -1 * (dEdx + dFdy)
-        
+        dir_id = 1
     else:
-        raise Exception('Invalid step')
+        raise Exception('Invalid derivative dir_id')
 
+    for ii in range(g.NVARS):
+        dEdx[:,:,ii] = compute_x_deriv(E[:,:,ii],x,y,dir_id)
+        dFdy[:,:,ii] = compute_y_deriv(F[:,:,ii],x,y,dir_id)
+
+    rhs = -1 * (dEdx + dFdy)
+    
     return rhs
+
+
+
 # Compute RHS for drho/dt
 
 # def compute_rhs_rho(Rho,U,rhs_rho,dir):
@@ -237,17 +242,17 @@ def compRHS(Q,x,y,step):
 #         for ii in range(1,nx-1):
 #             term1[ii] = -1 * (Rho[ii+1] * U[ii+1]**2 - Rho[ii] * U[ii]**2) / (xg[ii+1] - xg[ii]) # rho u^2
 #             term2[ii] = -1 * (P[ii+1] - P[ii]) / (xg[ii+1] - xg[ii]) # pressure
-#             term3[ii] = 2 * mu * (U[ii+1] - 2 * U[ii] + U[ii-1]) / (xg[ii+1] - xg[ii-1])**2 # d/dx(tau_xx) 
+#             term3[ii] = 2 * g.mu * (U[ii+1] - 2 * U[ii] + U[ii-1]) / (xg[ii+1] - xg[ii-1])**2 # d/dx(tau_xx) 
 #     elif dir == 'backward':
 #         for ii in range(1,nx-1):
 #             term1[ii] = -1 * (Rho[ii+1] * U[ii+1]**2 - Rho[ii-1] * U[ii-1]**2) / (xg[ii+1] - xg[ii-1]) # rho u^2
 #             term2[ii] = -1 * (P[ii+1] - P[ii-1]) / (xg[ii+1] - xg[ii-1]) # pressure
-#             term3[ii] = 2 * mu * (U[ii+1] - 2 * U[ii] + U[ii-1]) / (xg[ii+1] - xg[ii-1])**2 # d/dx(tau_xx) 
+#             term3[ii] = 2 * g.mu * (U[ii+1] - 2 * U[ii] + U[ii-1]) / (xg[ii+1] - xg[ii-1])**2 # d/dx(tau_xx) 
 #     else:
 #         for ii in range(1,nx-1):
 #             term1[ii] = -1 * (Rho[ii+1] * U[ii+1]**2 - Rho[ii-1] * U[ii-1]**2) / (xg[ii+1] - xg[ii-1]) # rho u^2
 #             term2[ii] = -1 * (P[ii+1] - P[ii-1]) / (xg[ii+1] - xg[ii-1]) # pressure
-#             term3[ii] = 2 * mu * (U[ii+1] - 2 * U[ii] + U[ii-1]) / (xg[ii+1] - xg[ii-1])**2 # d/dx(tau_xx) 
+#             term3[ii] = 2 * g.mu * (U[ii+1] - 2 * U[ii] + U[ii-1]) / (xg[ii+1] - xg[ii-1])**2 # d/dx(tau_xx) 
 
 #     rhs_rhoU[1:nx-1] += term1 + term2 + term3
 
@@ -261,7 +266,7 @@ def compRHS(Q,x,y,step):
 #     for ii in range(1,nx-1):
 #         term1[ii] = U[ii] * ( (Et[ii+1] - Et[ii-1]) / (xg[ii+1] - xg[ii-1]) + (P[ii+1] - P[ii-1]) / (xg[ii+1] - xg[ii-1]) ) +\
 #         (Et[ii] + P[ii]) * (U[ii+1] - U[ii-1]) / (xg[ii+1] - xg[ii-1]) # d/dx ((Et + p) * u)
-#         term2[ii] = 2 * mu * ( ((U[ii+1] - U[ii-1]) / (xg[ii+1] - xg[ii-1]))**2 +  U[ii] * \
+#         term2[ii] = 2 * g.mu * ( ((U[ii+1] - U[ii-1]) / (xg[ii+1] - xg[ii-1]))**2 +  U[ii] * \
 #         (U[ii+1] - 2 * U[ii] + U[ii-1]) / (xg[ii+1] - xg[ii-1])**2 ) # d/dx (u * tau_xx)
 
 #     rhos_E[1:nx-1] += term1 + term2

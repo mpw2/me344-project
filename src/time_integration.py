@@ -1,5 +1,6 @@
 import common as g
 from equations import *
+from boundary_conditions import *
 
 def compute_timestep_maccormack():
     Qo = g.Q.copy()
@@ -28,11 +29,11 @@ def compute_dt():
     Vr = np.abs(V_ + a0)
     Vl = np.abs(V_ - a0)
     V_ = np.maximum(Vr,Vl)
-     
-    dx = np.gradient(g.xg)
-    dy = np.gradient(g.yg)    
     
-    dt = CFL_ref / (U_/dx + V_/dy)
+    dx = np.gradient(g.xg, axis=0)
+    dy = np.gradient(g.yg, axis=1)    
+    
+    dt = g.CFL_ref / (U_/dx + V_/dy)
 
     g.dt = np.min(dt)
 
