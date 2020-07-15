@@ -32,7 +32,10 @@ P_jet = None # jet inlet pressure
 T_jet = None # jet inlet temperature
 
 # ambient conditions
-
+U_inf = None
+V_inf = None
+P_inf = None
+T_inf = None
 
 # grid parameters
 nx = None

@@ -1,4 +1,5 @@
 import common as g
+import numpy as np
 
 def apply_boundary_conditions():
 
@@ -7,7 +8,7 @@ def apply_boundary_conditions():
     
     # apply left BC
     for jj in range(g.ny):
-        if np.abs(g.yg(jj)) < g.jet_height:
+        if np.abs(g.yg[0,jj]) < g.jet_height:
             g.Q[0,jj,0] = Rho_jet
             g.Q[0,jj,1] = Rho_jet * g.U_jet
             g.Q[0,jj,2] = Rho_jet * g.V_jet
@@ -20,15 +21,15 @@ def apply_boundary_conditions():
 
     # apply top bc
     # extrapolation bc 
-    g.Q[1:nx,ny,:] = 2 * g.Q[1:nx,ny-1,:] - g.Q[1:nx,ny-2,:]
+    g.Q[1:g.nx,g.ny,:] = 2 * g.Q[1:g.nx,g.ny-1,:] - g.Q[1:g.nx,g.ny-2,:]
 
     # apply bottom bc
     # extrapolation bc
-    g.Q[1:nx,0,:] = 2 * g.Q[1:nx,1,:] - g.Q[1:nx,2,:]
+    g.Q[1:g.nx,0,:] = 2 * g.Q[1:g.nx,1,:] - g.Q[1:g.nx,2,:]
  
     # apply right bc (do not include jmin or jmax)
     # extrapolation BC
-    g.Q[nx,1:ny-1,:] = 2 * g.Q[nx-1,1:ny-1,:] - g.Q[nx-2,1:ny-1,:]
+    g.Q[g.nx,1:g.ny-1,:] = 2 * g.Q[g.nx-1,1:g.ny-1,:] - g.Q[g.nx-2,1:g.ny-1,:]
 
 
 

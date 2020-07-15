@@ -7,8 +7,12 @@
 6.283, 3.141
 
 # INLET CONDITIONS
-# Ujet, jet_height, Pjet
-1.0, 1.0, 1.1e5
+# jet_height, Ujet, Vjet, Pjet, Tjet
+0.5, 1.0, 0.0, 1.07e5, 300
+
+# AMBIENT CONDITIONS
+# Uinf, Vinf, Pinf, Tinf
+0.0, 0.0, 1e5, 300
 
 # GRID PARAMETERS
 # nx, ny
@@ -24,4 +28,4 @@
 # input file path
 ''
 # output file path
-'./out/jet_data
+'./out/jet_data'

@@ -24,27 +24,34 @@ def read_input_parameters():
     g.Lx, g.Ly = map(float,lines[li].split(','))
     # Read inlet conditions
     li = 2
-    g.Ujet, g.jet_height, g.Pjet = \
+    g.jet_height, g.U_jet, g.V_jet, g.P_jet, g.T_jet = \
         map(float,lines[li].split(','))
     
-    # Read grid parameters
+    # Read ambient conditions
     li = 3
+    g.U_inf, g.V_inf, g.P_inf, g.T_inf = \
+        map(float,lines[li].split(','))
+
+    # Read grid parameters
+    li = 4
     g.nx, g.ny = map(int,lines[li].split(','))
     
     # Read timestep parameters
-    li = 4
-    g.CFL_ref, = map(float,lines[li].split(','))
     li = 5
+    g.CFL_ref, = map(float,lines[li].split(','))
+    li = 6
     g.nsteps, g.nsave, g.nmonitor = \
         map(int,lines[li].split(','))
     
     # Read input/output parameters
-    li = 6
-    g.fin_path = lines[li]
     li = 7
-    g.fout_path = lines[li] 
+    g.fin_path = lines[li].replace('\'','')
+    li = 8
+    g.fout_path = lines[li].replace('\'','') 
    
-    
+    print('Input data file: {:s}'.format(g.fin_path))
+    print('Output data file: {:s}'.format(g.fout_path))
+ 
     # Close parameter input file
     f.close() 
     
@@ -81,12 +88,11 @@ def read_input_data():
 def output_data():
     
     # Open the output file
-    f = open(fout_path,"wb")
+    f = open(g.fout_path,"wb")
     
-    arr=bytearray(nx,ny)
     
-    ConsToPrim(Q,gamma)
-    arr=bytearray()
+    ConsToPrim(g.Q,g.gamma)
+    arr=bytearray(g.Q)
     f.write(arr)
 
     # Close the output file
