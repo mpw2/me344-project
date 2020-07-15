@@ -1,5 +1,4 @@
-
-import common
+from common import *
 
 def compute_timestep_maccormack():
     Qo = Q.copy()

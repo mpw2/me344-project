@@ -1,5 +1,4 @@
-
-import common
+from common import *
 
 def apply_boundary_conditions():
 

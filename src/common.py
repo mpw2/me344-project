@@ -1,14 +1,18 @@
-
+# Import packages and utilities
 import numpy as np
+from sys import argv
 
+# Import jet code modules
 from boundary_conditions        import *
-from equations          import *
-from initialization     import *
-from input_output       import *
-from main               import *
-from monitor            import *
-from mpi                import *
-from time_integration   import *
+from equations                  import *
+from initialization             import *
+from input_output               import *
+from main                       import *
+from monitor                    import *
+from mpi                        import *
+from time_integration           import *
+
+# ====================================
 
 # input/output parameters
 fout_path = None
@@ -24,13 +28,16 @@ Pr = None # Prandtl number
 R_g = None # gas constant
 k = None # heat transfer coefficient
 Rho_ref = None # reference density
-Patm = None # atmospheric pressure
-Ujet = None # jet velocity
+P_ref = None # reference pressure
 
 # domain parameters
 Lx = None
 Ly = None
-jet_height = None
+
+# inlet conditions
+Ujet = None # jet inlet velocity
+jet_height = None # extent of jet in y-dim
+Pjet = None # jet inlet pressure
 
 # grid parameters
 nx = None

@@ -1,5 +1,4 @@
-
-import common
+from common import *
 
 def initialize():
     # Output variables

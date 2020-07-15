@@ -10,6 +10,8 @@
 #
 #------------------------------------------------
 
+from common import *
+
 def main():
    # Read user input file
    read_input_parameters()

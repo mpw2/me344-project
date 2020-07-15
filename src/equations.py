@@ -1,5 +1,4 @@
-
-import common
+from common import *
 
 # dir_id: ( 0 - Forward, 1 - Backward, 2 - Central )
 # returns matrix of the same size as phi
