@@ -1,19 +1,14 @@
-from common import *
+import common as g
+import sys
 
 #------------------------------------------
 # Read user input parameters
 def read_input_parameters():
-    global mu, gamma, Pr, R_g, k, Rho_ref, P_ref
-    global Lx, Ly
-    global nx, ny
-    global Ujet, jet_height, Pjet
-    global CFL_ref, nsteps, nsave, nmonitor
-    global fin_path, fout_path, fparam_path
 
-    fparam_path = argv[1]
-    print('Reading parameters from: %s'.format(fparam_path)) 
+    g.fparam_path = sys.argv[1]
+    print('Reading parameters from: {:s}'.format(g.fparam_path)) 
 
-    f = open(fparam_path,'r')
+    f = open(g.fparam_path,'r')
     
     lines = f.readlines()
     # remove blank lines and labels
@@ -22,35 +17,39 @@ def read_input_parameters():
 
     # Read fluid properties
     li = 0
-    mu, gamma, Pr, R_g, k, Rho_ref, P_ref = map(float,lines[li].split(','))
+    g.mu, g.gamma, g.Pr, g.R_g, g.k, \
+        g.Rho_ref, g.P_ref = map(float,lines[li].split(','))
     # Read domain specification
     li = 1
-    Lx, Ly = map(float,lines[li].split(','))
-    # Read grid parameters
-    li = 2
-    nx, ny = map(int,lines[li].split(','))
+    g.Lx, g.Ly = map(float,lines[li].split(','))
     # Read inlet conditions
+    li = 2
+    g.Ujet, g.jet_height, g.Pjet = \
+        map(float,lines[li].split(','))
+    
+    # Read grid parameters
     li = 3
-    Ujet, jet_height, Pjet = map(float,lines[li].split(','))
+    g.nx, g.ny = map(int,lines[li].split(','))
     
     # Read timestep parameters
     li = 4
-    CFL_ref = map(float,lines[li].split(','))
+    g.CFL_ref, = map(float,lines[li].split(','))
     li = 5
-    nsteps, nsave, nmonitor = map(int,lines[li].split(','))
+    g.nsteps, g.nsave, g.nmonitor = \
+        map(int,lines[li].split(','))
     
     # Read input/output parameters
     li = 6
-    fin_path = lines[li]
+    g.fin_path = lines[li]
     li = 7
-    fout_path = lines[li] 
+    g.fout_path = lines[li] 
    
     
     # Close parameter input file
     f.close() 
     
     # Broadcast user input (mpi)
-
+    
 
 #-------------------------------------------
 # Initialize flow field

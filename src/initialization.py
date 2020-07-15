@@ -1,30 +1,28 @@
-from common import *
+import common as g
+import numpy as np
 
 def initialize():
-    # Output variables
-    global Q
-    global Rho, U, V, P
 
     # Transport variable arrays
-    Q = np.zeros((nx,ny,nvars))
+    g.Q = np.zeros((g.nx,g.ny,g.NVARS))
     
     # Primitive variable arrays
-    Rho = np.zeros((nx,ny))
-    U = np.zeros((nx,ny))
-    V = np.zeros((nx,ny))
-    P = np.zeros((nx,ny))
+    g.Rho = np.zeros((g.nx,g.ny))
+    g.U = np.zeros((g.nx,g.ny))
+    g.V = np.zeros((g.nx,g.ny))
+    g.P = np.zeros((g.nx,g.ny))
 
     # Build the grid
-    xg_temp = np.linspace(0,Lx,nx)
-    if ( ny % 2 == 1 ):
-        yg_temp = np.linspace(-Ly/2,Ly/2,ny)
+    xg_temp = np.linspace(0,g.Lx,g.nx)
+    if ( g.ny % 2 == 1 ):
+        yg_temp = np.linspace(-g.Ly/2,g.Ly/2,g.ny)
     else:
         raise Exception("Use odd values for ny")
     # use shape to allow easy commuting with field variables
-    xg = np.ndarray((nx,1))
-    yg = np.ndarray((1,ny))
-    xg[:,0] = xg_temp
-    yg[0,:] = yg_temp
+    g.xg = np.ndarray((g.nx,1))
+    g.yg = np.ndarray((1,g.ny))
+    g.xg[:,0] = xg_temp
+    g.yg[0,:] = yg_temp
     
 
 

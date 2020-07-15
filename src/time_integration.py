@@ -1,26 +1,25 @@
-from common import *
+import common as g
+from equations import *
 
 def compute_timestep_maccormack():
-    Qo = Q.copy()
+    Qo = g.Q.copy()
     
-    k1 = compRHS(Q,x,y,'predictor')
-    Q[1:nx-1,1:ny-1,:] = Q[1:nx-1,1:ny-1,:] + dt*k1[1:nx-1,1:ny-1,:] 
+    k1 = compRHS(g.Q,g.xg,g.yg,'predictor')
+    g.Q[1:g.nx-1,1:g.ny-1,:] = g.Q[1:g.nx-1,1:g.ny-1,:] + g.dt*k1[1:g.nx-1,1:g.ny-1,:] 
     
     apply_boundary_conditions()
 
-    k2 = compRHS(Q,x,y,'corrector')
-    Q[1:nx-1,1:ny-1,:]  = Qo[1:nx-1,1:ny-1,:] + dt*( k1[1:nx-1,1:ny-1,:] + k2[1:nx-1,1:ny-1,:] )/2.0
+    k2 = compRHS(g.Q,g.x,g.y,'corrector')
+    g.Q[1:g.nx-1,1:g.ny-1,:]  = Qo[1:nx-1,1:ny-1,:] + g.dt*( k1[1:g.nx-1,1:g.ny-1,:] + k2[1:g.nx-1,1:g.ny-1,:] )/2.0
     
     apply_boundary_conditions() 
 
 
 
 def compute_dt():
-    # Output
-    global dt
     
-    Rho_,U_,V_,P_ = ConsToPrim(Q,gamma)
-    a0 = np.sqrt( gamma*P/Rho )
+    Rho_,U_,V_,P_ = ConsToPrim(g.Q,g.gamma)
+    a0 = np.sqrt( g.gamma*g.P/g.Rho )
     
     Ur = np.abs(U_ + a0)
     Ul = np.abs(U_ - a0)
@@ -30,12 +29,12 @@ def compute_dt():
     Vl = np.abs(V_ - a0)
     V_ = np.maximum(Vr,Vl)
      
-    dx = np.gradient(xg)
-    dy = np.gradient(yg)    
+    dx = np.gradient(g.xg)
+    dy = np.gradient(g.yg)    
     
     dt = CFL_ref / (U_/dx + V_/dy)
 
-    dt = np.min(dt)
+    g.dt = np.min(dt)
 
 
 

@@ -8,6 +8,7 @@
 
 # INLET CONDITIONS
 # Ujet, jet_height, Pjet
+1.0, 1.0, 1.1e5
 
 # GRID PARAMETERS
 # nx, ny

@@ -10,7 +10,16 @@
 #
 #------------------------------------------------
 
-from common import *
+# Import jet code modules
+from boundary_conditions        import *
+from equations                  import *
+from initialization             import *
+from input_output               import *
+from main                       import *
+from monitor                    import *
+from mpi                        import *
+from time_integration           import *
+import common as g
 
 def main():
    # Read user input file
@@ -20,7 +29,7 @@ def main():
    initialize()
    
    # Start time integration loop
-   for n in range(Nt):
+   for n in range(g.nsteps):
         
         # compute timestep size
         compute_dt()
@@ -30,11 +39,11 @@ def main():
         
         
         # output to monitor
-        if ( n % nmonitor == 0 ):
+        if ( n % g.nmonitor == 0 ):
             output_monitor()
         
         # output to data file
-        if ( n % nsave == 0 ):
+        if ( n % g.nsave == 0 ):
             output_data()
     
     

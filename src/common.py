@@ -2,16 +2,6 @@
 import numpy as np
 from sys import argv
 
-# Import jet code modules
-from boundary_conditions        import *
-from equations                  import *
-from initialization             import *
-from input_output               import *
-from main                       import *
-from monitor                    import *
-from mpi                        import *
-from time_integration           import *
-
 # ====================================
 
 # input/output parameters
