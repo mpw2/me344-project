@@ -1,0 +1,31 @@
+# FLUID PROPERTIES
+# mu, gamma, Pr, R_g, k
+1.5e-6, 1.4, 0.71, 287, 0.0262
+
+# DOMAIN SPECIFICATION
+# Lx, Ly
+6.283, 3.141
+
+# INLET CONDITIONS
+# jet_height, Ujet, Vjet, Pjet, Tjet
+0.5, 1.0, 0.0, 1.07e5, 300
+
+# AMBIENT CONDITIONS
+# Uinf, Vinf, Pinf, Tinf
+0.0, 0.0, 1e5, 300
+
+# GRID PARAMETERS
+# nx, ny
+50, 51
+
+# TIMESTEPS
+# CFL
+0.1
+# Nsteps, Nsave, Nmonitor
+10000, 1000, 100
+
+# INPUT/OUTPUT
+# input file path
+''
+# output file path
+'./out/jet_data'

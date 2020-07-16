@@ -1,6 +1,7 @@
 import common as g
 import equations as eq
 import sys
+import pickle
 
 #------------------------------------------
 # Read user input parameters
@@ -91,12 +92,12 @@ def output_data():
     
     # Open the output file
     fout_path = g.fout_path + '.' + str(g.tstep)
-    f = open(fout_path,"wb")
-    
-    eq.ConsToPrim(g.Q)
-    arr=bytearray(g.Q)
-    f.write(arr)
+
+    saveVars = [g.xg,g.yg,g.Q]
+
+    with open(fout_path,'wb') as f:
+        pickle.dump(saveVars,f)
 
     # Close the output file
-    f.close()
+    #f.close()
      
