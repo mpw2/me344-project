@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# --- System Configuration ----------------------
+PYR=python3           # command to run code
+JET_DIR='/path/to/jet/code/' # path to jet code
+
+# --- Run Configuration -------------------------
+PARAM_IN='./params.in'  # input parameters file
+
+STD_OUT='./run_jet.o' # stdout redirect
+STD_ERR='./run_jet.e' # stderr redirect
+
+WRITE_TO_FILE=0       # redirect code output
+
+# -----------------------------------------------
+
+if [ $WRITE_TO_FILE == 0 ]; then
+    STD_OUT=&1
+    STD_ERR=&2
+fi
+
+# Run the code
+$PYR "$JET_DIR"src/main.py $PARAM_IN 1>$STD_OUT 2>$STD_ERR
+
