@@ -13,7 +13,7 @@ def compute_timestep_maccormack():
     apply_boundary_conditions()
 
     k2 = compRHS(g.Q,g.xg,g.yg,'corrector')
-    g.Q[1:g.nx-1,1:g.ny-1,:]  = Qo[1:g.nx-1,1:g.ny-1,:] + g.dt*( k1[1:g.nx-1,1:g.ny-1,:] + k2[1:g.nx-1,1:g.ny-1,:] )/2.0
+    g.Q[1:g.nx-1,1:g.ny-1,:] = Qo[1:g.nx-1,1:g.ny-1,:] + g.dt*( k1[1:g.nx-1,1:g.ny-1,:] + k2[1:g.nx-1,1:g.ny-1,:] )/2.0
     
     apply_boundary_conditions() 
 

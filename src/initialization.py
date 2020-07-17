@@ -1,6 +1,7 @@
 import common as g
 import numpy as np
 import input_output as io
+import boundary_conditions as bc
 
 def initialize():
 
@@ -34,5 +35,5 @@ def initialize():
     g.Rho_jet = g.P_jet / (g.R_g * g.T_jet)
 
     io.init_flow()
-
+    bc.apply_boundary_conditions()
 
