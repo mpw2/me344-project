@@ -1,5 +1,6 @@
 import common as g
 import equations as eq
+import numpy as np
 import sys
 import pickle
 
@@ -90,7 +91,7 @@ def read_input_data():
 # Write data to output file
 def output_data():
     
-    # Open the output file
+    # Specify the output file
     fout_path = g.fout_path + '.' + str(g.tstep)
 
     saveVars = [g.xg,g.yg,g.Q]
@@ -98,6 +99,4 @@ def output_data():
     with open(fout_path,'wb') as f:
         pickle.dump(saveVars,f)
 
-    # Close the output file
-    #f.close()
      
