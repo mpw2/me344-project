@@ -14,11 +14,10 @@ WRITE_TO_FILE=0       # redirect code output
 
 # -----------------------------------------------
 
-if [ $WRITE_TO_FILE == 0 ]; then
-    STD_OUT=&1
-    STD_ERR=&2
-fi
-
 # Run the code
-$PYR "$JET_DIR"src/main.py $PARAM_IN 1>$STD_OUT 2>$STD_ERR
+if [ $WRITE_TO_FILE == 0 ]; then
+    $PYR "$JET_DIR"src/main.py $PARAM_IN
+else
+    $PYR "$JET_DIR"src/main.py $PARAM_IN 1>$STD_OUT 2>$STD_ERR
+fi
 

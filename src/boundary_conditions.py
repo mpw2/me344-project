@@ -47,16 +47,6 @@ def apply_boundary_conditions():
 
 def apply_sponge():
     
-    sponge_length = 0.1    
-
-    for j in range(0,g.ny):
-        sdist = abs( ( abs( g.yg[0,j] ) - g.Ly/2.0 ) / (g.Ly/2.0) )
-        w0 = (sdist/sponge_length)**2
-        w1 = 1-(sdist/sponge_length)**2
-        if ( sdist < sponge_length ):
-            g.Q[:,j,0] = w0*g.Q[:,j,0] + w1*g.Rho_inf
-            g.Q[:,j,1] = w0*g.Q[:,j,1] + w1*0.0
-            g.Q[:,j,2] = w0*g.Q[:,j,2] + w1*0.0
-            g.Q[:,j,3] = w0*g.Q[:,j,3] + w1*g.P_inf / (g.gamma - 1.0)
-
+    # Apply the sponge to the field
+    g.Q = (1.0 - g.sponge_fac) * g.Q + g.sponge_fac * g.Qref
 

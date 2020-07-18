@@ -61,4 +61,11 @@ E_t = None # total energy
 NVARS = 4 # number of transported variables
 
 
+# sponge
+sponge_fac = None
+a_sponge = 2 # order of damping func
+x_sponge = 0.1 # nondimensional sponge length
+y_sponge = 0.1 # nondimensional sponge length
+
+Qref = None # reference condition
 
