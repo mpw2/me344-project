@@ -86,9 +86,12 @@ def main():
             x = np.tile(x,(1,ny))
             y = np.tile(y,(nx,1))
 
+            gamma = 1.4
+
             Rho = Q[:,:,0]
             U = Q[:,:,1] / Q[:,:,0]
             V = Q[:,:,2] / Q[:,:,0]
+            P = (gamma-1) * (Q[:,:,3] - 0.5 / Q[:,:,0] * (Q[:,:,1] + Q[:,:,2])**2)
 
             #print(Q)
             #Rho, U, V, P = eq.ConsToPrim(Q)
@@ -118,7 +121,18 @@ def main():
             plt.colorbar()
             plt.savefig('images/v/v' + '.' + step + '.png')
 
+            fig = plt.figure()
+            plt.contourf(x,y,P,100)
+            plt.xlabel('x')
+            plt.ylabel('y')
+            plt.title(r'$P$')
+            plt.colorbar()
+            plt.savefig('images/p/p' + '.' + step + '.png')
+
             plt.close('all')
+
+            print('Saved step ' + step + ' images')
+            print('')
 
 
 
