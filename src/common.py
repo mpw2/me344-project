@@ -24,7 +24,8 @@ Ly = None
 Lz = None
 
 # inlet conditions
-jet_height = None # extent of jet in y-dim
+jet_height_y = None # extent of jet in y-dim
+jet_height_z = None # extent of jet in z-dim
 U_jet = None # jet inlet streamwise velocity
 V_jet = None # jet inlet normal velocity
 W_jet = None # jet inlet spanwise velocity

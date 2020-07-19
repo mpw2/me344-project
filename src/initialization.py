@@ -2,6 +2,7 @@ import common as g
 import numpy as np
 import input_output as io
 import boundary_conditions as bc
+import pdb
 
 def initialize():
 

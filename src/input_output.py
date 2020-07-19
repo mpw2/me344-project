@@ -27,7 +27,7 @@ def read_input_parameters():
     g.Lx, g.Ly, g.Lz = map(float,lines[li].split(','))
     # Read inlet conditions
     li = 2
-    g.jet_height, g.U_jet, g.V_jet, g.W_jet, g.P_jet, g.T_jet = \
+    g.jet_height_y, g.jet_height_z, g.U_jet, g.V_jet, g.W_jet, g.P_jet, g.T_jet = \
         map(float,lines[li].split(','))
     
     # Read ambient conditions

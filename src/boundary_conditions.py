@@ -1,5 +1,6 @@
 import common as g
 import numpy as np
+import pdb
 
 def apply_boundary_conditions():
 
@@ -8,17 +9,19 @@ def apply_boundary_conditions():
     # APPLY LEFT BC
     for jj in range(g.ny):
         for kk in range(g.nz):
-            if abs( g.yg[0,jj,0] ) < g.jet_height/2.0 and abs( g.zg[0,0,kk] ) < g.jet_height/2.0:
+            if abs( g.yg[0,jj,0] ) <= g.jet_height_y/2.0 and abs( g.zg[0,0,kk] ) <= g.jet_height_z/2.0:
                 g.Q[0,jj,kk,0] = g.Rho_jet
                 g.Q[0,jj,kk,1] = g.Rho_jet * g.U_jet
                 g.Q[0,jj,kk,2] = g.Rho_jet * g.V_jet
-                g.Q[0,jj,kk,3] = g.P_jet / (g.gamma-1) + 0.5*g.Rho_jet*g.U_jet**2
+                g.Q[0,jj,kk,3] = g.Rho_jet * g.W_jet
+                g.Q[0,jj,kk,4] = g.P_jet / (g.gamma-1) + 0.5*g.Rho_jet*g.U_jet**2
             else:
                 # g.Q[0, jj, :] = g.Q[1, jj, :]
                 g.Q[0,jj,kk,0] = g.Rho_inf
                 g.Q[0,jj,kk,1] = 0
                 g.Q[0,jj,kk,2] = 0
-                g.Q[0,jj,kk,3] = g.P_inf / (g.gamma - 1)
+                g.Q[0,jj,kk,3] = 0
+                g.Q[0,jj,kk,4] = g.P_inf / (g.gamma - 1)
 
     # APPLY RIGHT BC (do not include jmin or jmax)
     # extrapolation BC

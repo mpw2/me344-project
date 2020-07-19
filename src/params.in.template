@@ -7,8 +7,8 @@
 6.283, 3.141, 3.141
 
 # INLET CONDITIONS
-# jet_height, Ujet, Vjet, Wjet, Pjet, Tjet
-0.5, 1.0, 0.0, 0.0, 1.07e5, 300
+# jet_height_y, jet_height_z, Ujet, Vjet, Wjet, Pjet, Tjet
+0.5, 0.5, 1.0, 0.0, 0.0, 1.07e5, 300
 
 # AMBIENT CONDITIONS
 # Uinf, Vinf, Winf, Pinf, Tinf

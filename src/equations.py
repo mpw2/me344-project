@@ -1,5 +1,6 @@
 import common as g
 import numpy as np
+import pdb
 
 # ---------------------------------------------------
 # Compute Finite Difference in x direction
@@ -301,7 +302,7 @@ def compG(Q,x,y,z,Rgas,mu,kappa,gamma,step):
     G[:,:,:,0] = Rho * W
     G[:,:,:,1] = Rho * U * W - tau_xz
     G[:,:,:,2] = Rho * V * W - tau_yz
-    G[:,:,:,3] = Rho * W**2 - tau_zz
+    G[:,:,:,3] = Rho * W**2 + P - tau_zz
     G[:,:,:,4] = (Q[:,:,:,-1] + P) * W - U * tau_xz - V * tau_yz - W * tau_zz + qz
 
     return G
