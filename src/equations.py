@@ -166,7 +166,7 @@ def Qz(T,x,y,z,k,step):
 
     if step == 'predictor':
         qz = -1 * k * compute_z_deriv(T,x,y,z,1)
-    elif step == 'predictor':
+    elif step == 'corrector':
         qz = -1 * k * compute_z_deriv(T,x,y,z,0)
     else:
         raise Exception('Invalid Step')
@@ -256,7 +256,7 @@ def compE(Q,x,y,z,Rgas,mu,kappa,gamma,step):
     E[:,:,:,1] = Rho * U**2 + P - tau_xx
     E[:,:,:,2] = Rho * U * V - tau_xy
     E[:,:,:,3] = Rho * U * W - tau_xz
-    E[:,:,:,4] = (Q[:,:,-1] + P) * U - U * tau_xx - V * tau_xy - W * tau_xz + qx
+    E[:,:,:,4] = (Q[:,:,:,-1] + P) * U - U * tau_xx - V * tau_xy - W * tau_xz + qx
 
     return E
 
@@ -279,11 +279,11 @@ def compF(Q,x,y,z,Rgas,mu,kappa,gamma,step):
     F[:,:,:,1] = Rho * U * V - tau_xy
     F[:,:,:,2] = Rho * V**2 + P - tau_yy
     F[:,:,:,3] = Rho * V * W - tau_yz
-    F[:,:,:,4] = (Q[:,:,-1] + P) * V - U * tau_xy - V * tau_yy - W * tau_yz + qy
+    F[:,:,:,4] = (Q[:,:,:,-1] + P) * V - U * tau_xy - V * tau_yy - W * tau_yz + qy
 
     return F
 
-def CompG(Q,x,y,z,Rgas,mu,kappa,gamma,step):
+def compG(Q,x,y,z,Rgas,mu,kappa,gamma,step):
     nx = x.shape[0]
     ny = y.shape[1]
     nz = z.shape[2]
@@ -296,13 +296,13 @@ def CompG(Q,x,y,z,Rgas,mu,kappa,gamma,step):
     tau_zz = Tauzz(W,x,y,z,mu,step)
     tau_xz = Tauxz(U,W,x,y,z,mu,2,step)
     tau_yz = Tauyz(V,W,x,y,z,mu,2,step)
-    Qz = Qz(T,x,y,z,kappa,step)
+    qz = Qz(T,x,y,z,kappa,step)
 
     G[:,:,:,0] = Rho * W
     G[:,:,:,1] = Rho * U * W - tau_xz
     G[:,:,:,2] = Rho * V * W - tau_yz
     G[:,:,:,3] = Rho * W**2 - tau_zz
-    G[:,:,:,4] = (Q[:,:,-1] + P) * W - U * tau_xy - V * tau_yz - W * tau_zz + qz
+    G[:,:,:,4] = (Q[:,:,:,-1] + P) * W - U * tau_xz - V * tau_yz - W * tau_zz + qz
 
     return G
 

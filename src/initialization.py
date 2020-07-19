@@ -12,6 +12,7 @@ def initialize():
     g.Rho = np.zeros((g.nx+1,g.ny+1,g.nz+1))
     g.U = np.zeros((g.nx+1,g.ny+1,g.nz+1))
     g.V = np.zeros((g.nx+1,g.ny+1,g.nz+1))
+    g.W = np.zeros((g.nx+1,g.ny+1,g.nz+1))
     g.P = np.zeros((g.nx+1,g.ny+1,g.nz+1))
 
     # Time variables
@@ -65,7 +66,8 @@ def initialize():
     g.Qref[:,:,:,0] = g.Rho_inf
     g.Qref[:,:,:,1] = 0.0
     g.Qref[:,:,:,2] = 0.0
-    g.Qref[:,:,:,3] = g.P_inf / (g.gamma - 1.0)
+    g.Qref[:,:,:,3] = 0.0
+    g.Qref[:,:,:,4] = g.P_inf / (g.gamma - 1.0)
     
     # --------------------------
     # Initialize the flow field

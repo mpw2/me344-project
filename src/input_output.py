@@ -76,11 +76,11 @@ def init_flow():
         g.W[:,:,:] = 0
         g.P[:,:,:] = g.P_inf
         Rho_,RhoU_,RhoV_,RhoW_,E_ = eq.PrimToCons(g.Rho,g.U,g.V,g.W,g.P)
-        g.Q[:,:,0] = Rho_
-        g.Q[:,:,1] = RhoU_
-        g.Q[:,:,2] = RhoV_
-        g.Q[:,:,3] = RhoW_
-        g.Q[:,:,4] = E_
+        g.Q[:,:,:,0] = Rho_
+        g.Q[:,:,:,1] = RhoU_
+        g.Q[:,:,:,2] = RhoV_
+        g.Q[:,:,:,3] = RhoW_
+        g.Q[:,:,:,4] = E_
 
 #-------------------------------------------
 # Read data from input file
