@@ -306,7 +306,7 @@ def CompG(Q,x,y,z,Rgas,mu,kappa,gamma,step):
 
     return G
 
-def compRHS(Q,x,y,step):
+def compRHS(Q,x,y,z,step):
     nx = x.shape[0]
     ny = y.shape[1]
     nz = z.shape[2]
