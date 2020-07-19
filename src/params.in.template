@@ -3,20 +3,20 @@
 1.5e-6, 1.4, 0.71, 287, 0.0262
 
 # DOMAIN SPECIFICATION
-# Lx, Ly
-6.283, 3.141
+# Lx, Ly, Lz
+6.283, 3.141, 3.141
 
 # INLET CONDITIONS
-# jet_height, Ujet, Vjet, Pjet, Tjet
-0.5, 1.0, 0.0, 1.07e5, 300
+# jet_height, Ujet, Vjet, Wjet, Pjet, Tjet
+0.5, 1.0, 0.0, 0.0, 1.07e5, 300
 
 # AMBIENT CONDITIONS
-# Uinf, Vinf, Pinf, Tinf
-0.0, 0.0, 1e5, 300
+# Uinf, Vinf, Winf, Pinf, Tinf
+0.0, 0.0, 0.0, 1e5, 300
 
 # GRID PARAMETERS
-# nx, ny
-100, 101
+# nx, ny, nz
+100, 101, 101
 
 # TIMESTEPS
 # CFL
