@@ -47,6 +47,7 @@ ny = None
 nz = None
 xg = None 
 yg = None
+zg = None
 
 # timestep parameters
 CFL_ref = None
@@ -70,9 +71,9 @@ NVARS = 5 # number of transported variables
 # sponge
 sponge_fac = None
 a_sponge = 2 # order of damping func
-x_sponge = 0.1 # nondimensional sponge length
-y_sponge = 0.1 # nondimensional sponge length
-z_sponge = 0.1 # nondimensional sponge length
+x_sponge = 0.2 # nondimensional sponge length
+y_sponge = 0.2 # nondimensional sponge length
+z_sponge = 0.2 # nondimensional sponge length
 
 Qref = None # reference condition
 
