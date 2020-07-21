@@ -50,7 +50,8 @@ t = None
 tstep = None
 
 # variable arrays
-Q = None  # conserved variable vector
+Q = None # conserved variable vector
+Qo = None # previous time step
 Rho = None # density
 U = None # streamwise velocity
 V = None # normal velocity
@@ -69,3 +70,6 @@ y_sponge = 0.1 # nondimensional sponge length
 
 Qref = None # reference condition
 
+
+rk_step_1 = None
+rk_step_2 = None

@@ -7,6 +7,7 @@ def initialize():
 
     # Transport variable arrays
     g.Q = np.zeros((g.nx+1,g.ny+1,g.NVARS))
+    g.Qo = np.zeros((g.nx+1,g.ny+1,g.NVARS))
     
     # Primitive variable arrays
     g.Rho = np.zeros((g.nx+1,g.ny+1))
@@ -60,3 +61,5 @@ def initialize():
     io.init_flow()
     bc.apply_boundary_conditions()
 
+    g.rk_step_1 = 'predictor'
+    g.rk_step_2 = 'corrector'
