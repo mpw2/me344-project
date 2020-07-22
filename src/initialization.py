@@ -55,11 +55,19 @@ def initialize():
         for j in range(g.ny+1):
             for k in range(g.nz+1):
                 # calculate nondim dist from desired boundaries
-                x1 = abs(g.Lx - g.xg[i,0,0])/x_sponge
-                y0 = abs(g.yg[0,j,0] + g.Ly/2)/y_sponge
-                y1 = abs(g.Ly/2 - g.yg[0,j,0])/y_sponge
-                z0 = abs(g.zg[0,0,k] + g.Lz/2)/z_sponge
-                z1 = abs(g.Lz/2 - g.zg[0,0,k])/z_sponge
+                x1 = np.inf
+                y0 = np.inf
+                y1 = np.inf
+                z0 = np.inf
+                z1 = np.inf
+                if x_sponge > 0:
+                    x1 = abs(g.Lx - g.xg[i,0,0])/x_sponge
+                if y_sponge > 0:
+                    y0 = abs(g.yg[0,j,0] + g.Ly/2)/y_sponge
+                    y1 = abs(g.Ly/2 - g.yg[0,j,0])/y_sponge
+                if z_sponge > 0:
+                    z0 = abs(g.zg[0,0,k] + g.Lz/2)/z_sponge
+                    z1 = abs(g.Lz/2 - g.zg[0,0,k])/z_sponge
                 # take minimum distance within sponge length
                 wall_dist[i,j,k,0] = np.min([x1,y0,y1,z0,z1,1.0])
     g.sponge_fac = g.sponge_strength * ( 1.0 - wall_dist**g.a_sponge )
