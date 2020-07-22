@@ -8,6 +8,7 @@ def initialize():
 
     # Transport variable arrays
     g.Q = np.zeros((g.nx+1,g.ny+1,g.nz+1,g.NVARS))
+    g.Qo = np.zeros((g.nx+1,g.ny+1,g.nz+1,g.NVARS))
     
     # Primitive variable arrays
     g.Rho = np.zeros((g.nx+1,g.ny+1,g.nz+1))
@@ -18,6 +19,7 @@ def initialize():
 
     # Time variables
     g.t = 0.0
+    g.dt = 0.0
     g.tstep = 0
     
     # Build the grid
@@ -73,5 +75,6 @@ def initialize():
     # --------------------------
     # Initialize the flow field
     io.init_flow()
+    g.Qo[:,:,:,:] = g.Q[:,:,:,:]
     bc.apply_boundary_conditions()
 

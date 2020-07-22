@@ -57,6 +57,7 @@ tstep = None
 
 # variable arrays
 Q = None  # conserved variable vector
+Qo = None
 Rho = None # density
 U = None # streamwise velocity
 V = None # normal velocity

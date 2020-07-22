@@ -22,8 +22,10 @@ def apply_boundary_conditions():
 
     #apply_extrapolation_bc('z0')
     #apply_extrapolation_bc('z1')
-    apply_pressure_bc('z0')
-    apply_pressure_bc('z1')
+    #apply_pressure_bc('z0')
+    #apply_pressure_bc('z1')
+    apply_periodic_bc('z')
+
     
     # apply inlet BC
     for jj in range(g.ny):
@@ -43,18 +45,19 @@ def apply_boundary_conditions():
 def apply_extrapolation_bc(dirid):
     if dirid == 'x0':
         g.Q[   0, :, :, :] = g.Q[     1, :, :, :]
-    if dirid == 'x1':
+    elif dirid == 'x1':
         g.Q[g.nx, :, :, :] = g.Q[g.nx-1, :, :, :]
-    if dirid == 'y0':
+    elif dirid == 'y0':
         g.Q[:,    0, :, :] = g.Q[:,      1, :, :]
-    if dirid == 'y1':
+    elif dirid == 'y1':
         g.Q[:, g.ny, :, :] = g.Q[:, g.ny-1, :, :]
-    if dirid == 'z0':
+    elif dirid == 'z0':
         g.Q[:, :,    0, :] = g.Q[:, :,      1, :]
-    if dirid == 'z1':
+    elif dirid == 'z1':
         g.Q[:, :, g.nz, :] = g.Q[:, :, g.nz-1, :]
     else:
-        raise Exception('Unknown dirid: {:s}'.format(dirid))
+        msg = "Unknown dirid: {:s}".format(dirid)
+        raise Exception(msg)
 
 # --------------------------
 # Convective outlet BC
@@ -64,11 +67,13 @@ def apply_extrapolation_bc(dirid):
 def apply_convective_bc(dirid):
     if dirid == 'x1':
         U = g.Qo[g.nx, :, :, 1] / g.Qo[g.nx, :, :, 0]
+        factor = g.dt / ( g.xg[g.nx,0,0] - g.xg[g.nx-1,0,0] ) * U[:,:]
+        factor = factor.reshape(*np.shape(factor),1)
         g.Q[g.nx,:,:,:] = g.Qo[g.nx,:,:,:] - \
-                        g.dt/( g.xg(g.nx)-g.xg(g.nx-1) ) * \
-                        U[0,:,:,0] * ( g.Qo[g.nx,:,:,:] - g.Qo[g.nx-1,:,:,:] )
+            factor * ( g.Qo[g.nx,:,:,:] - g.Qo[g.nx-1,:,:,:] )
     else:
-        raise Exception('BC not implemented for dirid: {:s}'.format(dirid))
+        msg = "BC not implemented for dirid: {:s}".format(dirid)
+        raise Exception(msg)
 
 # --------------------------
 # Pressure BC
@@ -86,7 +91,7 @@ def apply_pressure_bc(dirid):
         g.Q[:,0,:,3] = g.Rho_inf * W
         RhoU2 = 0.5 * g.Rho_inf * ( U**2 + V**2 + W**2 )
         g.Q[:,0,:,4] = g.P_inf / ( g.gamma - 1.0 ) + RhoU2
-    if dirid == 'y1': 
+    elif dirid == 'y1': 
         U = g.Q[:,g.ny,:,1]/g.Q[:,g.ny,:,0]
         V = g.Q[:,g.ny,:,2]/g.Q[:,g.ny,:,0]
         W = g.Q[:,g.ny,:,3]/g.Q[:,g.ny,:,0]
@@ -96,7 +101,7 @@ def apply_pressure_bc(dirid):
         g.Q[:,g.ny,:,3] = g.Rho_inf * W
         RhoU2 = 0.5 * g.Rho_inf * ( U**2 + V**2 + W**2 )
         g.Q[:,g.ny,:,4] = g.P_inf / ( g.gamma - 1.0 ) + RhoU2
-    if dirid == 'z0': 
+    elif dirid == 'z0': 
         U = g.Q[:,:,0,1]/g.Q[:,:,0,0]
         V = g.Q[:,:,0,2]/g.Q[:,:,0,0]
         W = g.Q[:,:,0,3]/g.Q[:,:,0,0]
@@ -106,10 +111,10 @@ def apply_pressure_bc(dirid):
         g.Q[:,:,0,3] = g.Rho_inf * W
         RhoU2 = 0.5 * g.Rho_inf * ( U**2 + V**2 + W**2 )
         g.Q[:,:,0,4] = g.P_inf / ( g.gamma - 1.0 ) + RhoU2
-    if dirid == 'z1': 
-        U = g.Q[:,:,g.nz,1]/g.Q[:,;,g.nz,0]
-        V = g.Q[:,:,g.nz,2]/g.Q[:,;,g.nz,0]
-        W = g.Q[:,:,g.nz,3]/g.Q[:,;,g.nz,0]
+    elif dirid == 'z1': 
+        U = g.Q[:,:,g.nz,1]/g.Q[:,:,g.nz,0]
+        V = g.Q[:,:,g.nz,2]/g.Q[:,:,g.nz,0]
+        W = g.Q[:,:,g.nz,3]/g.Q[:,:,g.nz,0]
         g.Q[:,:,g.nz,0] = g.Rho_inf
         g.Q[:,:,g.nz,1] = g.Rho_inf * U
         g.Q[:,:,g.nz,2] = g.Rho_inf * V
@@ -117,10 +122,11 @@ def apply_pressure_bc(dirid):
         RhoU2 = 0.5 * g.Rho_inf * ( U**2 + V**2 + W**2 )
         g.Q[:,:,g.nz,4] = g.P_inf / ( g.gamma - 1.0 ) + RhoU2
     else:
-        raise Exception('BC not implemented for dirid: {:s}'.format(dirid)) 
+        msg = "BC not implemented for dirid: {:s}".format(dirid)
+        raise Exception(msg)
 
 # ---------------------------
-# Isothermal wall BC
+#  Isothermal wall BC
 #
 def apply_isothermal_wall(dirid):
     if dirid == 'x0':
@@ -129,7 +135,19 @@ def apply_isothermal_wall(dirid):
         g.Q[0,:,:,3] = 0
         g.Q[0,:,:,4] = g.Q[0,:,:,0] * g.R_g / ( g.gamma - 1.0 ) * g.T_inf
     else:
-        raise Exception('BC not implemented for dirid: {:s}'.format(dirid))
+        msg = "BC not implemented for dirid: {:s}".format(dirid)
+        raise Exception(msg)
+
+# ---------------------------
+#  Periodic BC
+#
+def apply_periodic_bc(dirid):
+    if dirid == 'z':
+        g.Q[:, :, g.nz, :] = g.Q[:, :,      1, :]
+        g.Q[:, :,    0, :] = g.Q[:, :, g.nz-1, :]
+    else:
+        msg = "BC not implemented for dirid: {:s}".format(dirid)
+        raise Exception(msg)
 
 # ---------------------------
 # Apply a rudimentary sponge
