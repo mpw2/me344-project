@@ -17,6 +17,14 @@ def initialize():
     g.W = np.zeros((g.nx+1,g.ny+1,g.nz+1))
     g.P = np.zeros((g.nx+1,g.ny+1,g.nz+1))
 
+    # RHS variables
+    g.E = np.zeros((g.nx+1,g.ny+1,g.nz+1,g.NVARS))
+    g.F = np.zeros((g.nx+1,g.ny+1,g.nz+1,g.NVARS))
+    g.G = np.zeros((g.nx+1,g.ny+1,g.nz+1,g.NVARS))
+    g.dEdx = np.zeros((g.nx+1,g.ny+1,g.nz+1,g.NVARS))
+    g.dFdy = np.zeros((g.nx+1,g.ny+1,g.nz+1,g.NVARS))
+    g.dGdz = np.zeros((g.nx+1,g.ny+1,g.nz+1,g.NVARS))
+
     # Time variables
     g.t = 0.0
     g.dt = 0.0

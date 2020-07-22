@@ -248,10 +248,6 @@ def comp_sponge_term(Q,Qref,sigma):
 # -----------------------------------------------------
 
 def compE(Q,x,y,z,Rgas,mu,kappa,gamma,step):
-    nx = x.shape[0]
-    ny = y.shape[1]
-    nz = z.shape[2]
-    E = np.zeros([nx,ny,nz,g.NVARS])
 
     Rho, U, V, W, P = ConsToPrim(Q)
 
@@ -262,19 +258,13 @@ def compE(Q,x,y,z,Rgas,mu,kappa,gamma,step):
     tau_xz = Tauxz(U,W,x,y,z,mu,0,step)
     qx = Qx(T,x,y,z,kappa,step)
 
-    E[:,:,:,0] = Rho * U
-    E[:,:,:,1] = Rho * U**2 + P - tau_xx
-    E[:,:,:,2] = Rho * U * V - tau_xy
-    E[:,:,:,3] = Rho * U * W - tau_xz
-    E[:,:,:,4] = (Q[:,:,:,-1] + P) * U - U * tau_xx - V * tau_xy - W * tau_xz + qx
-
-    return E
+    g.E[:,:,:,0] = Rho * U
+    g.E[:,:,:,1] = Rho * U**2 + P - tau_xx
+    g.E[:,:,:,2] = Rho * U * V - tau_xy
+    g.E[:,:,:,3] = Rho * U * W - tau_xz
+    g.E[:,:,:,4] = (Q[:,:,:,-1] + P) * U - U * tau_xx - V * tau_xy - W * tau_xz + qx
 
 def compF(Q,x,y,z,Rgas,mu,kappa,gamma,step):
-    nx = x.shape[0]
-    ny = y.shape[1]
-    nz = z.shape[2]
-    F = np.zeros([nx,ny,nz,g.NVARS])
 
     Rho, U, V, W, P = ConsToPrim(Q)
 
@@ -285,19 +275,13 @@ def compF(Q,x,y,z,Rgas,mu,kappa,gamma,step):
     tau_yz = Tauyz(V,W,x,y,z,mu,1,step)
     qy = Qy(T,x,y,z,kappa,step)
 
-    F[:,:,:,0] = Rho * V
-    F[:,:,:,1] = Rho * U * V - tau_xy
-    F[:,:,:,2] = Rho * V**2 + P - tau_yy
-    F[:,:,:,3] = Rho * V * W - tau_yz
-    F[:,:,:,4] = (Q[:,:,:,-1] + P) * V - U * tau_xy - V * tau_yy - W * tau_yz + qy
-
-    return F
+    g.F[:,:,:,0] = Rho * V
+    g.F[:,:,:,1] = Rho * U * V - tau_xy
+    g.F[:,:,:,2] = Rho * V**2 + P - tau_yy
+    g.F[:,:,:,3] = Rho * V * W - tau_yz
+    g.F[:,:,:,4] = (Q[:,:,:,-1] + P) * V - U * tau_xy - V * tau_yy - W * tau_yz + qy
 
 def compG(Q,x,y,z,Rgas,mu,kappa,gamma,step):
-    nx = x.shape[0]
-    ny = y.shape[1]
-    nz = z.shape[2]
-    G = np.zeros([nx,ny,nz,g.NVARS])
 
     Rho, U, V, W, P = ConsToPrim(Q)
 
@@ -308,26 +292,17 @@ def compG(Q,x,y,z,Rgas,mu,kappa,gamma,step):
     tau_yz = Tauyz(V,W,x,y,z,mu,2,step)
     qz = Qz(T,x,y,z,kappa,step)
 
-    G[:,:,:,0] = Rho * W
-    G[:,:,:,1] = Rho * U * W - tau_xz
-    G[:,:,:,2] = Rho * V * W - tau_yz
-    G[:,:,:,3] = Rho * W**2 + P - tau_zz
-    G[:,:,:,4] = (Q[:,:,:,-1] + P) * W - U * tau_xz - V * tau_yz - W * tau_zz + qz
-
-    return G
+    g.G[:,:,:,0] = Rho * W
+    g.G[:,:,:,1] = Rho * U * W - tau_xz
+    g.G[:,:,:,2] = Rho * V * W - tau_yz
+    g.G[:,:,:,3] = Rho * W**2 + P - tau_zz
+    g.G[:,:,:,4] = (Q[:,:,:,-1] + P) * W - U * tau_xz - V * tau_yz - W * tau_zz + qz
 
 def compRHS(Q,x,y,z,step):
-    nx = x.shape[0]
-    ny = y.shape[1]
-    nz = z.shape[2]
 
-    dEdx = np.zeros((nx,ny,nz,g.NVARS))
-    dFdy = np.zeros((nx,ny,nz,g.NVARS))
-    dGdz = np.zeros((nx,ny,nz,g.NVARS))
-
-    E = compE(Q, x, y, z, g.R_g, g.mu, g.k, g.gamma, step)
-    F = compF(Q, x, y, z, g.R_g, g.mu, g.k, g.gamma, step)
-    G = compG(Q, x, y, z, g.R_g, g.mu, g.k, g.gamma, step)
+    compE(Q, x, y, z, g.R_g, g.mu, g.k, g.gamma, step)
+    compF(Q, x, y, z, g.R_g, g.mu, g.k, g.gamma, step)
+    compG(Q, x, y, z, g.R_g, g.mu, g.k, g.gamma, step)
     
     sponge_rhs = comp_sponge_term(Q, g.Qref, g.sponge_fac)    
 
@@ -341,11 +316,11 @@ def compRHS(Q,x,y,z,step):
         raise Exception('Invalid derivative dir_id')
 
     for ii in range(g.NVARS):
-        dEdx[:,:,:,ii] = compute_x_deriv(E[:,:,:,ii],x,y,z,dir_id)
-        dFdy[:,:,:,ii] = compute_y_deriv(F[:,:,:,ii],x,y,z,dir_id)
-        dGdz[:,:,:,ii] = compute_z_deriv(G[:,:,:,ii],x,y,z,dir_id)
+        g.dEdx[:,:,:,ii] = compute_x_deriv(g.E[:,:,:,ii],x,y,z,dir_id)
+        g.dFdy[:,:,:,ii] = compute_y_deriv(g.F[:,:,:,ii],x,y,z,dir_id)
+        g.dGdz[:,:,:,ii] = compute_z_deriv(g.G[:,:,:,ii],x,y,z,dir_id)
 
-    rhs = -1 * (dEdx + dFdy + dGdz) + sponge_rhs
+    rhs = -1 * (g.dEdx + g.dFdy + g.dGdz) + sponge_rhs
     
     return rhs
 

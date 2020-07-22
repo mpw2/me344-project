@@ -129,5 +129,6 @@ dmypy.json
 .pyre/
 
 # ignored dirs
-./test_jet
-./test3d
+test_jet/
+test3d/
+run/

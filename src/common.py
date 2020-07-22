@@ -65,6 +65,14 @@ W = None # spanwise velocity
 P = None # pressure
 E_t = None # total energy
 
+# rhs terms
+E = None
+F = None
+G = None
+dEdx = None
+dFdy = None
+dGdz = None
+
 # constants
 NVARS = 5 # number of transported variables
 
