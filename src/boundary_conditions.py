@@ -7,8 +7,8 @@ import pdb
 #
 def apply_boundary_conditions():
     
-    # apply a rudimentary sponge
-    apply_sponge()
+    # # apply a rudimentary sponge
+    # apply_sponge()
 
     # apply boundary conditions
     apply_isothermal_wall('x0')

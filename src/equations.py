@@ -238,6 +238,15 @@ def Tauyz(V,W,x,y,z,mu,flux_dir,step):
 
     return tau_yz
 
+# -----------------------------------------------------
+#  Sponge term
+#   - decays the solution near boundaries to
+#     prevent undesired reflection of characteristics
+# -----------------------------------------------------
+def comp_sponge_term(Q,Qref,sigma):
+    return sigma * (Qref - Q)
+# -----------------------------------------------------
+
 def compE(Q,x,y,z,Rgas,mu,kappa,gamma,step):
     nx = x.shape[0]
     ny = y.shape[1]
@@ -320,6 +329,8 @@ def compRHS(Q,x,y,z,step):
     F = compF(Q, x, y, z, g.R_g, g.mu, g.k, g.gamma, step)
     G = compG(Q, x, y, z, g.R_g, g.mu, g.k, g.gamma, step)
     
+    sponge_rhs = comp_sponge_term(Q, g.Qref, g.sponge_fac)    
+
     dir_id = None
     
     if step == 'predictor':
@@ -334,7 +345,7 @@ def compRHS(Q,x,y,z,step):
         dFdy[:,:,:,ii] = compute_y_deriv(F[:,:,:,ii],x,y,z,dir_id)
         dGdz[:,:,:,ii] = compute_z_deriv(G[:,:,:,ii],x,y,z,dir_id)
 
-    rhs = -1 * (dEdx + dFdy + dGdz)
+    rhs = -1 * (dEdx + dFdy + dGdz) + sponge_rhs
     
     return rhs
 

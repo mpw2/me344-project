@@ -60,7 +60,7 @@ def initialize():
                 z1 = abs(g.Lz/2 - g.zg[0,0,k])/z_sponge
                 # take minimum distance within sponge length
                 wall_dist[i,j,k,0] = np.min([x1,y0,y1,z0,z1,1.0])
-    g.sponge_fac = 1.0 - wall_dist**g.a_sponge
+    g.sponge_fac = g.sponge_strength * ( 1.0 - wall_dist**g.a_sponge )
     
     # Calculate the reference condition
     g.Qref = np.zeros((1,1,1,g.NVARS))
