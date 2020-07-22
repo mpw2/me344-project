@@ -3,7 +3,13 @@ import equations as eq
 import numpy as np
 
 def output_monitor():
+    # ---------------------------------------------
+    # Check for NaNs
+    checkQ = np.sum(g.Q,axis=(0,1,2))
+    if np.any(np.isnan(checkQ)):
+        raise Exception('Error: NaNs!!!')
     
+    # --------------------------------------------
     print('---- monitor ----')
     print('time step : {:d}'.format(g.tstep))
     print('sim. time : {:.4e}'.format(g.t))
