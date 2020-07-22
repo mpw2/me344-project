@@ -24,18 +24,22 @@ def main():
 
         x = saveVars[0]
         y = saveVars[1]
-        Q = saveVars[2]
+        z = saveVars[2]
+        Q = saveVars[3]
 
         # need to convert x and y to 2d arrays
         nx = x.size
         ny = y.size
+        nz = z.size
 
-        x = np.tile(x,(1,ny))
-        y = np.tile(y,(nx,1))
+        x = np.tile(x,(1,ny,nz))
+        y = np.tile(y,(nx,1,nz))
+        z = np.tile(z,(nx,ny,1))
 
-        Rho = Q[:,:,0]
-        U = Q[:,:,1] / Q[:,:,0]
-        V = Q[:,:,2] / Q[:,:,0]
+        Rho = Q[:,:,:,0]
+        U = Q[:,:,:,1] / Q[:,:,:,0]
+        V = Q[:,:,:,2] / Q[:,:,:,0]
+        W = Q[:,:,:,3] / Q[:,:,:,0]
 
         #print(Q)
         #Rho, U, V, P = eq.ConsToPrim(Q)
@@ -77,28 +81,32 @@ def main():
 
             x = saveVars[0]
             y = saveVars[1]
-            Q = saveVars[2]
+            z = saveVars[2]
+            Q = saveVars[3]
 
             # need to convert x and y to 2d arrays
             nx = x.size
             ny = y.size
+            nz = z.size
 
-            x = np.tile(x,(1,ny))
-            y = np.tile(y,(nx,1))
+            x = np.tile(x,(1,ny,nz))
+            y = np.tile(y,(nx,1,nz))
+            z = np.tile(z,(nx,ny,1))
 
             gamma = 1.4
 
-            Rho = Q[:,:,0]
-            U = Q[:,:,1] / Q[:,:,0]
-            V = Q[:,:,2] / Q[:,:,0]
-            P = (gamma-1) * (Q[:,:,3] - 0.5 / Q[:,:,0] * (Q[:,:,1] + Q[:,:,2])**2)
+            Rho = Q[:,:,:,0]
+            U = Q[:,:,:,1] / Q[:,:,:,0]
+            V = Q[:,:,:,2] / Q[:,:,:,0]
+            W = Q[:,:,:,3] / Q[:,:,:,0]
+            P = (gamma-1) * (Q[:,:,:,4] - 0.5 / Q[:,:,:,0] * (Q[:,:,:,1] + Q[:,:,:,2] + Q[:,:,:,3])**2)
 
             #print(Q)
             #Rho, U, V, P = eq.ConsToPrim(Q)
 
 
             fig = plt.figure()
-            plt.contourf(x,y,Rho,100)
+            plt.contourf(x[:,:,0],y[:,:,0],Rho[:,:,int(nz/2)],100)
             plt.xlabel('x')
             plt.ylabel('y')
             plt.title(r'$\rho$')
@@ -106,7 +114,7 @@ def main():
             plt.savefig('images/rho/rho' + '.' + step + '.png')
 
             fig = plt.figure()
-            plt.contourf(x,y,U,100)
+            plt.contourf(x[:,:,0],y[:,:,0],U[:,:,int(nz/2)],100)
             plt.xlabel('x')
             plt.ylabel('y')
             plt.title(r'$U$')
@@ -114,7 +122,7 @@ def main():
             plt.savefig('images/u/u' + '.' + step + '.png')
 
             fig = plt.figure()
-            plt.contourf(x,y,V,100)
+            plt.contourf(x[:,:,0],y[:,:,0],V[:,:,int(nz/2)],100)
             plt.xlabel('x')
             plt.ylabel('y')
             plt.title(r'$V$')
@@ -122,7 +130,15 @@ def main():
             plt.savefig('images/v/v' + '.' + step + '.png')
 
             fig = plt.figure()
-            plt.contourf(x,y,P,100)
+            plt.contourf(x[:,:,0],y[:,:,0],W[:,:,int(nz/2)],100)
+            plt.xlabel('x')
+            plt.ylabel('y')
+            plt.title(r'$W$')
+            plt.colorbar()
+            plt.savefig('images/w/w' + '.' + step + '.png')
+
+            fig = plt.figure()
+            plt.contourf(x[:,:,0],y[:,:,0],P[:,:,int(nz/2)],100)
             plt.xlabel('x')
             plt.ylabel('y')
             plt.title(r'$P$')

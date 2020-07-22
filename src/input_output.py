@@ -24,20 +24,20 @@ def read_input_parameters():
         map(float,lines[li].split(','))
     # Read domain specification
     li = 1
-    g.Lx, g.Ly = map(float,lines[li].split(','))
+    g.Lx, g.Ly, g.Lz = map(float,lines[li].split(','))
     # Read inlet conditions
     li = 2
-    g.jet_height, g.U_jet, g.V_jet, g.P_jet, g.T_jet = \
+    g.jet_height_y, g.jet_height_z, g.U_jet, g.V_jet, g.W_jet, g.P_jet, g.T_jet = \
         map(float,lines[li].split(','))
     
     # Read ambient conditions
     li = 3
-    g.U_inf, g.V_inf, g.P_inf, g.T_inf = \
+    g.U_inf, g.V_inf, g.W_inf, g.P_inf, g.T_inf = \
         map(float,lines[li].split(','))
 
     # Read grid parameters
     li = 4
-    g.nx, g.ny = map(int,lines[li].split(','))
+    g.nx, g.ny, g.nz = map(int,lines[li].split(','))
     
     # Read timestep parameters
     li = 5
@@ -70,15 +70,17 @@ def init_flow():
         read_input_data()
     else:
         # Default flow field initialization
-        g.Rho[:,:] = g.Rho_inf
-        g.U[:,:] = 0
-        g.V[:,:] = 0
-        g.P[:,:] = g.P_inf
-        Rho_,RhoU_,RhoV_,E_ = eq.PrimToCons(g.Rho,g.U,g.V,g.P)
-        g.Q[:,:,0] = Rho_
-        g.Q[:,:,1] = RhoU_
-        g.Q[:,:,2] = RhoV_
-        g.Q[:,:,3] = E_
+        g.Rho[:,:,:] = g.Rho_inf
+        g.U[:,:,:] = 0
+        g.V[:,:,:] = 0
+        g.W[:,:,:] = 0
+        g.P[:,:,:] = g.P_inf
+        Rho_,RhoU_,RhoV_,RhoW_,E_ = eq.PrimToCons(g.Rho,g.U,g.V,g.W,g.P)
+        g.Q[:,:,:,0] = Rho_
+        g.Q[:,:,:,1] = RhoU_
+        g.Q[:,:,:,2] = RhoV_
+        g.Q[:,:,:,3] = RhoW_
+        g.Q[:,:,:,4] = E_
 
 #-------------------------------------------
 # Read data from input file
@@ -94,7 +96,7 @@ def output_data():
     # Specify the output file
     fout_path = g.fout_path + '.' + str(g.tstep)
 
-    saveVars = [g.xg,g.yg,g.Q]
+    saveVars = [g.xg,g.yg,g.zg,g.Q]
 
     with open(fout_path,'wb') as f:
         pickle.dump(saveVars,f)

@@ -5,15 +5,15 @@ from boundary_conditions import *
 def compute_timestep_maccormack():
     g.t = g.t + g.dt
 
-    g.Qo[:,:,:] = g.Q[:,:,:]
+    g.Qo[:,:,:,:] = g.Q[:,:,:,:]
     
-    k1 = compRHS(g.Q, g.xg, g.yg, g.rk_step_1)
-    g.Q[1:g.nx-1,1:g.ny-1,:] = g.Q[1:g.nx-1,1:g.ny-1,:] + g.dt*k1[1:g.nx-1,1:g.ny-1,:] 
+    k1 = compRHS(g.Q,g.xg,g.yg,g.zg,g.rk_step_1)
+    g.Q[:,:,:,:] = g.Q[:,:,:,:] + g.dt*k1[:,:,:,:] 
     
     apply_boundary_conditions()
 
-    k2 = compRHS(g.Q, g.xg, g.yg, g.rk_step_2)
-    g.Q[1:g.nx-1,1:g.ny-1,:] = g.Qo[1:g.nx-1,1:g.ny-1,:] + g.dt*( k1[1:g.nx-1,1:g.ny-1,:] + k2[1:g.nx-1,1:g.ny-1,:] )/2.0
+    k2 = compRHS(g.Q,g.xg,g.yg,g.zg,g.rk_step_2)
+    g.Q[:,:,:,:] = g.Qo[:,:,:,:] + g.dt*( k1[:,:,:,:] + k2[:,:,:,:] )/2.0
     
     apply_boundary_conditions() 
 
@@ -22,7 +22,7 @@ def compute_timestep_maccormack():
 
 def compute_dt():
     
-    Rho_,U_,V_,P_ = ConsToPrim(g.Q)
+    Rho_,U_,V_,W_,P_ = ConsToPrim(g.Q)
     a0 = np.sqrt( g.gamma*g.P/g.Rho )
     
     Ur = np.abs(U_ + a0)
@@ -32,11 +32,16 @@ def compute_dt():
     Vr = np.abs(V_ + a0)
     Vl = np.abs(V_ - a0)
     V_ = np.maximum(Vr,Vl)
+
+    Wr = np.abs(W_ + a0)
+    Wl = np.abs(W_ - a0)
+    W_ = np.maximum(Wr,Wl)
     
     dx = np.gradient(g.xg, axis=0)
     dy = np.gradient(g.yg, axis=1)    
+    dz = np.gradient(g.zg, axis=2)
     
-    dt = g.CFL_ref / (U_/dx + V_/dy)
+    dt = g.CFL_ref / (U_/dx + V_/dy + W_/dz)
 
     g.dt = np.min(dt)
 
