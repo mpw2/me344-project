@@ -100,6 +100,7 @@ def main():
             V = Q[:,:,:,2] / Q[:,:,:,0]
             W = Q[:,:,:,3] / Q[:,:,:,0]
             P = (gamma-1) * (Q[:,:,:,4] - 0.5 / Q[:,:,:,0] * (Q[:,:,:,1] + Q[:,:,:,2] + Q[:,:,:,3])**2)
+            Phi = Q[:,:,:,5] / Q[:,:,:,0]
 
             #print(Q)
             #Rho, U, V, P = eq.ConsToPrim(Q)
@@ -144,6 +145,14 @@ def main():
             plt.title(r'$P$')
             plt.colorbar()
             plt.savefig('images/p/p' + '.' + step + '.png')
+
+            fig = plt.figure()
+            plt.contourf(x[:,:,0],y[:,:,0],Phi[:,:,int(nz/2)],100)
+            plt.xlabel('x')
+            plt.ylabel('y')
+            plt.title(r'$\phi$')
+            plt.colorbar()
+            plt.savefig('images/phi/phi' + '.' + step + '.png')
 
             plt.close('all')
 

@@ -97,7 +97,7 @@ def ConsToPrim(Q):
     P_ = np.squeeze((g.gamma - 1) * (Q[:,:,:,4] - 0.5 / Q[:,:,:,0] * (Q[:,:,:,1] + Q[:,:,:,2] + Q[:,:,:,3])**2))
     Phi_ = np.squeeze(Q[:,:,:,5])
 
-    return Rho_, U_, V_, W_, P_ Phi_
+    return Rho_, U_, V_, W_, P_, Phi_
 
 def PrimToCons(Rho,U,V,W,P,Phi):
     rhoU_ = Rho * U
@@ -180,7 +180,7 @@ def Phix(Phi,x,y,z,D,step):
 
     if step == 'predictor':
         phix = D * compute_x_deriv(Phi,x,y,z,1)
-    elif: step == 'corrector':
+    elif step == 'corrector':
         phix = D * compute_x_deriv(Phi,x,y,z,0)
     else:
         raise Exception('Invalid Step')
@@ -191,7 +191,7 @@ def Phiy(Phi,x,y,z,D,step):
 
     if step == 'predictor':
         phiy = D * compute_y_deriv(Phi,x,y,z,1)
-    elif: step == 'corrector':
+    elif step == 'corrector':
         phiy = D * compute_y_deriv(Phi,x,y,z,0)
     else:
         raise Exception('Invalid Step')
@@ -202,7 +202,7 @@ def Phiz(Phi,x,y,z,D,step):
 
     if step == 'predictor':
         phiz = D * compute_z_deriv(Phi,x,y,z,1)
-    elif: step == 'corrector':
+    elif step == 'corrector':
         phiz = D * compute_z_deriv(Phi,x,y,z,0)
     else:
         raise Exception('Invalid Step')
@@ -303,7 +303,7 @@ def compE(Q,x,y,z,Rgas,mu,kappa,D,gamma,step):
 
 def compF(Q,x,y,z,Rgas,mu,kappa,D,gamma,step):
 
-    Rho, U, V, W, P = ConsToPrim(Q)
+    Rho, U, V, W, P, Phi = ConsToPrim(Q)
 
     T = P / (Rho * Rgas)
 
@@ -322,7 +322,7 @@ def compF(Q,x,y,z,Rgas,mu,kappa,D,gamma,step):
 
 def compG(Q,x,y,z,Rgas,mu,kappa,D,gamma,step):
 
-    Rho, U, V, W, P = ConsToPrim(Q)
+    Rho, U, V, W, P, Phi = ConsToPrim(Q)
 
     T = P / (Rho * Rgas)
 

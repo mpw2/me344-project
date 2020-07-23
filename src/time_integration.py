@@ -22,7 +22,7 @@ def compute_timestep_maccormack():
 
 def compute_dt():
     
-    Rho_,U_,V_,W_,P_ = ConsToPrim(g.Q)
+    Rho_,U_,V_,W_,P_,Phi_ = ConsToPrim(g.Q)
     a0 = np.sqrt( g.gamma*g.P/g.Rho )
     
     Ur = np.abs(U_ + a0)
