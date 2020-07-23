@@ -17,6 +17,7 @@ gamma = None # cp/cv ratio
 Pr = None # Prandtl number
 R_g = None # gas constant
 k = None # heat transfer coefficient
+D = None # scalar diffusivity coefficient
 
 # domain parameters
 Lx = None
@@ -31,7 +32,8 @@ V_jet = None # jet inlet normal velocity
 W_jet = None # jet inlet spanwise velocity
 P_jet = None # jet inlet pressure
 T_jet = None # jet inlet temperature
-Rho_jet = None #
+Rho_jet = None # jet inlet density
+Phi_jet = None # jet inlet scalar concentration
 
 # ambient conditions
 U_inf = None
@@ -40,6 +42,7 @@ W_inf = None
 P_inf = None # reference pressure
 T_inf = None
 Rho_inf = None # reference density
+Phi_inf = None # reference scalar concentration
 
 # grid parameters
 nx = None
@@ -64,6 +67,7 @@ V = None # normal velocity
 W = None # spanwise velocity
 P = None # pressure
 E_t = None # total energy
+Phi = None # scalar concentration
 
 # rhs terms
 E = None
@@ -74,7 +78,7 @@ dFdy = None
 dGdz = None
 
 # constants
-NVARS = 5 # number of transported variables
+NVARS = 6 # number of transported variables
 
 
 # sponge

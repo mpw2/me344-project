@@ -1,18 +1,18 @@
 # FLUID PROPERTIES
-# mu, gamma, Pr, R_g, k
-1.5e-6, 1.4, 0.71, 287, 0.0262
+# mu, gamma, Pr, R_g, k, D
+1.5e-6, 1.4, 0.71, 287, 0.0262, 1.5e-5
 
 # DOMAIN SPECIFICATION
 # Lx, Ly, Lz
 6.283, 3.141, 3.141
 
 # INLET CONDITIONS
-# jet_height_y, jet_height_z, Ujet, Vjet, Wjet, Pjet, Tjet
-0.5, 0.5, 1.0, 0.0, 0.0, 1.07e5, 300
+# jet_height_y, jet_height_z, Ujet, Vjet, Wjet, Pjet, Tjet, Phijet
+0.5, 0.5, 1.0, 0.0, 0.0, 1.07e5, 300, 1.0
 
 # AMBIENT CONDITIONS
-# Uinf, Vinf, Winf, Pinf, Tinf
-0.0, 0.0, 0.0, 1e5, 300
+# Uinf, Vinf, Winf, Pinf, Tinf, Phi_inf
+0.0, 0.0, 0.0, 1e5, 300, 0.0
 
 # GRID PARAMETERS
 # nx, ny, nz

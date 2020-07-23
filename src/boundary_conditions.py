@@ -36,6 +36,7 @@ def apply_boundary_conditions():
                 g.Q[0,jj,kk,2] = g.Rho_jet * g.V_jet
                 g.Q[0,jj,kk,3] = g.Rho_jet * g.W_jet
                 g.Q[0,jj,kk,4] = g.P_jet / (g.gamma-1) + 0.5 * g.Rho_jet * g.U_jet**2
+                g.Q[0,jj,kk,5] = g.Rho_jet * g.Phi_jet
 
 
 # --------------------------

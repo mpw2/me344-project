@@ -20,19 +20,19 @@ def read_input_parameters():
 
     # Read fluid properties
     li = 0
-    g.mu, g.gamma, g.Pr, g.R_g, g.k, = \
+    g.mu, g.gamma, g.Pr, g.R_g, g.k, g.D = \
         map(float,lines[li].split(','))
     # Read domain specification
     li = 1
     g.Lx, g.Ly, g.Lz = map(float,lines[li].split(','))
     # Read inlet conditions
     li = 2
-    g.jet_height_y, g.jet_height_z, g.U_jet, g.V_jet, g.W_jet, g.P_jet, g.T_jet = \
+    g.jet_height_y, g.jet_height_z, g.U_jet, g.V_jet, g.W_jet, g.P_jet, g.T_jet g.Phi_jet = \
         map(float,lines[li].split(','))
     
     # Read ambient conditions
     li = 3
-    g.U_inf, g.V_inf, g.W_inf, g.P_inf, g.T_inf = \
+    g.U_inf, g.V_inf, g.W_inf, g.P_inf, g.T_inf, g.Phi_inf = \
         map(float,lines[li].split(','))
 
     # Read grid parameters
@@ -75,12 +75,14 @@ def init_flow():
         g.V[:,:,:] = 0
         g.W[:,:,:] = 0
         g.P[:,:,:] = g.P_inf
-        Rho_,RhoU_,RhoV_,RhoW_,E_ = eq.PrimToCons(g.Rho,g.U,g.V,g.W,g.P)
+        g.Phi[:,:,:] = 0
+        Rho_,RhoU_,RhoV_,RhoW_,E_,RhoPhi_ = eq.PrimToCons(g.Rho,g.U,g.V,g.W,g.P,g.Phi)
         g.Q[:,:,:,0] = Rho_
         g.Q[:,:,:,1] = RhoU_
         g.Q[:,:,:,2] = RhoV_
         g.Q[:,:,:,3] = RhoW_
         g.Q[:,:,:,4] = E_
+        g.Q[:,:,:,5] = RhoPhi_
 
 #-------------------------------------------
 # Read data from input file

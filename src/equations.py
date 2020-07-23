@@ -95,16 +95,18 @@ def ConsToPrim(Q):
     V_ = np.squeeze(Q[:,:,:,2] / Q[:,:,:,0])
     W_ = np.squeeze(Q[:,:,:,3] / Q[:,:,:,0])
     P_ = np.squeeze((g.gamma - 1) * (Q[:,:,:,4] - 0.5 / Q[:,:,:,0] * (Q[:,:,:,1] + Q[:,:,:,2] + Q[:,:,:,3])**2))
+    Phi_ = np.squeeze(Q[:,:,:,5])
 
-    return Rho_, U_, V_, W_, P_
+    return Rho_, U_, V_, W_, P_ Phi_
 
-def PrimToCons(Rho,U,V,W,P):
+def PrimToCons(Rho,U,V,W,P,Phi):
     rhoU_ = Rho * U
     rhoV_ = Rho * V
     rhoW_ = Rho * W
     Et_ = P / (g.gamma - 1) + 0.5 * Rho * (U**2 + V**2 + W**2)
+    rhoPhi_ = Rho * Phi
 
-    return Rho, rhoU_, rhoV_, rhoW_, Et_
+    return Rho, rhoU_, rhoV_, rhoW_, Et_, rhoPhi_
 
 def Tauxx(U,x,y,z,mu,step):
 
@@ -173,6 +175,39 @@ def Qz(T,x,y,z,k,step):
         raise Exception('Invalid Step')
 
     return qz
+
+def Phix(Phi,x,y,z,D,step):
+
+    if step == 'predictor':
+        phix = D * compute_x_deriv(Phi,x,y,z,1)
+    elif: step == 'corrector':
+        phix = D * compute_x_deriv(Phi,x,y,z,0)
+    else:
+        raise Exception('Invalid Step')
+
+    return phix
+
+def Phiy(Phi,x,y,z,D,step):
+
+    if step == 'predictor':
+        phiy = D * compute_y_deriv(Phi,x,y,z,1)
+    elif: step == 'corrector':
+        phiy = D * compute_y_deriv(Phi,x,y,z,0)
+    else:
+        raise Exception('Invalid Step')
+
+    return phiy
+
+def Phiz(Phi,x,y,z,D,step):
+
+    if step == 'predictor':
+        phiz = D * compute_z_deriv(Phi,x,y,z,1)
+    elif: step == 'corrector':
+        phiz = D * compute_z_deriv(Phi,x,y,z,0)
+    else:
+        raise Exception('Invalid Step')
+
+    return phiz
 
 def Tauxy(U,V,x,y,z,mu,flux_dir,step):
 
@@ -247,9 +282,9 @@ def comp_sponge_term(Q,Qref,sigma):
     return sigma * (Qref - Q)
 # -----------------------------------------------------
 
-def compE(Q,x,y,z,Rgas,mu,kappa,gamma,step):
+def compE(Q,x,y,z,Rgas,mu,kappa,D,gamma,step):
 
-    Rho, U, V, W, P = ConsToPrim(Q)
+    Rho, U, V, W, P, Phi = ConsToPrim(Q)
 
     T = P / (Rho * Rgas)
 
@@ -257,14 +292,16 @@ def compE(Q,x,y,z,Rgas,mu,kappa,gamma,step):
     tau_xy = Tauxy(U,V,x,y,z,mu,0,step)
     tau_xz = Tauxz(U,W,x,y,z,mu,0,step)
     qx = Qx(T,x,y,z,kappa,step)
+    phix = Phix(Phi,x,y,z,D,step)
 
     g.E[:,:,:,0] = Rho * U
     g.E[:,:,:,1] = Rho * U**2 + P - tau_xx
     g.E[:,:,:,2] = Rho * U * V - tau_xy
     g.E[:,:,:,3] = Rho * U * W - tau_xz
-    g.E[:,:,:,4] = (Q[:,:,:,-1] + P) * U - U * tau_xx - V * tau_xy - W * tau_xz + qx
+    g.E[:,:,:,4] = (Q[:,:,:,4] + P) * U - U * tau_xx - V * tau_xy - W * tau_xz + qx
+    g.E[:,:,:,5] = Rho * U * Phi - phix
 
-def compF(Q,x,y,z,Rgas,mu,kappa,gamma,step):
+def compF(Q,x,y,z,Rgas,mu,kappa,D,gamma,step):
 
     Rho, U, V, W, P = ConsToPrim(Q)
 
@@ -274,14 +311,16 @@ def compF(Q,x,y,z,Rgas,mu,kappa,gamma,step):
     tau_xy = Tauxy(U,V,x,y,z,mu,1,step)
     tau_yz = Tauyz(V,W,x,y,z,mu,1,step)
     qy = Qy(T,x,y,z,kappa,step)
+    phiy = Phiy(Phi,x,y,z,D,step)
 
     g.F[:,:,:,0] = Rho * V
     g.F[:,:,:,1] = Rho * U * V - tau_xy
     g.F[:,:,:,2] = Rho * V**2 + P - tau_yy
     g.F[:,:,:,3] = Rho * V * W - tau_yz
-    g.F[:,:,:,4] = (Q[:,:,:,-1] + P) * V - U * tau_xy - V * tau_yy - W * tau_yz + qy
+    g.F[:,:,:,4] = (Q[:,:,:,4] + P) * V - U * tau_xy - V * tau_yy - W * tau_yz + qy
+    g.F[:,:,:,5] = Rho * V * Phi - phiy
 
-def compG(Q,x,y,z,Rgas,mu,kappa,gamma,step):
+def compG(Q,x,y,z,Rgas,mu,kappa,D,gamma,step):
 
     Rho, U, V, W, P = ConsToPrim(Q)
 
@@ -291,18 +330,20 @@ def compG(Q,x,y,z,Rgas,mu,kappa,gamma,step):
     tau_xz = Tauxz(U,W,x,y,z,mu,2,step)
     tau_yz = Tauyz(V,W,x,y,z,mu,2,step)
     qz = Qz(T,x,y,z,kappa,step)
+    phiz = Phiz(Phi,x,y,z,D,step)
 
     g.G[:,:,:,0] = Rho * W
     g.G[:,:,:,1] = Rho * U * W - tau_xz
     g.G[:,:,:,2] = Rho * V * W - tau_yz
     g.G[:,:,:,3] = Rho * W**2 + P - tau_zz
-    g.G[:,:,:,4] = (Q[:,:,:,-1] + P) * W - U * tau_xz - V * tau_yz - W * tau_zz + qz
+    g.G[:,:,:,4] = (Q[:,:,:,4] + P) * W - U * tau_xz - V * tau_yz - W * tau_zz + qz
+    g.G[:,:,:,5] = Rho * W * Phi - phiz
 
 def compRHS(Q,x,y,z,step):
 
-    compE(Q, x, y, z, g.R_g, g.mu, g.k, g.gamma, step)
-    compF(Q, x, y, z, g.R_g, g.mu, g.k, g.gamma, step)
-    compG(Q, x, y, z, g.R_g, g.mu, g.k, g.gamma, step)
+    compE(Q, x, y, z, g.R_g, g.mu, g.k, g.D, g.gamma, step)
+    compF(Q, x, y, z, g.R_g, g.mu, g.k, g.D, g.gamma, step)
+    compG(Q, x, y, z, g.R_g, g.mu, g.k, g.D, g.gamma, step)
     
     sponge_rhs = comp_sponge_term(Q, g.Qref, g.sponge_fac)    
 

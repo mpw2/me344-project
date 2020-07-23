@@ -16,6 +16,7 @@ def initialize():
     g.V = np.zeros((g.nx+1,g.ny+1,g.nz+1))
     g.W = np.zeros((g.nx+1,g.ny+1,g.nz+1))
     g.P = np.zeros((g.nx+1,g.ny+1,g.nz+1))
+    g.Phi = np.zeros((g.nx+1,g.ny+1,g.nz+1))
 
     # RHS variables
     g.E = np.zeros((g.nx+1,g.ny+1,g.nz+1,g.NVARS))
@@ -87,6 +88,7 @@ def initialize():
     g.Qref[:,:,:,2] = 0.0
     g.Qref[:,:,:,3] = 0.0
     g.Qref[:,:,:,4] = g.P_inf / (g.gamma - 1.0)
+    g.Qref[:,:,:,5] = 0.0
     
     # --------------------------
     # Initialize the flow field
