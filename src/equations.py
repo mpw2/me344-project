@@ -1,3 +1,4 @@
+from numba import njit
 import common as g
 import numpy as np
 
@@ -14,6 +15,7 @@ import numpy as np
 # Output:
 #     d(phi)/dy : same dimensions as phi
 # ---------------------------------------------------
+@njit
 def compute_x_deriv(phi, x, y, z, dir_id):
     nx = x.shape[0]-1
     ny = y.shape[1]-1
@@ -51,6 +53,7 @@ def compute_x_deriv(phi, x, y, z, dir_id):
 # Output:
 #     d(phi)/dy : same dimensions as phi
 # ---------------------------------------------------
+@njit
 def compute_y_deriv(phi, x, y, z, dir_id):
     nx = x.shape[0]-1
     ny = y.shape[1]-1
@@ -88,6 +91,7 @@ def compute_y_deriv(phi, x, y, z, dir_id):
 # Output:
 #     d(phi)/dz : same dimensions as phi
 # ---------------------------------------------------
+@njit
 def compute_z_deriv(phi, x, y, z, dir_id):
     nx = x.shape[0]-1
     ny = y.shape[1]-1
@@ -113,18 +117,27 @@ def compute_z_deriv(phi, x, y, z, dir_id):
     return dphi
 
 
+@njit
 def ConsToPrim(Q):
-    Rho_ = np.squeeze(Q[:, :, :, 0])
-    U_ = np.squeeze(Q[:, :, :, 1] / Q[:, :, :, 0])
-    V_ = np.squeeze(Q[:, :, :, 2] / Q[:, :, :, 0])
-    W_ = np.squeeze(Q[:, :, :, 3] / Q[:, :, :, 0])
-    P_ = np.squeeze((g.gamma - 1) * (Q[:, :, :, 4] - 0.5 / Q[:, :, :, 0] *
-                    (Q[:, :, :, 1] + Q[:, :, :, 2] + Q[:, :, :, 3])**2))
-    Phi_ = np.squeeze(Q[:, :, :, 5])
+    # Rho_ = np.squeeze(Q[:, :, :, 0])
+    # U_ = np.squeeze(Q[:, :, :, 1] / Q[:, :, :, 0])
+    # V_ = np.squeeze(Q[:, :, :, 2] / Q[:, :, :, 0])
+    # W_ = np.squeeze(Q[:, :, :, 3] / Q[:, :, :, 0])
+    # P_ = np.squeeze((g.gamma - 1) * (Q[:, :, :, 4] - 0.5 / Q[:, :, :, 0] *
+    #                 (Q[:, :, :, 1] + Q[:, :, :, 2] + Q[:, :, :, 3])**2))
+    # Phi_ = np.squeeze(Q[:, :, :, 5])
+    Rho_ = Q[:, :, :, 0]
+    U_ = Q[:, :, :, 1] / Q[:, :, :, 0]
+    V_ = Q[:, :, :, 2] / Q[:, :, :, 0]
+    W_ = Q[:, :, :, 3] / Q[:, :, :, 0]
+    P_ = (g.gamma - 1) * (Q[:, :, :, 4] - 0.5 / Q[:, :, :, 0] *
+                          (Q[:, :, :, 1] + Q[:, :, :, 2] + Q[:, :, :, 3])**2)
+    Phi_ = Q[:, :, :, 5]
 
     return Rho_, U_, V_, W_, P_, Phi_
 
 
+@njit
 def PrimToCons(Rho, U, V, W, P, Phi):
     rhoU_ = Rho * U
     rhoV_ = Rho * V
