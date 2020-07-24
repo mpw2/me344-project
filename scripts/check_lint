@@ -1,0 +1,5 @@
+#!/bin/bash
+
+pylint --variable-naming-style any --const-naming-style any \
+    --function-naming-style any --argument-naming-style any \
+    ../src/*.py ../post/*.py

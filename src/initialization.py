@@ -1,10 +1,20 @@
-import common as g
+"""initialize.py
+
+Description:
+    Module for initializing arrays and flow variables.
+"""
 import numpy as np
-import input_output as io
+
 import boundary_conditions as bc
+import common as g
+import input_output as io
+import mpi
 
 
 def initialize():
+
+    # Initialize MPI
+    mpi.init()
 
     # Transport variable arrays
     g.Q = np.zeros((g.nx+1, g.ny+1, g.nz+1, g.NVARS))
@@ -31,7 +41,13 @@ def initialize():
     g.dt = 0.0
     g.tstep = 0
 
-    # Build the grid
+    # split up the grid for parallel calculation
+    if mpi.nprocs > g.nx:
+        raise Exception("Too many processors for given nx")
+    g.i0_global
+    g.i1_global
+
+    # build the grid arrays
     xg_temp = np.linspace(0, g.Lx, g.nx+1)
     if (g.ny % 2 == 1):
         yg_temp = np.linspace(-g.Ly/2, g.Ly/2, g.ny+1)
@@ -51,6 +67,7 @@ def initialize():
     g.yg[0, :, 0] = yg_temp
     g.zg[0, 0, :] = zg_temp
 
+    # calculate boundary densities
     g.Rho_inf = g.P_inf / (g.R_g * g.T_inf)
     g.Rho_jet = g.P_jet / (g.R_g * g.T_jet)
 

@@ -1,4 +1,14 @@
-from numba import njit
+# ----------------------------------------------------------------------
+# Equations.py
+#
+# Description:
+#  - Contains the governing equations of the flow and forcing terms.
+#  - Contains the numerical operators for computing derivatives.
+#  - Contains functions to convert conserved and primitive variables.
+#
+# ----------------------------------------------------------------------
+
+# from numba import njit
 import common as g
 import numpy as np
 
@@ -15,7 +25,7 @@ import numpy as np
 # Output:
 #     d(phi)/dy : same dimensions as phi
 # ---------------------------------------------------
-@njit
+# @njit
 def compute_x_deriv(phi, x, y, z, dir_id):
     nx = x.shape[0]-1
     ny = y.shape[1]-1
@@ -53,29 +63,29 @@ def compute_x_deriv(phi, x, y, z, dir_id):
 # Output:
 #     d(phi)/dy : same dimensions as phi
 # ---------------------------------------------------
-@njit
+# @njit
 def compute_y_deriv(phi, x, y, z, dir_id):
     nx = x.shape[0]-1
     ny = y.shape[1]-1
     nz = z.shape[2]-1
     dphi = np.zeros((nx+1, ny+1, nz+1))
     if dir_id == 0:
-        dphi[:,     ny, :] = (phi[:,   ny, :] - phi[:,   ny-1, :]) / \
-                             (y[:,     ny, :] - y[:,     ny-1, :])
+        dphi[:, ny, :] = (phi[:, ny, :] - phi[:, ny-1, :]) / \
+                         (y[:, ny, :] - y[:, ny-1, :])
         dphi[:, 0:ny-1, :] = (phi[:, 1:ny, :] - phi[:, 0:ny-1, :]) / \
-                             (y[:,   1:ny, :] - y[:,   0:ny-1, :])
+                             (y[:, 1:ny, :] - y[:, 0:ny-1, :])
     if dir_id == 1:
-        dphi[:,      0, :] = (phi[:,    1, :] - phi[:,      0, :]) / \
-                             (y[:,      1, :] - y[:,        0, :])
-        dphi[:,   1:ny, :] = (phi[:, 1:ny, :] - phi[:, 0:ny-1, :]) / \
-                             (y[:,   1:ny, :] - y[:,   0:ny-1, :])
+        dphi[:, 0, :] = (phi[:, 1, :] - phi[:, 0, :]) / \
+                        (y[:, 1, :] - y[:, 0, :])
+        dphi[:, 1:ny, :] = (phi[:, 1:ny, :] - phi[:, 0:ny-1, :]) / \
+                           (y[:, 1:ny, :] - y[:, 0:ny-1, :])
     if dir_id == 2:
-        dphi[:,      0, :] = (phi[:,    1, :] - phi[:,      0, :]) / \
-                             (y[:,      1, :] - y[:,        0, :])
-        dphi[:,     ny, :] = (phi[:,   ny, :] - phi[:,   ny-1, :]) / \
-                             (y[:,     ny, :] - y[:,     ny-1, :])
+        dphi[:, 0, :] = (phi[:, 1, :] - phi[:, 0, :]) / \
+                        (y[:, 1, :] - y[:, 0, :])
+        dphi[:, ny, :] = (phi[:, ny, :] - phi[:, ny-1, :]) / \
+                         (y[:, ny, :] - y[:, ny-1, :])
         dphi[:, 1:ny-1, :] = (phi[:, 2:ny, :] - phi[:, 0:ny-2, :]) / \
-                             (y[:,   2:ny, :] - y[:,   0:ny-2, :])
+                             (y[:, 2:ny, :] - y[:, 0:ny-2, :])
     return dphi
 
 
@@ -91,53 +101,71 @@ def compute_y_deriv(phi, x, y, z, dir_id):
 # Output:
 #     d(phi)/dz : same dimensions as phi
 # ---------------------------------------------------
-@njit
+# @njit
 def compute_z_deriv(phi, x, y, z, dir_id):
     nx = x.shape[0]-1
     ny = y.shape[1]-1
     nz = z.shape[2]-1
     dphi = np.zeros((nx+1, ny+1, nz+1))
     if dir_id == 0:
-        dphi[:, :,     nz] = (phi[:, :,   nz] - phi[:, :,   nz-1]) / \
-                             (z[:, :,     nz] - z[:, :,     nz-1])
+        dphi[:, :, nz] = (phi[:, :, nz] - phi[:, :, nz-1]) / \
+                         (z[:, :, nz] - z[:, :, nz-1])
         dphi[:, :, 0:nz-1] = (phi[:, :, 1:nz] - phi[:, :, 0:nz-1]) / \
-                             (z[:, :,   1:nz] - z[:, :,   0:nz-1])
+                             (z[:, :, 1:nz] - z[:, :, 0:nz-1])
     if dir_id == 1:
-        dphi[:, :,      0] = (phi[:, :,    1] - phi[:, :,      0]) / \
-                             (z[:, :,      1] - z[:, :,        0])
-        dphi[:, :,   1:nz] = (phi[:, :, 1:nz] - phi[:, :, 0:nz-1]) / \
-                             (z[:, :,   1:nz] - z[:, :,   0:nz-1])
+        dphi[:, :, 0] = (phi[:, :, 1] - phi[:, :, 0]) / \
+                        (z[:, :, 1] - z[:, :, 0])
+        dphi[:, :, 1:nz] = (phi[:, :, 1:nz] - phi[:, :, 0:nz-1]) / \
+                           (z[:, :, 1:nz] - z[:, :, 0:nz-1])
     if dir_id == 2:
-        dphi[:, :,      0] = (phi[:, :,    1] - phi[:, :,      0]) / \
-                             (z[:, :,      1] - z[:, :,        0])
-        dphi[:, :,     nz] = (phi[:, :,   nz] - phi[:, :,   nz-1]) / \
-                             (z[:, :,     nz] - z[:, :,     nz-1])
+        dphi[:, :, 0] = (phi[:, :, 1] - phi[:, :, 0]) / \
+                        (z[:, :, 1] - z[:, :, 0])
+        dphi[:, :, nz] = (phi[:, :, nz] - phi[:, :, nz-1]) / \
+                         (z[:, :, nz] - z[:, :, nz-1])
         dphi[:, :, 1:nz-1] = (phi[:, :, 2:nz] - phi[:, :, 0:nz-2]) / \
-                             (z[:, :,   2:nz] - z[:, :,   0:nz-2])
+                             (z[:, :, 2:nz] - z[:, :, 0:nz-2])
     return dphi
 
 
-@njit
+# -----------------------------------------------------------------------------
+# ConsToPrim - Conserved variables to primitive variables
+#
+# Input:
+#  - Q : Vector of conserved variables (nx, ny, nz, nvars)
+# Output:
+#  - Rho     : Density
+#  - U, V, W : Velocity components
+#  - P       : Pressure
+#  - Phi     : Passive Scalar
+# -----------------------------------------------------------------------------
+# @njit
 def ConsToPrim(Q):
-    # Rho_ = np.squeeze(Q[:, :, :, 0])
-    # U_ = np.squeeze(Q[:, :, :, 1] / Q[:, :, :, 0])
-    # V_ = np.squeeze(Q[:, :, :, 2] / Q[:, :, :, 0])
-    # W_ = np.squeeze(Q[:, :, :, 3] / Q[:, :, :, 0])
-    # P_ = np.squeeze((g.gamma - 1) * (Q[:, :, :, 4] - 0.5 / Q[:, :, :, 0] *
-    #                 (Q[:, :, :, 1] + Q[:, :, :, 2] + Q[:, :, :, 3])**2))
-    # Phi_ = np.squeeze(Q[:, :, :, 5])
     Rho_ = Q[:, :, :, 0]
     U_ = Q[:, :, :, 1] / Q[:, :, :, 0]
     V_ = Q[:, :, :, 2] / Q[:, :, :, 0]
     W_ = Q[:, :, :, 3] / Q[:, :, :, 0]
     P_ = (g.gamma - 1) * (Q[:, :, :, 4] - 0.5 / Q[:, :, :, 0] *
                           (Q[:, :, :, 1] + Q[:, :, :, 2] + Q[:, :, :, 3])**2)
-    Phi_ = Q[:, :, :, 5]
+    Phi_ = Q[:, :, :, 5] / Q[:, :, :, 0]
 
     return Rho_, U_, V_, W_, P_, Phi_
 
 
-@njit
+# -----------------------------------------------------------------------------
+# PrimToCons - Primitive variables to conserved variables
+#
+# Input:
+#  - Rho     : Density
+#  - U, V, W : Velocity components
+#  - P       : Pressure
+#  - Phi     : Passive scalar
+# Output:
+#  - Rho       : Density
+#  - Rho U,V,W : Momentum
+#  - Et        : Total energy
+#  - Rho Phi   : Passive scalar
+# -----------------------------------------------------------------------------
+# @njit
 def PrimToCons(Rho, U, V, W, P, Phi):
     rhoU_ = Rho * U
     rhoV_ = Rho * V
@@ -149,7 +177,7 @@ def PrimToCons(Rho, U, V, W, P, Phi):
 
 
 def Tauxx(U, x, y, z, mu, step):
-
+    """Calculate stress tensor component xx"""
     if step == 'predictor':
         tau_xx = 2 * mu * compute_x_deriv(U, x, y, z, 1)
     elif step == 'corrector':
@@ -161,7 +189,7 @@ def Tauxx(U, x, y, z, mu, step):
 
 
 def Tauyy(V, x, y, z, mu, step):
-
+    """Calculate stress tensor component yy"""
     if step == 'predictor':
         tau_yy = 2 * mu * compute_y_deriv(V, x, y, z, 1)
     elif step == 'corrector':
@@ -173,7 +201,7 @@ def Tauyy(V, x, y, z, mu, step):
 
 
 def Tauzz(W, x, y, z, mu, step):
-
+    """Calculate stress tensor component zz"""
     if step == 'predictor':
         tau_zz = 2 * mu * compute_z_deriv(W, x, y, z, 1)
     elif step == 'corrector':
@@ -185,7 +213,7 @@ def Tauzz(W, x, y, z, mu, step):
 
 
 def Qx(T, x, y, z, k, step):
-
+    """Calculate temperature diffusion in x"""
     if step == 'predictor':
         qx = -1 * k * compute_x_deriv(T, x, y, z, 1)
     elif step == 'corrector':
@@ -197,7 +225,7 @@ def Qx(T, x, y, z, k, step):
 
 
 def Qy(T, x, y, z, k, step):
-
+    """Calculate temperature diffusion in y"""
     if step == 'predictor':
         qy = -1 * k * compute_y_deriv(T, x, y, z, 1)
     elif step == 'corrector':
@@ -209,7 +237,7 @@ def Qy(T, x, y, z, k, step):
 
 
 def Qz(T, x, y, z, k, step):
-
+    """Calculate temperature diffusion in z"""
     if step == 'predictor':
         qz = -1 * k * compute_z_deriv(T, x, y, z, 1)
     elif step == 'corrector':
@@ -221,7 +249,7 @@ def Qz(T, x, y, z, k, step):
 
 
 def Phix(Phi, x, y, z, D, step):
-
+    """Calculate scalar diffusion in x"""
     if step == 'predictor':
         phix = D * compute_x_deriv(Phi, x, y, z, 1)
     elif step == 'corrector':
@@ -233,7 +261,7 @@ def Phix(Phi, x, y, z, D, step):
 
 
 def Phiy(Phi, x, y, z, D, step):
-
+    """Calculate scalar diffusion in y"""
     if step == 'predictor':
         phiy = D * compute_y_deriv(Phi, x, y, z, 1)
     elif step == 'corrector':
@@ -245,7 +273,7 @@ def Phiy(Phi, x, y, z, D, step):
 
 
 def Phiz(Phi, x, y, z, D, step):
-
+    """Calculate scalar diffusion in z"""
     if step == 'predictor':
         phiz = D * compute_z_deriv(Phi, x, y, z, 1)
     elif step == 'corrector':
@@ -257,7 +285,7 @@ def Phiz(Phi, x, y, z, D, step):
 
 
 def Tauxy(U, V, x, y, z, mu, flux_dir, step):
-
+    """Calculate stress tensor component xy"""
     if step == 'predictor':
         if flux_dir == 0:
             tau_xy = mu * (compute_y_deriv(U, x, y, z, 2) +
@@ -285,7 +313,7 @@ def Tauxy(U, V, x, y, z, mu, flux_dir, step):
 
 
 def Tauxz(U, W, x, y, z, mu, flux_dir, step):
-
+    """Calculate stress tensor component xz"""
     if step == 'predictor':
         if flux_dir == 0:
             tau_xz = mu * (compute_z_deriv(U, x, y, z, 2) +
@@ -310,7 +338,7 @@ def Tauxz(U, W, x, y, z, mu, flux_dir, step):
 
 
 def Tauyz(V, W, x, y, z, mu, flux_dir, step):
-
+    """Calculate stress tensor component yz"""
     if step == 'predictor':
         if flux_dir == 1:
             tau_yz = mu * (compute_z_deriv(V, x, y, z, 2) +
@@ -345,9 +373,8 @@ def comp_sponge_term(Q, Qref, sigma):
 
 
 def compE(Q, x, y, z, Rgas, mu, kappa, D, gamma, step):
-
+    """Calculate x direction flux term"""
     Rho, U, V, W, P, Phi = ConsToPrim(Q)
-
     T = P / (Rho * Rgas)
 
     tau_xx = Tauxx(U, x, y, z, mu, step)
@@ -366,9 +393,8 @@ def compE(Q, x, y, z, Rgas, mu, kappa, D, gamma, step):
 
 
 def compF(Q, x, y, z, Rgas, mu, kappa, D, gamma, step):
-
+    """Calculate y direction flux term"""
     Rho, U, V, W, P, Phi = ConsToPrim(Q)
-
     T = P / (Rho * Rgas)
 
     tau_yy = Tauyy(V, x, y, z, mu, step)
@@ -387,9 +413,8 @@ def compF(Q, x, y, z, Rgas, mu, kappa, D, gamma, step):
 
 
 def compG(Q, x, y, z, Rgas, mu, kappa, D, gamma, step):
-
+    """Calculate z direction flux term"""
     Rho, U, V, W, P, Phi = ConsToPrim(Q)
-
     T = P / (Rho * Rgas)
 
     tau_zz = Tauzz(W, x, y, z, mu, step)
@@ -408,7 +433,15 @@ def compG(Q, x, y, z, Rgas, mu, kappa, D, gamma, step):
 
 
 def compRHS(Q, x, y, z, step):
+    """Compute RHS flux and forcing terms
+    
+    Alternate differencing direction every step, e.g.
+    In the predictor step use forward differences
+    In the corrector step use backward differences
 
+    Use opposite differencing direction to calculate flux terms
+    Use central differencing in directions not aligned with flux
+    """
     compE(Q, x, y, z, g.R_g, g.mu, g.k, g.D, g.gamma, step)
     compF(Q, x, y, z, g.R_g, g.mu, g.k, g.D, g.gamma, step)
     compG(Q, x, y, z, g.R_g, g.mu, g.k, g.D, g.gamma, step)

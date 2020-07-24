@@ -1,7 +1,8 @@
+import numpy as np
+
 import common as g
 import equations as eq
 import boundary_conditions as bc
-import numpy as np
 
 
 def compute_timestep_maccormack():
@@ -25,8 +26,8 @@ def compute_timestep_maccormack():
 
 def compute_dt():
 
-    Rho_, U_, V_, W_, P_, Phi_ = eq.ConsToPrim(g.Q)
-    a0 = np.sqrt(g.gamma*g.P / g.Rho)
+    Rho_, U_, V_, W_, P_, _ = eq.ConsToPrim(g.Q)
+    a0 = np.sqrt(g.gamma*P_ / Rho_)
 
     Ur = np.abs(U_ + a0)
     Ul = np.abs(U_ - a0)

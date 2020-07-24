@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# ------------------------------------------------
+# ----------------------------------------------------------------------
 #
 # Finite Volume Jet Code
 #
@@ -8,7 +8,7 @@
 #
 # ... Solver details
 #
-# ------------------------------------------------
+# ----------------------------------------------------------------------
 
 # Import jet code modules
 import initialization as ini
@@ -19,12 +19,13 @@ import common as g
 
 
 def main():
-    # Read user input file
+    # read user input file
     io.read_input_parameters()
 
-    # Initialize data structures
+    # initialize data structures
     ini.initialize()
 
+    # output initial condition to monitor
     mon.output_monitor()
 
     # Start time integration loop
@@ -38,11 +39,11 @@ def main():
         ti.compute_timestep_maccormack()
 
         # output to monitor
-        if (tstep % g.nmonitor == 0):
+        if tstep % g.nmonitor == 0:
             mon.output_monitor()
 
         # output to data file
-        if (tstep % g.nsave == 0):
+        if tstep % g.nsave == 0:
             io.output_data()
 
 

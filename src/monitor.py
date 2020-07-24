@@ -1,6 +1,7 @@
+import numpy as np
+
 import common as g
 import equations as eq
-import numpy as np
 
 
 def output_monitor():

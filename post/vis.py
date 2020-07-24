@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 
+import os
+import pickle
+import sys
+
 import numpy as np
 import matplotlib.pyplot as plt
-import sys
-import pickle
-import os
 
 
 def main():
