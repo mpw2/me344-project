@@ -1,9 +1,5 @@
 <h1>me344-project</h1>
 
-<p align="left">
-  <a href="https://github.com/ricardochaves/python-lint"><img alt="GitHub Actions status" src="https://github.com/ricardochaves/python-lint/workflows/Python%20Lint/badge.svg"></a>
-</p>
-
 <h2>Description</h2>
 
 <p>A parallel code for simulating low-Mach compressible jet flows. 
