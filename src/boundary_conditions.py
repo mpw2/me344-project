@@ -1,4 +1,6 @@
 import common as g
+import mpi
+
 import numpy as np
 
 
@@ -7,13 +9,28 @@ import numpy as np
 #
 def apply_boundary_conditions():
 
-    # # apply a rudimentary sponge
-    # apply_sponge()
-
-    # apply boundary conditions
-    apply_isothermal_wall('x0')
-    # apply_extrapolation_bc('x1')
-    apply_convective_bc('x1')
+    if mpi.myrank==0:
+        apply_isothermal_wall('x0')  # inlet boundary
+        # apply inlet BC
+        for jj in range(g.ny):
+            for kk in range(g.nz):
+                if (abs(g.yg[0, jj, 0]) <= g.jet_height_y/2.0 and
+                        abs(g.zg[0, 0, kk]) <= g.jet_height_z/2.0):
+                    g.Q[0, jj, kk, 0] = g.Rho_jet
+                    g.Q[0, jj, kk, 1] = g.Rho_jet * g.U_jet
+                    g.Q[0, jj, kk, 2] = g.Rho_jet * g.V_jet
+                    g.Q[0, jj, kk, 3] = g.Rho_jet * g.W_jet
+                    g.Q[0, jj, kk, 4] = g.P_jet / (g.gamma-1) + \
+                        0.5 * g.Rho_jet * g.U_jet**2
+                    g.Q[0, jj, kk, 5] = g.Rho_jet * g.Phi_jet
+        communicate_internal_planes('x1')  # internal
+    if mpi.myrank==mpi.nprocs-1:
+        communicate_internal_planes('x0')  # internal
+        apply_convective_bc('x1')  # outlet boundary
+        # apply_extrapolation_bc('x1')
+    else:
+        communicate_internal_planes('x0')
+        communicate_internal_planes('x1')
 
     # apply_extrapolation_bc('y0')
     # apply_extrapolation_bc('y1')
@@ -25,19 +42,6 @@ def apply_boundary_conditions():
     # apply_pressure_bc('z0')
     # apply_pressure_bc('z1')
     apply_periodic_bc('z')
-
-    # apply inlet BC
-    for jj in range(g.ny):
-        for kk in range(g.nz):
-            if (abs(g.yg[0, jj, 0]) <= g.jet_height_y/2.0 and
-                    abs(g.zg[0, 0, kk]) <= g.jet_height_z/2.0):
-                g.Q[0, jj, kk, 0] = g.Rho_jet
-                g.Q[0, jj, kk, 1] = g.Rho_jet * g.U_jet
-                g.Q[0, jj, kk, 2] = g.Rho_jet * g.V_jet
-                g.Q[0, jj, kk, 3] = g.Rho_jet * g.W_jet
-                g.Q[0, jj, kk, 4] = g.P_jet / (g.gamma-1) + \
-                    0.5 * g.Rho_jet * g.U_jet**2
-                g.Q[0, jj, kk, 5] = g.Rho_jet * g.Phi_jet
 
 
 # --------------------------
@@ -163,6 +167,12 @@ def apply_sponge():
 
     # Apply the sponge to the field
     g.Q = (1.0 - g.sponge_fac) * g.Q + g.sponge_fac * g.Qref
+
+
+# -------------------------
+#
+#
+def communicate_internal_planes():
 
 
 #
