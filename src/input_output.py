@@ -78,44 +78,44 @@ def read_input_parameters():
 
     # Broadcast user input (mpi)
     # fluid properties
-    mpi.comm.bcast(g.mu, root=0)
-    mpi.comm.bcast(g.gamma, root=0)
-    mpi.comm.bcast(g.Pr, root=0)
-    mpi.comm.bcast(g.R_g, root=0)
-    mpi.comm.bcast(g.k, root=0)
-    mpi.comm.bcast(g.D, root=0)
+    g.mu = mpi.comm.bcast(g.mu, root=0)
+    g.gamma = mpi.comm.bcast(g.gamma, root=0)
+    g.Pr = mpi.comm.bcast(g.Pr, root=0)
+    g.R_g = mpi.comm.bcast(g.R_g, root=0)
+    g.k = mpi.comm.bcast(g.k, root=0)
+    g.D = mpi.comm.bcast(g.D, root=0)
     # domain specification
-    mpi.comm.bcast(g.Lx, root=0)
-    mpi.comm.bcast(g.Ly, root=0)
-    mpi.comm.bcast(g.Lz, root=0)
+    g.Lx = mpi.comm.bcast(g.Lx, root=0)
+    g.Ly = mpi.comm.bcast(g.Ly, root=0)
+    g.Lz = mpi.comm.bcast(g.Lz, root=0)
     # inlet conditions
-    mpi.comm.bcast(g.jet_height_y, root=0)
-    mpi.comm.bcast(g.jet_height_z, root=0)
-    mpi.comm.bcast(g.U_jet, root=0)
-    mpi.comm.bcast(g.V_jet, root=0)
-    mpi.comm.bcast(g.W_jet, root=0)
-    mpi.comm.bcast(g.P_jet, root=0)
-    mpi.comm.bcast(g.T_jet, root=0)
-    mpi.comm.bcast(g.Phi_jet, root=0)
+    g.jet_height_y = mpi.comm.bcast(g.jet_height_y, root=0)
+    g.jet_height_z = mpi.comm.bcast(g.jet_height_z, root=0)
+    g.U_jet = mpi.comm.bcast(g.U_jet, root=0)
+    g.V_jet = mpi.comm.bcast(g.V_jet, root=0)
+    g.W_jet = mpi.comm.bcast(g.W_jet, root=0)
+    g.P_jet = mpi.comm.bcast(g.P_jet, root=0)
+    g.T_jet = mpi.comm.bcast(g.T_jet, root=0)
+    g.Phi_jet = mpi.comm.bcast(g.Phi_jet, root=0)
     # ambient conditions
-    mpi.comm.bcast(g.U_inf, root=0)
-    mpi.comm.bcast(g.V_inf, root=0)
-    mpi.comm.bcast(g.W_inf, root=0)
-    mpi.comm.bcast(g.P_inf, root=0)
-    mpi.comm.bcast(g.T_inf, root=0)
-    mpi.comm.bcast(g.Phi_inf, root=0)
+    g.U_inf = mpi.comm.bcast(g.U_inf, root=0)
+    g.V_inf = mpi.comm.bcast(g.V_inf, root=0)
+    g.W_inf = mpi.comm.bcast(g.W_inf, root=0)
+    g.P_inf = mpi.comm.bcast(g.P_inf, root=0)
+    g.T_inf = mpi.comm.bcast(g.T_inf, root=0)
+    g.Phi_inf = mpi.comm.bcast(g.Phi_inf, root=0)
     # grid parameters
-    mpi.comm.bcast(g.nx, root=0)
-    mpi.comm.bcast(g.ny, root=0)
-    mpi.comm.bcast(g.nz, root=0)
+    g.nx = mpi.comm.bcast(g.nx, root=0)
+    g.ny = mpi.comm.bcast(g.ny, root=0)
+    g.nz = mpi.comm.bcast(g.nz, root=0)
     # timestep parameters
-    mpi.comm.bcast(g.CFL_ref, root=0)
-    mpi.comm.bcast(g.nsteps, root=0)
-    mpi.comm.bcast(g.nsave, root=0)
-    mpi.comm.bcast(g.nmonitor, root=0)
+    g.CFL_ref = mpi.comm.bcast(g.CFL_ref, root=0)
+    g.nsteps = mpi.comm.bcast(g.nsteps, root=0)
+    g.nsave = mpi.comm.bcast(g.nsave, root=0)
+    g.nmonitor = mpi.comm.bcast(g.nmonitor, root=0)
     # input/output parameters
-    mpi.comm.bcast(g.fin_path, root=0)
-    mpi.comm.bcast(g.fout_path, root=0)
+    g.fin_path = mpi.comm.bcast(g.fin_path, root=0)
+    g.fout_path = mpi.comm.bcast(g.fout_path, root=0)
 
 
 def init_flow():
@@ -152,14 +152,15 @@ def read_input_data():
 
 def output_data():
     """Write flow state to output file fout_path"""
-    # Specify the output file
-    fout_path = g.fout_path + '.' + str(g.tstep)
+    if mpi.myrank==0:
+        # Specify the output file
+        fout_path = g.fout_path + '.' + str(g.tstep)
 
-    save_vars = [g.xg, g.yg, g.zg, g.Q]
+        save_vars = [g.xg, g.yg, g.zg, g.Q]
 
-    f = open(fout_path, 'wb')
-    pickle.dump(save_vars, f)
-    f.close()
+        f = open(fout_path, 'wb')
+        pickle.dump(save_vars, f)
+        f.close()
 
 
 #

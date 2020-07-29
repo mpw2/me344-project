@@ -18,8 +18,9 @@ def init():
     """Initialize parallel processes"""
     # MPI_init() called automatically on import
     # Initialize MPI parameter variables
-    mpi.nprocs = mpi.comm.Get_size()
-    mpi.myrank = mpi.comm.Get_rank()
+    global nprocs, myrank, comm
+    nprocs = comm.Get_size()
+    myrank = comm.Get_rank()
 
 
 def finalize():
