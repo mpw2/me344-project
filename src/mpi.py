@@ -16,14 +16,17 @@ myrank = None
 
 def init():
     """Initialize parallel processes"""
-    MPI.init()
+    # MPI_init() called automatically on import
+    # Initialize MPI parameter variables
     mpi.nprocs = mpi.comm.Get_size()
     mpi.myrank = mpi.comm.Get_rank()
 
 
 def finalize():
     """Finalize parallel processes"""
-    MPI.finalize()
+    # MPI_Finalize() called automatically at exit
+    # nothing to do
+    pass
 
 
 #
