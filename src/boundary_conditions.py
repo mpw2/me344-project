@@ -48,28 +48,24 @@ def apply_boundary_conditions():
 #
 def communicate_internal_planes():
 
-    comm = mpi.comm
-    myrank = mpi.myrank
-    nprocs = mpi.nprocs
-
     # all processes with a chunk ahead of them
-    if myrank < nprocs-2:
+    if mpi.myrank < mpi.nprocs-2:
         data = g.Q[-2,:,:,:]
-        comm.isend(data, dest=myrank+1, tag=myrank)
+        mpi.comm.isend(data, dest=mpi.myrank+1, tag=mpi.myrank)
 
     # zeroth process doesn't receive
-    if myrank != 0:
-        recv = comm.irecv(source=myrank-1, tag=myrank-1)
+    if mpi.myrank != 0:
+        recv = mpi.comm.irecv(source=mpi.myrank-1, tag=mpi.myrank-1)
         g.Q[0,:,:,:] = recv
 
     # all processes with a chunk behind them
-    if myrank > 0:
+    if mpi.myrank > 0:
         data = g.Q[1,:,:,:]
-        comm.isend(data, dest=myrank-1, tag=myrank)
+        mpi.comm.isend(data, dest=mpi.myrank-1, tag=mpi.myrank)
 
     # nprocs-1 process doesn't receive
-    if myrank != nprocs-1
-        recv = comm.irecv(source=myrank+1, tag=myrank+1)
+    if mpi.myrank != mpi.nprocs-1
+        recv = mpi.comm.irecv(source=mpi.myrank+1, tag=mpi.myrank+1)
         g.Q[-1:,:,:] = recv
 
 
