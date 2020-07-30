@@ -20,7 +20,7 @@ import mpi
 
 def read_input_parameters():
     """Read user input parameters from file.
-    
+
     Parameter file specified in argv[1]
     """
     if mpi.myrank == 0:
@@ -120,7 +120,7 @@ def read_input_parameters():
 
 def init_flow():
     """Initialize the flow field.
-    
+
     If fin_path is specified, initialize with a data file.
     Else use the default initial condition.
     """
@@ -152,7 +152,7 @@ def read_input_data():
 
 def output_data():
     """Write flow state to output file fout_path"""
-    if mpi.myrank==0:
+    if mpi.myrank == 0:
         # Specify the output file
         fout_path = g.fout_path + '.' + str(g.tstep)
 

@@ -62,7 +62,7 @@ def compute_dt():
 
     # Find the minimum dt across processes
     dt_local[0] = np.min(dt)
-    mpi.comm.Reduce(dt_local[0], dt_global[0], op=MPI.MIN, root=0)
+    mpi.comm.Reduce(dt_local[0], dt_global[0], op=mpi.MPI.MIN, root=0)
 
     # broadcast time step size
     g.dt = mpi.comm.bcast(dt_global[0], root=0)

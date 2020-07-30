@@ -434,7 +434,7 @@ def compG(Q, x, y, z, Rgas, mu, kappa, D, gamma, step):
 
 def compRHS(Q, x, y, z, step):
     """Compute RHS flux and forcing terms
-    
+
     Alternate differencing direction every step, e.g.
     In the predictor step use forward differences
     In the corrector step use backward differences
