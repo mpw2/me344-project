@@ -22,15 +22,14 @@ def apply_boundary_conditions():
                     g.Q[0, jj, kk, 3] = g.Rho_jet * g.W_jet
                     g.Q[0, jj, kk, 4] = g.P_jet / (g.gamma-1) + \
                         0.5 * g.Rho_jet * g.U_jet**2
-                    g.Q[0, jj, kk, 5] = g.Rho_jet * g.Phi_jet
-        communicate_internal_planes('x1')  # internal
-    if mpi.myrank==mpi.nprocs-1:
-        communicate_internal_planes('x0')  # internal
-        apply_convective_bc('x1')  # outlet boundary
-        # apply_extrapolation_bc('x1')
-    else:
-        communicate_internal_planes('x0')
-        communicate_internal_planes('x1')
+                    g.Q[0, jj, kk, 5] = g.Rho_jet * g.
+
+
+
+    if mpy.myrank == mpi.nprocs-1:
+        apply_convective_bc('x1') # outlet boundary
+
+    communicate_internal_planes()
 
     # apply_extrapolation_bc('y0')
     # apply_extrapolation_bc('y1')
@@ -42,6 +41,37 @@ def apply_boundary_conditions():
     # apply_pressure_bc('z0')
     # apply_pressure_bc('z1')
     apply_periodic_bc('z')
+
+
+# --------------------------
+# Communicate data between MPI planes
+#
+def communicate_internal_planes():
+
+    comm = mpi.comm
+    myrank = mpi.myrank
+    nprocs = mpi.nprocs
+
+    # all processes with a chunk ahead of them
+    if myrank < nprocs-2:
+        data = g.Q[-2,:,:,:]
+        comm.isend(data, dest=myrank+1, tag=myrank)
+
+    # zeroth process doesn't receive
+    if myrank != 0:
+        recv = comm.irecv(source=myrank-1, tag=myrank-1)
+        g.Q[0,:,:,:] = recv
+
+    # all processes with a chunk behind them
+    if myrank > 0:
+        data = g.Q[1,:,:,:]
+        comm.isend(data, dest=myrank-1, tag=myrank)
+
+    # nprocs-1 process doesn't receive
+    if myrank != nprocs-1
+        recv = comm.irecv(source=myrank+1, tag=myrank+1)
+        g.Q[-1:,:,:] = recv
+
 
 
 # --------------------------
