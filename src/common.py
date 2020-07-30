@@ -39,21 +39,29 @@ Rho_jet = None  # jet inlet density
 Phi_jet = None  # jet inlet scalar concentration
 
 # ambient conditions
-U_inf = None
-V_inf = None
-W_inf = None
+U_inf = None  # reference streamwise velocity
+V_inf = None  # reference normal velocity
+W_inf = None  # reference spanwise velocity
 P_inf = None  # reference pressure
-T_inf = None
+T_inf = None  # reference temperature
 Rho_inf = None  # reference density
 Phi_inf = None  # reference scalar concentration
 
 # grid parameters
-nx = None
+nx_global = None  # global grid size
+ny_glboal = None
+nz_global = None
+nx = None  # local grid size
 ny = None
 nz = None
-xg = None
+xg_global = None  # global grid coordinates
+yg_global = None
+zg_global = None
+xg = None  # local grid coordinates
 yg = None
 zg = None
+i0_global = None  # lower extent streamwise index
+i1_global = None  # upper extent streamwise index
 
 # timestep parameters
 CFL_ref = None
