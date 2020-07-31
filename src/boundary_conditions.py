@@ -1,17 +1,26 @@
-import common as g
-import mpi
+"""boundary_conditions.py
+
+Contains functions necessary to enforce boundary conditions of flow.
+
+Includes physical boundary conditions at edges of domain as well as
+numerical boundary conditions including updating interior ghost planes
+between parallel tasks.
+"""
 
 import numpy as np
 
+import common as g
+import mpi
 
-# --------------------------------------------------
-# Apply boundary conditions to transported variables
-#
+
 def apply_boundary_conditions():
+    """Apply boundary conditions to transported variables"""
 
+    # inlet boundary
     if mpi.myrank==0:
-        apply_isothermal_wall('x0')  # inlet boundary
-        # apply inlet BC
+        # base inlet boundary
+        apply_isothermal_wall('x0')
+        # jet inlet condition
         for jj in range(g.ny):
             for kk in range(g.nz):
                 if (abs(g.yg[0, jj, 0]) <= g.jet_height_y/2.0 and
@@ -25,22 +34,24 @@ def apply_boundary_conditions():
                     g.Q[0, jj, kk, 5] = g.Rho_jet * g.
 
 
-
+    # outlet boundary
     if mpy.myrank == mpi.nprocs-1:
-        apply_convective_bc('x1') # outlet boundary
+        apply_convective_bc('x1')
 
     communicate_internal_planes()
 
-    # apply_extrapolation_bc('y0')
-    # apply_extrapolation_bc('y1')
+    # normal boundaries
     apply_pressure_bc('y0')
     apply_pressure_bc('y1')
+    # apply_extrapolation_bc('y0')
+    # apply_extrapolation_bc('y1')
 
+    # spanwise boundaries
+    apply_periodic_bc('z')
     # apply_extrapolation_bc('z0')
     # apply_extrapolation_bc('z1')
     # apply_pressure_bc('z0')
     # apply_pressure_bc('z1')
-    apply_periodic_bc('z')
 
 
 # --------------------------
@@ -94,8 +105,8 @@ def apply_extrapolation_bc(dirid):
 
 # --------------------------
 # Convective outlet BC
-#  - boundary normal velocity
-#  - calculated from previous step
+#  - dU_i/dt = U_i * dU_i/dx_i
+#  - U_i(n+1) = U_i + dt * (U_i * dU_i/dx_i)
 #
 def apply_convective_bc(dirid):
     if dirid == 'x1':
@@ -111,8 +122,8 @@ def apply_convective_bc(dirid):
 
 # --------------------------
 # Pressure BC
-#  - set the total energy and density by
-#    ambient pressure and temperature
+#  - Rho = Rho_inf
+#  - P = P_inf
 #
 def apply_pressure_bc(dirid):
     if dirid == 'y0':
@@ -162,6 +173,8 @@ def apply_pressure_bc(dirid):
 
 # ---------------------------
 #  Isothermal wall BC
+#   - U,V,W = 0 (no-slip, no-penetration)
+#   - T = const.
 #
 def apply_isothermal_wall(dirid):
     if dirid == 'x0':
@@ -176,6 +189,8 @@ def apply_isothermal_wall(dirid):
 
 # ---------------------------
 #  Periodic BC
+#   - phi(n) = phi(1)
+#   - phi(0) = phi(n-1)
 #
 def apply_periodic_bc(dirid):
     if dirid == 'z':
@@ -184,21 +199,6 @@ def apply_periodic_bc(dirid):
     else:
         msg = "BC not implemented for dirid: {:s}".format(dirid)
         raise Exception(msg)
-
-
-# ---------------------------
-# Apply a rudimentary sponge
-#
-def apply_sponge():
-
-    # Apply the sponge to the field
-    g.Q = (1.0 - g.sponge_fac) * g.Q + g.sponge_fac * g.Qref
-
-
-# -------------------------
-#
-#
-def communicate_internal_planes():
 
 
 #
