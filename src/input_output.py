@@ -147,20 +147,36 @@ def init_flow():
 
 def read_input_data():
     """Read flow variables from data file fin_path"""
-    raise Exception("Not implemented")
+    # Specify the input file(s)
+    fin_path = g.fin_path + '.' + str(g.myrank)
+
+    # Read from the input file(s)
+    f = open(fin_path, 'rb')
+    save_vars = pickle.load(f)
+    f.close()
+
+    # Set the flow variables
+    g.xg = save_vars[0]
+    g.yg = save_vars[1]
+    g.zg = save_vars[2]
+    g.Q = save_vars[3]
 
 
 def output_data():
-    """Write flow state to output file fout_path"""
-    if g.myrank == 0:
-        # Specify the output file
-        fout_path = g.fout_path + '.' + str(g.tstep)
+    """Write flow state to output file fout_path
 
-        save_vars = [g.xg, g.yg, g.zg, g.Q]
+    filename format: 'fout_path.timestep.rank'
+    """
+    # Specify the output file
+    fout_path = g.fout_path + '.' + str(g.tstep) + '.' + str(g.myrank)
 
-        f = open(fout_path, 'wb')
-        pickle.dump(save_vars, f)
-        f.close()
+    # Variables to save
+    save_vars = [g.xg, g.yg, g.zg, g.Q]
+
+    # Write binary output
+    f = open(fout_path, 'wb')
+    pickle.dump(save_vars, f)
+    f.close()
 
 
 #
