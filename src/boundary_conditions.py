@@ -10,14 +10,13 @@ between parallel tasks.
 import numpy as np
 
 import common as g
-import mpi
 
 
 def apply_boundary_conditions():
     """Apply boundary conditions to transported variables"""
 
     # inlet boundary
-    if mpi.myrank==0:
+    if g.myrank==0:
         # base inlet boundary
         apply_isothermal_wall('x0')
         # jet inlet condition
@@ -35,7 +34,7 @@ def apply_boundary_conditions():
 
 
     # outlet boundary
-    if mpy.myrank == mpi.nprocs-1:
+    if g.myrank == g.nprocs-1:
         apply_convective_bc('x1')
 
     communicate_internal_planes()
@@ -60,24 +59,20 @@ def apply_boundary_conditions():
 def communicate_internal_planes():
 
     # all processes with a chunk ahead of them
-    if mpi.myrank < mpi.nprocs-2:
-        data = g.Q[-2,:,:,:]
-        mpi.comm.isend(data, dest=mpi.myrank+1, tag=mpi.myrank)
+    if g.myrank < g.nprocs-2:
+        g.comm.Isend(g.Q[-2,:,:,:], dest=g.myrank+1, tag=g.myrank)
 
     # zeroth process doesn't receive
-    if mpi.myrank != 0:
-        recv = mpi.comm.irecv(source=mpi.myrank-1, tag=mpi.myrank-1)
-        g.Q[0,:,:,:] = recv
+    if g.myrank != 0:
+        g.comm.Recv(g.Q[0,:,:,:],source=g.myrank-1, tag=g.myrank-1)
 
     # all processes with a chunk behind them
-    if mpi.myrank > 0:
-        data = g.Q[1,:,:,:]
-        mpi.comm.isend(data, dest=mpi.myrank-1, tag=mpi.myrank)
+    if g.myrank > 0:
+        g.comm.Isend(g.Q[1,:,:,:], dest=g.myrank-1, tag=g.myrank)
 
     # nprocs-1 process doesn't receive
-    if mpi.myrank != mpi.nprocs-1
-        recv = mpi.comm.irecv(source=mpi.myrank+1, tag=mpi.myrank+1)
-        g.Q[-1:,:,:] = recv
+    if g.myrank != g.nprocs-1
+        g.comm.Recv(g.Q[-1,:,:,:], source=g.myrank+1, tag=g.myrank+1)
 
 
 

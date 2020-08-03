@@ -7,6 +7,12 @@
 # ------------------------------------------
 
 
+# MPI objects/parameters
+MPI = None
+comm = None
+nprocs = None
+myrank = None
+
 # input/output parameters
 fout_path = None
 fin_path = None

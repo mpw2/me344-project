@@ -29,7 +29,7 @@ def output_monitor():
     Phi_sum = np.sum(Phi)
 
     sendbuf[:] = [Rho_sum, U_sum, V_sum, W_sum, P_sum, Phi_sum]
-    mpi.comm.Reduce(sendbuf, recvbuf, op=mpi.MPI.SUM, root=0)
+    g.comm.Reduce(sendbuf, recvbuf, op=g.MPI.MPI.SUM, root=0)
     recvbuf = recvbuf / (g.nx_global * g.ny_global * g.nz_global)
     Rho_mean, U_mean, V_mean, W_mean, P_mean, Phi_mean = recvbuf
 
@@ -42,11 +42,11 @@ def output_monitor():
     Phi_max = np.max(Phi)
 
     sendbuf[:] = [Rho_max, U_max, V_max, W_max, P_max, Phi_max]
-    mpi.comm.Reduce(sendbuf, recvbuf, op=mpi.MPI.MAX, root=0)
+    g.comm.Reduce(sendbuf, recvbuf, op=g.MPI.MAX, root=0)
     Rho_max, U_max, V_max, W_max, P_max, Phi_max = recvbuf
 
     # only print monitor if rank 0
-    if mpi.myrank != 0:
+    if g.myrank != 0:
         return
 
     print('---- monitor ----')

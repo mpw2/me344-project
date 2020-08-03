@@ -2,19 +2,24 @@
 
 Description:
     Module for initializing arrays and flow variables.
+    Initializes MPI processes.
 """
 import numpy as np
+from mpi4py import MPI
 
 import boundary_conditions as bc
 import common as g
 import input_output as io
-import mpi
 
 
 def initialize():
 
     # Initialize MPI
-    mpi.init()
+    g.MPI = MPI
+    g.comm = MPI.COMM_WORLD
+    g.nprocs = g.comm.Get_size()
+    g.myrank = g.comm.Get_rank()
+    # --- MPI Setup Complete ---
 
     # Transport variable arrays
     g.Q = np.zeros((g.nx+1, g.ny+1, g.nz+1, g.NVARS))
@@ -42,7 +47,7 @@ def initialize():
     g.tstep = 0
 
     # split up the grid for parallel calculation
-    if mpi.nprocs > g.nx:
+    if g.nprocs > g.nx:
         raise Exception("Too many processors for given nx")
     g.i0_global
     g.i1_global
