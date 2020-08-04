@@ -19,9 +19,7 @@ import common as g
 
 
 def main():
-    # read user input file
-    io.read_input_parameters()
-
+    
     # initialize data structures
     ini.initialize()
 

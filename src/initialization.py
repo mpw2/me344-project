@@ -21,6 +21,9 @@ def initialize():
     g.nprocs = g.comm.Get_size()
     g.myrank = g.comm.Get_rank()
 
+    # --- Read User Input Parameters -----------------------------------
+    io.read_input_parameters()
+
     # --- Parallel Grid Allocation -------------------------------------
     # split up the grid for parallel calculation
     # parallelize in streamwise direction
