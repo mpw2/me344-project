@@ -74,6 +74,9 @@ CFL_ref = None
 dt = None
 t = None
 tstep = None
+nsteps = None
+nsave = None
+nmonitor = None
 
 # variable arrays
 Q = None  # conserved variable vector

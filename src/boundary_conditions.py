@@ -15,6 +15,9 @@ import common as g
 def apply_boundary_conditions():
     """Apply boundary conditions to transported variables"""
 
+    # update internal ghost planes
+    communicate_internal_planes()
+    
     # inlet boundary
     if g.myrank == 0:
         # base inlet boundary
@@ -36,8 +39,6 @@ def apply_boundary_conditions():
     if g.myrank == g.nprocs-1:
         apply_convective_bc('x1')
 
-    communicate_internal_planes()
-
     # normal boundaries
     apply_pressure_bc('y0')
     apply_pressure_bc('y1')
@@ -58,11 +59,11 @@ def apply_boundary_conditions():
 def communicate_internal_planes():
 
     # all processes with a chunk ahead of them
-    if g.myrank < g.nprocs-2:
+    if g.myrank < g.nprocs-1:
         g.comm.Isend(g.Q[-2, :, :, :], dest=g.myrank+1, tag=g.myrank)
 
     # zeroth process doesn't receive
-    if g.myrank != 0:
+    if g.myrank > 0:
         g.comm.Recv(g.Q[0, :, :, :], source=g.myrank-1, tag=g.myrank-1)
 
     # all processes with a chunk behind them
@@ -70,7 +71,7 @@ def communicate_internal_planes():
         g.comm.Isend(g.Q[1, :, :, :], dest=g.myrank-1, tag=g.myrank)
 
     # nprocs-1 process doesn't receive
-    if g.myrank != g.nprocs-1:
+    if g.myrank < g.nprocs-1:
         g.comm.Recv(g.Q[-1, :, :, :], source=g.myrank+1, tag=g.myrank+1)
 
 
