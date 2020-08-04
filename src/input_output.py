@@ -15,7 +15,6 @@ import pickle
 
 import common as g
 import equations as eq
-import mpi
 
 
 def read_input_parameters():
@@ -146,9 +145,13 @@ def init_flow():
 
 
 def read_input_data():
-    """Read flow variables from data file fin_path"""
+    """Read flow variables from data file fin_path
+
+    filename format: 'fin_path.{tstep}.{rank}'
+    Assumes exactly "nprocs" files exist
+    """
     # Specify the input file(s)
-    fin_path = g.fin_path + '.' + str(g.myrank)
+    fin_path = g.fin_path + '.{:03d}'.format(g.myrank)
 
     # Read from the input file(s)
     f = open(fin_path, 'rb')
@@ -165,10 +168,10 @@ def read_input_data():
 def output_data():
     """Write flow state to output file fout_path
 
-    filename format: 'fout_path.timestep.rank'
+    filename format: 'fout_path.{tstep}.{rank}'
     """
     # Specify the output file
-    fout_path = g.fout_path + '.' + str(g.tstep) + '.' + str(g.myrank)
+    fout_path = g.fout_path + '.{0:d}.{1:03d}'.format(g.tstep, g.myrank)
 
     # Variables to save
     save_vars = [g.xg, g.yg, g.zg, g.Q]

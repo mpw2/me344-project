@@ -21,8 +21,6 @@ fparam_path = None
 # physical parameters
 mu = None  # dynamic viscosity
 gamma = None  # cp/cv ratio
-# Ma = None  # Mach number
-# Re = None  # Reynolds number
 Pr = None  # Prandtl number
 R_g = None  # gas constant
 k = None  # heat transfer coefficient
@@ -55,19 +53,21 @@ Phi_inf = None  # reference scalar concentration
 
 # grid parameters
 nx_global = None  # global grid size
-ny_glboal = None
+ny_global = None
 nz_global = None
-nx = None  # local grid size
-ny = None
-nz = None
 xg_global = None  # global grid coordinates
 yg_global = None
 zg_global = None
+
+i0_global = None  # lower extent streamwise index
+i1_global = None  # upper extent streamwise index
+
+nx = None  # local grid size
+ny = None
+nz = None
 xg = None  # local grid coordinates
 yg = None
 zg = None
-i0_global = None  # lower extent streamwise index
-i1_global = None  # upper extent streamwise index
 
 # timestep parameters
 CFL_ref = None

@@ -16,7 +16,7 @@ def apply_boundary_conditions():
     """Apply boundary conditions to transported variables"""
 
     # inlet boundary
-    if g.myrank==0:
+    if g.myrank == 0:
         # base inlet boundary
         apply_isothermal_wall('x0')
         # jet inlet condition
@@ -30,8 +30,7 @@ def apply_boundary_conditions():
                     g.Q[0, jj, kk, 3] = g.Rho_jet * g.W_jet
                     g.Q[0, jj, kk, 4] = g.P_jet / (g.gamma-1) + \
                         0.5 * g.Rho_jet * g.U_jet**2
-                    g.Q[0, jj, kk, 5] = g.Rho_jet * g.
-
+                    g.Q[0, jj, kk, 5] = g.Rho_jet * g.Phi_jet
 
     # outlet boundary
     if g.myrank == g.nprocs-1:
@@ -60,20 +59,19 @@ def communicate_internal_planes():
 
     # all processes with a chunk ahead of them
     if g.myrank < g.nprocs-2:
-        g.comm.Isend(g.Q[-2,:,:,:], dest=g.myrank+1, tag=g.myrank)
+        g.comm.Isend(g.Q[-2, :, :, :], dest=g.myrank+1, tag=g.myrank)
 
     # zeroth process doesn't receive
     if g.myrank != 0:
-        g.comm.Recv(g.Q[0,:,:,:],source=g.myrank-1, tag=g.myrank-1)
+        g.comm.Recv(g.Q[0, :, :, :], source=g.myrank-1, tag=g.myrank-1)
 
     # all processes with a chunk behind them
     if g.myrank > 0:
-        g.comm.Isend(g.Q[1,:,:,:], dest=g.myrank-1, tag=g.myrank)
+        g.comm.Isend(g.Q[1, :, :, :], dest=g.myrank-1, tag=g.myrank)
 
     # nprocs-1 process doesn't receive
-    if g.myrank != g.nprocs-1
-        g.comm.Recv(g.Q[-1,:,:,:], source=g.myrank+1, tag=g.myrank+1)
-
+    if g.myrank != g.nprocs-1:
+        g.comm.Recv(g.Q[-1, :, :, :], source=g.myrank+1, tag=g.myrank+1)
 
 
 # --------------------------

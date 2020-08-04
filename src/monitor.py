@@ -2,7 +2,6 @@ import numpy as np
 
 import common as g
 import equations as eq
-import mpi
 
 
 def output_monitor():

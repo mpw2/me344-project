@@ -13,14 +13,32 @@ import input_output as io
 
 
 def initialize():
+    """Initialize simulation, flow variables, data and arrays"""
 
-    # Initialize MPI
+    # --- Initialize MPI -----------------------------------------------
     g.MPI = MPI
     g.comm = MPI.COMM_WORLD
     g.nprocs = g.comm.Get_size()
     g.myrank = g.comm.Get_rank()
-    # --- MPI Setup Complete ---
 
+    # --- Parallel Grid Allocation -------------------------------------
+    # split up the grid for parallel calculation
+    # parallelize in streamwise direction
+    if g.nprocs > g.nx:
+        raise Exception("Too many processors for given nx")
+    strides = np.linspace(0, g.nx, g.nprocs + 1)
+    strides = np.floor(strides)
+    g.i0_global = np.int32(strides[:g.nprocs])
+    g.i1_global = np.int32(np.minimum(strides[1:] + 1, g.nx))
+    strides = g.i1_global - g.i0_global
+    # save global and local grid size
+    g.nx_global = g.nx
+    g.nx = strides[g.myrank]
+    # normal and spanwise have no parallelization
+    g.ny_global = g.ny
+    g.nz_global = g.nz
+
+    # --- Allocate Arrays ----------------------------------------------
     # Transport variable arrays
     g.Q = np.zeros((g.nx+1, g.ny+1, g.nz+1, g.NVARS))
     g.Qo = np.zeros((g.nx+1, g.ny+1, g.nz+1, g.NVARS))
@@ -41,41 +59,54 @@ def initialize():
     g.dFdy = np.zeros((g.nx+1, g.ny+1, g.nz+1, g.NVARS))
     g.dGdz = np.zeros((g.nx+1, g.ny+1, g.nz+1, g.NVARS))
 
-    # Time variables
-    g.t = 0.0
-    g.dt = 0.0
-    g.tstep = 0
+    # Grid Arrays
+    g.xg_global = np.ndarray((g.nx_global+1, 1, 1))
+    g.yg_global = np.ndarray((1, g.ny_global+1, 1))
+    g.zg_global = np.ndarray((1, 1, g.nz_global+1))
+    g.xg = np.ndarray((g.nx+1, 1, 1))
+    g.yg = np.ndarray((1, g.ny+1, 1))
+    g.zg = np.ndarray((1, 1, g.nz+1))
 
-    # split up the grid for parallel calculation
-    if g.nprocs > g.nx:
-        raise Exception("Too many processors for given nx")
-    g.i0_global
-    g.i1_global
+    # --- Time Variables -----------------------------------------------
+    g.t = 0.0  # simulation time
+    g.dt = 0.0  # timestep size
+    g.tstep = 0  # timestep index
 
-    # build the grid arrays
-    xg_temp = np.linspace(0, g.Lx, g.nx+1)
-    if (g.ny % 2 == 1):
-        yg_temp = np.linspace(-g.Ly/2, g.Ly/2, g.ny+1)
+    # Runge Kutta Variables
+    g.rk_step_1 = 'predictor'
+    g.rk_step_2 = 'corrector'
+
+    # --- Build Grids --------------------------------------------------
+    # build the global grid arrays
+    xg_temp = np.linspace(0, g.Lx, g.nx_global+1)
+    if (g.ny_global % 2 == 1):
+        yg_temp = np.linspace(-g.Ly/2, g.Ly/2, g.ny_global+1)
     else:
         raise Exception("Use odd values for ny")
 
-    if (g.nz % 2 == 1):
-        zg_temp = np.linspace(-g.Lz/2, g.Lz/2, g.nz+1)
+    if (g.nz_global % 2 == 1):
+        zg_temp = np.linspace(-g.Lz/2, g.Lz/2, g.nz_global+1)
     else:
         raise Exception('Use odd values for nz')
 
     # use shape to allow easy commuting with field variables
-    g.xg = np.ndarray((g.nx+1, 1, 1))
-    g.yg = np.ndarray((1, g.ny+1, 1))
-    g.zg = np.ndarray((1, 1, g.nz+1))
-    g.xg[:, 0, 0] = xg_temp
-    g.yg[0, :, 0] = yg_temp
-    g.zg[0, 0, :] = zg_temp
+    g.xg_global[:, 0, 0] = xg_temp
+    g.yg_global[0, :, 0] = yg_temp
+    g.zg_global[0, 0, :] = zg_temp
 
+    # assign the local grid arrays
+    i0 = g.i0_global[g.myrank]
+    i1 = g.i1_global[g.myrank]
+    g.xg[:, 0, 0] = g.xg_global[i0:i1, 0, 0]
+    g.yg[0, :, 0] = g.yg_global[0, :, 0]
+    g.zg[0, 0, :] = g.zg_global[0, 0, :]
+
+    # --- Boundary Conditions ------------------------------------------
     # calculate boundary densities
     g.Rho_inf = g.P_inf / (g.R_g * g.T_inf)
     g.Rho_jet = g.P_jet / (g.R_g * g.T_jet)
 
+    # --- Sponge -------------------------------------------------------
     # calculate the sponge damping factors
     x_sponge = g.x_sponge*g.Lx
     y_sponge = g.y_sponge*g.Ly/2
@@ -111,14 +142,10 @@ def initialize():
     g.Qref[:, :, :, 4] = g.P_inf / (g.gamma - 1.0)
     g.Qref[:, :, :, 5] = 0.0
 
-    # --------------------------
-    # Initialize the flow field
-    io.init_flow()
-    g.Qo[:, :, :, :] = g.Q[:, :, :, :]
+    # --- Initial Flow -------------------------------------------------
+    io.init_flow()  # set the initial flow
+    g.Qo[:, :, :, :] = g.Q[:, :, :, :]  # init prev flow state
     bc.apply_boundary_conditions()
-
-    g.rk_step_1 = 'predictor'
-    g.rk_step_2 = 'corrector'
 
 
 #

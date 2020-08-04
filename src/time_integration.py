@@ -3,7 +3,6 @@ import numpy as np
 import common as g
 import equations as eq
 import boundary_conditions as bc
-import mpi
 
 
 def compute_timestep_maccormack():
