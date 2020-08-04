@@ -104,8 +104,8 @@ def apply_extrapolation_bc(dirid):
 def apply_convective_bc(dirid):
     if dirid == 'x1':
         U = g.Qo[g.nx, :, :, 1] / g.Qo[g.nx, :, :, 0]
-        factor = g.dt / (g.xg[g.nx, 0, 0] - g.xg[g.nx-1, 0, 0]) * U[:, :]
-        factor = factor.reshape(*np.shape(factor), 1)
+        factor = g.dt / (g.xg[g.nx, 0, 0] - g.xg[g.nx-1, 0, 0]) * U
+        factor = factor.reshape(1, g.ny+1, g.nz+1, 1)
         g.Q[g.nx, :, :, :] = g.Qo[g.nx, :, :, :] - \
             factor * (g.Qo[g.nx, :, :, :] - g.Qo[g.nx-1, :, :, :])
     else:

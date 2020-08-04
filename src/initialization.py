@@ -99,7 +99,7 @@ def initialize():
 
     # assign the local grid arrays
     i0 = g.i0_global[g.myrank]
-    i1 = g.i1_global[g.myrank]
+    i1 = g.i1_global[g.myrank] + 1
     g.xg[:, 0, 0] = g.xg_global[i0:i1, 0, 0]
     g.yg[0, :, 0] = g.yg_global[0, :, 0]
     g.zg[0, 0, :] = g.zg_global[0, 0, :]

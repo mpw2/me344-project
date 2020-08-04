@@ -1,16 +1,22 @@
 #!/usr/bin/env python
+"""
+Finite Difference Jet Code
 
-# ----------------------------------------------------------------------
-#
-# Finite Volume Jet Code
-#
-# Authors: Carlos Gonzalez, Michael Whitmore
-#
-# ... Solver details
-#
-# ----------------------------------------------------------------------
+Authors: Carlos Gonzalez, Michael Whitmore
 
-# Import jet code modules
+Solver Details:
+    - 2nd Order Finite Difference
+    - MacCormack Scheme
+
+Package Requirements:
+    Solver: 
+        - numpy
+        - mpi4py
+        - numba
+    Post-processing:
+        - matplotlib
+"""
+
 import initialization as ini
 import input_output as io
 import monitor as mon

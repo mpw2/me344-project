@@ -13,8 +13,8 @@ def output_monitor():
         raise Exception('Error: NaNs!!!')
 
     # Allocate MPI memory buffers
-    sendbuf = np.array([g.NVARS], dtype=np.float64)
-    recvbuf = np.array([g.NVARS], dtype=np.float64)
+    sendbuf = np.empty((g.NVARS), dtype=np.float64)
+    recvbuf = np.empty((g.NVARS), dtype=np.float64)
 
     # Compute primitive variables
     Rho, U, V, W, P, Phi = eq.ConsToPrim(g.Q)
@@ -28,7 +28,7 @@ def output_monitor():
     Phi_sum = np.sum(Phi)
 
     sendbuf[:] = [Rho_sum, U_sum, V_sum, W_sum, P_sum, Phi_sum]
-    g.comm.Reduce(sendbuf, recvbuf, op=g.MPI.MPI.SUM, root=0)
+    g.comm.Reduce(sendbuf, recvbuf, op=g.MPI.SUM, root=0)
     recvbuf = recvbuf / (g.nx_global * g.ny_global * g.nz_global)
     Rho_mean, U_mean, V_mean, W_mean, P_mean, Phi_mean = recvbuf
 
