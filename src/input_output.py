@@ -27,53 +27,53 @@ def read_input_parameters():
         g.fparam_path = sys.argv[1]
         print('Reading parameters from: {:s}'.format(g.fparam_path))
 
-        f = open(g.fparam_path, 'r')
+        fil = open(g.fparam_path, 'r')
 
-        lines = f.readlines()
+        lines = fil.readlines()
         # remove blank lines and comments/labels
         lines = [ln for ln in lines if ln.strip()]
         lines = [ln for ln in lines if ln[0] != '#']
 
         # Read fluid properties
-        li = 0
+        lix = 0
         g.mu, g.gamma, g.Pr, g.R_g, g.k, g.D = \
-            map(float, lines[li].split(', '))
+            map(float, lines[lix].split(', '))
         # Read domain specification
-        li = 1
-        g.Lx, g.Ly, g.Lz = map(float, lines[li].split(', '))
+        lix = 1
+        g.Lx, g.Ly, g.Lz = map(float, lines[lix].split(', '))
         # Read inlet conditions
-        li = 2
+        lix = 2
         g.jet_height_y, g.jet_height_z, g.U_jet, g.V_jet, g.W_jet, \
             g.P_jet, g.T_jet, g.Phi_jet = \
-            map(float, lines[li].split(', '))
+            map(float, lines[lix].split(', '))
 
         # Read ambient conditions
-        li = 3
+        lix = 3
         g.U_inf, g.V_inf, g.W_inf, g.P_inf, g.T_inf, g.Phi_inf = \
-            map(float, lines[li].split(', '))
+            map(float, lines[lix].split(', '))
 
         # Read grid parameters
-        li = 4
-        g.nx, g.ny, g.nz = map(int, lines[li].split(', '))
+        lix = 4
+        g.nx, g.ny, g.nz = map(int, lines[lix].split(', '))
 
         # Read timestep parameters
-        li = 5
-        g.CFL_ref, = map(float, lines[li].split(', '))
-        li = 6
+        lix = 5
+        g.CFL_ref, = map(float, lines[lix].split(', '))
+        lix = 6
         g.nsteps, g.nsave, g.nmonitor = \
-            map(int, lines[li].split(', '))
+            map(int, lines[lix].split(', '))
 
         # Read input/output parameters
-        li = 7
-        g.fin_path = lines[li].replace('\'', '').strip()
-        li = 8
-        g.fout_path = lines[li].replace('\'', '').strip()
+        lix = 7
+        g.fin_path = lines[lix].replace('\'', '').strip()
+        lix = 8
+        g.fout_path = lines[lix].replace('\'', '').strip()
 
         print('Input data file: {:s}'.format(g.fin_path))
         print('Output data file: {:s}'.format(g.fout_path))
 
         # Close parameter input file
-        f.close()
+        fil.close()
 
     # Broadcast user input (MPI)
     # fluid properties
@@ -134,14 +134,14 @@ def init_flow():
         g.W[:, :, :] = 0
         g.P[:, :, :] = g.P_inf
         g.Phi[:, :, :] = 0
-        Rho_, RhoU_, RhoV_, RhoW_, E_, RhoPhi_ = \
+        _rho, _rho_u, _rho_v, _rho_w, _e_tot, _rho_phi = \
             eq.PrimToCons(g.Rho, g.U, g.V, g.W, g.P, g.Phi)
-        g.Q[:, :, :, 0] = Rho_
-        g.Q[:, :, :, 1] = RhoU_
-        g.Q[:, :, :, 2] = RhoV_
-        g.Q[:, :, :, 3] = RhoW_
-        g.Q[:, :, :, 4] = E_
-        g.Q[:, :, :, 5] = RhoPhi_
+        g.Q[:, :, :, 0] = _rho
+        g.Q[:, :, :, 1] = _rho_u
+        g.Q[:, :, :, 2] = _rho_v
+        g.Q[:, :, :, 3] = _rho_w
+        g.Q[:, :, :, 4] = _e_tot
+        g.Q[:, :, :, 5] = _rho_phi
 
 
 def read_input_data():
@@ -154,9 +154,9 @@ def read_input_data():
     fin_path = g.fin_path + '.{:03d}'.format(g.myrank)
 
     # Read from the input file(s)
-    f = open(fin_path, 'rb')
-    save_vars = pickle.load(f)
-    f.close()
+    fil = open(fin_path, 'rb')
+    save_vars = pickle.load(fil)
+    fil.close()
 
     # Set the flow variables
     g.xg = save_vars[0]
@@ -177,9 +177,9 @@ def output_data():
     save_vars = [g.xg, g.yg, g.zg, g.Q]
 
     # Write binary output
-    f = open(fout_path, 'wb')
-    pickle.dump(save_vars, f)
-    f.close()
+    fil = open(fout_path, 'wb')
+    pickle.dump(save_vars, fil)
+    fil.close()
 
 
 #

@@ -25,6 +25,7 @@ import common as g
 
 
 def main():
+    """main method: run time integration loop"""
 
     # initialize data structures
     ini.initialize()

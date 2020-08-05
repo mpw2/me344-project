@@ -1,3 +1,7 @@
+"""monitor.py
+Writes solver monitor output to std_out periodically.
+"""
+
 import numpy as np
 
 import common as g
@@ -8,8 +12,8 @@ def output_monitor():
     """Write monitor output to stdout"""
 
     # Check for NaNs
-    checkQ = np.sum(g.Q, axis=(0, 1, 2))
-    if np.any(np.isnan(checkQ)):
+    check_q = np.sum(g.Q, axis=(0, 1, 2))
+    if np.any(np.isnan(check_q)):
         raise Exception('Error: NaNs!!!')
 
     # Allocate MPI memory buffers
@@ -17,32 +21,32 @@ def output_monitor():
     recvbuf = np.empty((g.NVARS), dtype=np.float64)
 
     # Compute primitive variables
-    Rho, U, V, W, P, Phi = eq.ConsToPrim(g.Q)
+    _rho, _u, _v, _w, _p, _phi = eq.ConsToPrim(g.Q)
 
     # Compute globally averaged variables
-    Rho_sum = np.sum(Rho)
-    U_sum = np.sum(U)
-    V_sum = np.sum(V)
-    W_sum = np.sum(W)
-    P_sum = np.sum(P)
-    Phi_sum = np.sum(Phi)
+    rho_sum = np.sum(_rho)
+    u_sum = np.sum(_u)
+    v_sum = np.sum(_v)
+    w_sum = np.sum(_w)
+    p_sum = np.sum(_p)
+    phi_sum = np.sum(_phi)
 
-    sendbuf[:] = [Rho_sum, U_sum, V_sum, W_sum, P_sum, Phi_sum]
+    sendbuf[:] = [rho_sum, u_sum, v_sum, w_sum, p_sum, phi_sum]
     g.comm.Reduce(sendbuf, recvbuf, op=g.MPI.SUM, root=0)
     recvbuf = recvbuf / (g.nx_global * g.ny_global * g.nz_global)
-    Rho_mean, U_mean, V_mean, W_mean, P_mean, Phi_mean = recvbuf
+    rho_mean, u_mean, v_mean, w_mean, p_mean, phi_mean = recvbuf
 
     # Compute global max variables
-    Rho_max = np.max(Rho)
-    U_max = np.max(U)
-    V_max = np.max(V)
-    W_max = np.max(W)
-    P_max = np.max(P)
-    Phi_max = np.max(Phi)
+    rho_max = np.max(_rho)
+    u_max = np.max(_u)
+    v_max = np.max(_v)
+    w_max = np.max(_w)
+    p_max = np.max(_p)
+    phi_max = np.max(_phi)
 
-    sendbuf[:] = [Rho_max, U_max, V_max, W_max, P_max, Phi_max]
+    sendbuf[:] = [rho_max, u_max, v_max, w_max, p_max, phi_max]
     g.comm.Reduce(sendbuf, recvbuf, op=g.MPI.MAX, root=0)
-    Rho_max, U_max, V_max, W_max, P_max, Phi_max = recvbuf
+    rho_max, u_max, v_max, w_max, p_max, phi_max = recvbuf
 
     # only print monitor if rank 0
     if g.myrank != 0:
@@ -54,10 +58,10 @@ def output_monitor():
     print('')
     print(('Max  Rho, U, V, W, P, Phi : {0:10.4e}, {1:10.4e}, '
            '{2:10.4e}, {3:10.4e}, {4:10.4e}, {5:10.4e}'
-           ).format(Rho_max, U_max, V_max, W_max, P_max, Phi_max))
+           ).format(rho_max, u_max, v_max, w_max, p_max, phi_max))
     print(('Mean Rho, U, V, W, P, Phi : {0:10.4e}, {1:10.4e}, '
            '{2:10.4e}, {3:10.4e}, {4:10.4e}, {5:10.4e}'
-           ).format(Rho_mean, U_mean, V_mean, W_mean, P_mean, Phi_mean))
+           ).format(rho_mean, u_mean, v_mean, w_mean, p_mean, phi_mean))
     print('')
 
 

@@ -82,12 +82,12 @@ def initialize():
     # --- Build Grids --------------------------------------------------
     # build the global grid arrays
     xg_temp = np.linspace(0, g.Lx, g.nx_global+1)
-    if (g.ny_global % 2 == 1):
+    if g.ny_global % 2 == 1:
         yg_temp = np.linspace(-g.Ly/2, g.Ly/2, g.ny_global+1)
     else:
         raise Exception("Use odd values for ny")
 
-    if (g.nz_global % 2 == 1):
+    if g.nz_global % 2 == 1:
         zg_temp = np.linspace(-g.Lz/2, g.Lz/2, g.nz_global+1)
     else:
         raise Exception('Use odd values for nz')
