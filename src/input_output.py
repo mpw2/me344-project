@@ -171,7 +171,7 @@ def output_data():
     filename format: 'fout_path.{tstep}.{rank}'
     """
     # Specify the output file
-    fout_path = g.fout_path + '.{0:d}.{1:03d}'.format(g.tstep, g.myrank)
+    fout_path = g.fout_path + '.{0:06d}.{1:03d}'.format(g.tstep, g.myrank)
 
     # Variables to save
     save_vars = [g.xg, g.yg, g.zg, g.Q]
