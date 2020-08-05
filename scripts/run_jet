@@ -21,6 +21,7 @@ while getopts ":i:n:" flag; do
     case ${flag} in
     i )
         param_in=$OPTARG
+        ;;
     n ) 
         nprocs=$OPTARG
         ;;
