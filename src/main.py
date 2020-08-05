@@ -32,7 +32,7 @@ def main():
     # output initial condition to monitor
     mon.output_monitor()
 
-    # Start time integration loop
+    # start time integration loop
     for tstep in range(1, g.nsteps+1):
         g.tstep = tstep
 
@@ -49,7 +49,9 @@ def main():
         # output to data file
         if tstep % g.nsave == 0:
             io.output_data()
-
+    
+    # finish up
+    mon.output_final()
 
 if __name__ == "__main__":
     main()
