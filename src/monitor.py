@@ -3,6 +3,7 @@ Writes solver monitor output to std_out periodically.
 """
 
 import numpy as np
+import sys
 
 import common as g
 import equations as eq
@@ -14,7 +15,8 @@ def output_monitor():
     # Check for NaNs
     check_q = np.sum(g.Q, axis=(0, 1, 2))
     if np.any(np.isnan(check_q)):
-        raise Exception('Error: NaNs!!!')
+        #raise Exception('Error: NaNs!!!')
+        g.comm.Abort()
 
     # Allocate MPI memory buffers
     sendbuf = np.empty((g.NVARS), dtype=np.float64)
@@ -63,7 +65,7 @@ def output_monitor():
            '{2:10.4e}, {3:10.4e}, {4:10.4e}, {5:10.4e}'
            ).format(rho_mean, u_mean, v_mean, w_mean, p_mean, phi_mean))
     print('')
-
+    sys.stdout.flush()
 
 def output_final():
     """Print info upon program completion"""
