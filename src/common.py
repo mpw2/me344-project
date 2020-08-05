@@ -1,10 +1,6 @@
-# ------------------------------------------
-#
-# common.py
-#
-#  - contains global variables
-#
-# ------------------------------------------
+"""common.py
+Contains global variables
+"""
 
 
 # MPI objects/parameters

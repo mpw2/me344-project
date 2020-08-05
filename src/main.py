@@ -9,7 +9,7 @@ Solver Details:
     - MacCormack Scheme
 
 Package Requirements:
-    Solver: 
+    Solver:
         - numpy
         - mpi4py
         - numba
@@ -25,7 +25,8 @@ import common as g
 
 
 def main():
-    
+    """main method: run time integration loop"""
+
     # initialize data structures
     ini.initialize()
 
@@ -49,9 +50,10 @@ def main():
         # output to data file
         if tstep % g.nsave == 0:
             io.output_data()
-    
+
     # finish up
     mon.output_final()
+
 
 if __name__ == "__main__":
     main()

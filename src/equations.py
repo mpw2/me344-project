@@ -1,32 +1,29 @@
-# ----------------------------------------------------------------------
-# Equations.py
-#
-# Description:
-#  - Contains the governing equations of the flow and forcing terms.
-#  - Contains the numerical operators for computing derivatives.
-#  - Contains functions to convert conserved and primitive variables.
-#
-# ----------------------------------------------------------------------
+"""equations.py
 
-# from numba import njit
-import common as g
+Description:
+ - Contains the governing equations of the flow and forcing terms.
+ - Contains the numerical operators for computing derivatives.
+ - Contains functions to convert conserved and primitive variables.
+"""
+
+# import numba as nb
 import numpy as np
 
+import common as g
 
-# ---------------------------------------------------
-# Compute Finite Difference in x direction
-#
-# Input:
-#     phi    : quantity
-#     x      : x-dir grid
-#     y      : y-dir grid
-#     z      : z-dir grid
-#     dir_id : 0 - Forward, 1 - Backward, 2 - Central
-# Output:
-#     d(phi)/dy : same dimensions as phi
-# ---------------------------------------------------
-# @njit
+
+# @nb.jit(nopython=True)
 def compute_x_deriv(phi, x, y, z, dir_id):
+    """Compute Finite Difference in x direction
+    Input:
+        phi    : quantity
+        x      : x-dir grid
+        y      : y-dir grid
+        z      : z-dir grid
+        dir_id : 0 - Forward, 1 - Backward, 2 - Central
+    Output:
+        d(phi)/dy : same dimensions as phi
+    """
     nx = x.shape[0]-1
     ny = y.shape[1]-1
     nz = z.shape[2]-1
@@ -51,20 +48,18 @@ def compute_x_deriv(phi, x, y, z, dir_id):
     return dphi
 
 
-# ---------------------------------------------------
-# Compute Finite Difference in y direction
-#
-# Input:
-#     phi    : quantity
-#     x      : x-dir grid
-#     y      : y-dir grid
-#     z      : z-dir grid
-#     dir_id : 0 - Forward, 1 - Backward, 2 - Central
-# Output:
-#     d(phi)/dy : same dimensions as phi
-# ---------------------------------------------------
-# @njit
+# @nb.jit(nopython=True)
 def compute_y_deriv(phi, x, y, z, dir_id):
+    """Compute Finite Difference in y direction
+    Input:
+        phi    : quantity
+        x      : x-dir grid
+        y      : y-dir grid
+        z      : z-dir grid
+        dir_id : 0 - Forward, 1 - Backward, 2 - Central
+    Output:
+        d(phi)/dy : same dimensions as phi
+    """
     nx = x.shape[0]-1
     ny = y.shape[1]-1
     nz = z.shape[2]-1
@@ -89,20 +84,18 @@ def compute_y_deriv(phi, x, y, z, dir_id):
     return dphi
 
 
-# ---------------------------------------------------
-# Compute Finite Difference in z direction
-#
-# Input:
-#     phi    : quantity
-#     x      : x-dir grid
-#     y      : y-dir grid
-#     z      : z-dir grid
-#     dir_id : 0 - Forward, 1 - Backward, 2 - Central
-# Output:
-#     d(phi)/dz : same dimensions as phi
-# ---------------------------------------------------
-# @njit
+# @nb.jit(nopython=True)
 def compute_z_deriv(phi, x, y, z, dir_id):
+    """Compute Finite Difference in z direction
+    Input:
+        phi    : quantity
+        x      : x-dir grid
+        y      : y-dir grid
+        z      : z-dir grid
+        dir_id : 0 - Forward, 1 - Backward, 2 - Central
+    Output:
+        d(phi)/dz : same dimensions as phi
+    """
     nx = x.shape[0]-1
     ny = y.shape[1]-1
     nz = z.shape[2]-1
@@ -127,53 +120,49 @@ def compute_z_deriv(phi, x, y, z, dir_id):
     return dphi
 
 
-# -----------------------------------------------------------------------------
-# ConsToPrim - Conserved variables to primitive variables
-#
-# Input:
-#  - Q : Vector of conserved variables (nx, ny, nz, nvars)
-# Output:
-#  - Rho     : Density
-#  - U, V, W : Velocity components
-#  - P       : Pressure
-#  - Phi     : Passive Scalar
-# -----------------------------------------------------------------------------
-# @njit
+# @nb.jit(nopython=True)
 def ConsToPrim(Q):
-    Rho_ = Q[:, :, :, 0]
-    U_ = Q[:, :, :, 1] / Q[:, :, :, 0]
-    V_ = Q[:, :, :, 2] / Q[:, :, :, 0]
-    W_ = Q[:, :, :, 3] / Q[:, :, :, 0]
-    P_ = (g.gamma - 1) * (Q[:, :, :, 4] - 0.5 / Q[:, :, :, 0] *
+    """ConsToPrim - Conserved variables to primitive variables
+    Input:
+     - Q : Vector of conserved variables (nx, ny, nz, nvars)
+    Output:
+     - Rho     : Density
+     - U, V, W : Velocity components
+     - P       : Pressure
+     - Phi     : Passive Scalar
+    """
+    _rho = Q[:, :, :, 0]
+    _u = Q[:, :, :, 1] / Q[:, :, :, 0]
+    _v = Q[:, :, :, 2] / Q[:, :, :, 0]
+    _w = Q[:, :, :, 3] / Q[:, :, :, 0]
+    _p = (g.gamma - 1) * (Q[:, :, :, 4] - 0.5 / Q[:, :, :, 0] *
                           (Q[:, :, :, 1] + Q[:, :, :, 2] + Q[:, :, :, 3])**2)
-    Phi_ = Q[:, :, :, 5] / Q[:, :, :, 0]
+    _phi = Q[:, :, :, 5] / Q[:, :, :, 0]
 
-    return Rho_, U_, V_, W_, P_, Phi_
+    return _rho, _u, _v, _w, _p, _phi
 
 
-# -----------------------------------------------------------------------------
-# PrimToCons - Primitive variables to conserved variables
-#
-# Input:
-#  - Rho     : Density
-#  - U, V, W : Velocity components
-#  - P       : Pressure
-#  - Phi     : Passive scalar
-# Output:
-#  - Rho       : Density
-#  - Rho U,V,W : Momentum
-#  - Et        : Total energy
-#  - Rho Phi   : Passive scalar
-# -----------------------------------------------------------------------------
-# @njit
-def PrimToCons(Rho, U, V, W, P, Phi):
-    rhoU_ = Rho * U
-    rhoV_ = Rho * V
-    rhoW_ = Rho * W
-    Et_ = P / (g.gamma - 1) + 0.5 * Rho * (U**2 + V**2 + W**2)
-    rhoPhi_ = Rho * Phi
+# @nb.jit(nopython=True)
+def PrimToCons(rho, u, v, w, p, phi):
+    """PrimToCons - Primitive variables to conserved variables
+    Input:
+     - Rho     : Density
+     - U, V, W : Velocity components
+     - P       : Pressure
+     - Phi     : Passive scalar
+    Output:
+     - Rho       : Density
+     - Rho U,V,W : Momentum
+     - Et        : Total energy
+     - Rho Phi   : Passive scalar
+    """
+    _rho_u = rho * u
+    _rho_v = rho * v
+    _rho_w = rho * w
+    _e_tot = p / (g.gamma - 1) + 0.5 * rho * (u**2 + v**2 + w**2)
+    _rho_phi = rho * phi
 
-    return Rho, rhoU_, rhoV_, rhoW_, Et_, rhoPhi_
+    return rho, _rho_u, _rho_v, _rho_w, _e_tot, _rho_phi
 
 
 def Tauxx(U, x, y, z, mu, step):
@@ -362,89 +351,87 @@ def Tauyz(V, W, x, y, z, mu, flux_dir, step):
     return tau_yz
 
 
-# -----------------------------------------------------
-#  Sponge term
-#   - decays the solution near boundaries to
-#     prevent undesired reflection of characteristics
-# -----------------------------------------------------
 def comp_sponge_term(Q, Qref, sigma):
+    """Compute sponge term
+    decays the solution near boundaries to prevent undesired
+    reflection of characteristics
+    """
     return sigma * (Qref - Q)
-# -----------------------------------------------------
 
 
-def compE(Q, x, y, z, Rgas, mu, kappa, D, gamma, step):
+def compE(Q, x, y, z, Rgas, mu, kappa, D, step):
     """Calculate x direction flux term"""
-    Rho, U, V, W, P, Phi = ConsToPrim(Q)
-    T = P / (Rho * Rgas)
+    _rho, _u, _v, _w, _p, _phi = ConsToPrim(Q)
+    _temp = _p / (_rho * Rgas)
 
-    tau_xx = Tauxx(U, x, y, z, mu, step)
-    tau_xy = Tauxy(U, V, x, y, z, mu, 0, step)
-    tau_xz = Tauxz(U, W, x, y, z, mu, 0, step)
-    qx = Qx(T, x, y, z, kappa, step)
-    phix = Phix(Phi, x, y, z, D, step)
+    tau_xx = Tauxx(_u, x, y, z, mu, step)
+    tau_xy = Tauxy(_u, _v, x, y, z, mu, 0, step)
+    tau_xz = Tauxz(_u, _w, x, y, z, mu, 0, step)
+    qx = Qx(_temp, x, y, z, kappa, step)
+    phix = Phix(_phi, x, y, z, D, step)
 
-    g.E[:, :, :, 0] = Rho * U
-    g.E[:, :, :, 1] = Rho * U**2 + P - tau_xx
-    g.E[:, :, :, 2] = Rho * U * V - tau_xy
-    g.E[:, :, :, 3] = Rho * U * W - tau_xz
-    g.E[:, :, :, 4] = (Q[:, :, :, 4] + P) * U - \
-        U * tau_xx - V * tau_xy - W * tau_xz + qx
-    g.E[:, :, :, 5] = Rho * U * Phi - phix
+    g.E[:, :, :, 0] = _rho * _u
+    g.E[:, :, :, 1] = _rho * _u**2 + _p - tau_xx
+    g.E[:, :, :, 2] = _rho * _u * _v - tau_xy
+    g.E[:, :, :, 3] = _rho * _u * _w - tau_xz
+    g.E[:, :, :, 4] = (Q[:, :, :, 4] + _p) * _u - \
+        _u * tau_xx - _v * tau_xy - _w * tau_xz + qx
+    g.E[:, :, :, 5] = _rho * _u * _phi - phix
 
 
-def compF(Q, x, y, z, Rgas, mu, kappa, D, gamma, step):
+def compF(Q, x, y, z, Rgas, mu, kappa, D, step):
     """Calculate y direction flux term"""
-    Rho, U, V, W, P, Phi = ConsToPrim(Q)
-    T = P / (Rho * Rgas)
+    _rho, _u, _v, _w, _p, _phi = ConsToPrim(Q)
+    _temp = _p / (_rho * Rgas)
 
-    tau_yy = Tauyy(V, x, y, z, mu, step)
-    tau_xy = Tauxy(U, V, x, y, z, mu, 1, step)
-    tau_yz = Tauyz(V, W, x, y, z, mu, 1, step)
-    qy = Qy(T, x, y, z, kappa, step)
-    phiy = Phiy(Phi, x, y, z, D, step)
+    tau_yy = Tauyy(_v, x, y, z, mu, step)
+    tau_xy = Tauxy(_u, _v, x, y, z, mu, 1, step)
+    tau_yz = Tauyz(_v, _w, x, y, z, mu, 1, step)
+    qy = Qy(_temp, x, y, z, kappa, step)
+    phiy = Phiy(_phi, x, y, z, D, step)
 
-    g.F[:, :, :, 0] = Rho * V
-    g.F[:, :, :, 1] = Rho * U * V - tau_xy
-    g.F[:, :, :, 2] = Rho * V**2 + P - tau_yy
-    g.F[:, :, :, 3] = Rho * V * W - tau_yz
-    g.F[:, :, :, 4] = (Q[:, :, :, 4] + P) * V - \
-        U * tau_xy - V * tau_yy - W * tau_yz + qy
-    g.F[:, :, :, 5] = Rho * V * Phi - phiy
+    g.F[:, :, :, 0] = _rho * _v
+    g.F[:, :, :, 1] = _rho * _u * _v - tau_xy
+    g.F[:, :, :, 2] = _rho * _v**2 + _p - tau_yy
+    g.F[:, :, :, 3] = _rho * _v * _w - tau_yz
+    g.F[:, :, :, 4] = (Q[:, :, :, 4] + _p) * _v - \
+        _u * tau_xy - _v * tau_yy - _w * tau_yz + qy
+    g.F[:, :, :, 5] = _rho * _v * _phi - phiy
 
 
-def compG(Q, x, y, z, Rgas, mu, kappa, D, gamma, step):
+def compG(Q, x, y, z, Rgas, mu, kappa, D, step):
     """Calculate z direction flux term"""
-    Rho, U, V, W, P, Phi = ConsToPrim(Q)
-    T = P / (Rho * Rgas)
+    _rho, _u, _v, _w, _p, _phi = ConsToPrim(Q)
+    _temp = _p / (_rho * Rgas)
 
-    tau_zz = Tauzz(W, x, y, z, mu, step)
-    tau_xz = Tauxz(U, W, x, y, z, mu, 2, step)
-    tau_yz = Tauyz(V, W, x, y, z, mu, 2, step)
-    qz = Qz(T, x, y, z, kappa, step)
-    phiz = Phiz(Phi, x, y, z, D, step)
+    tau_zz = Tauzz(_w, x, y, z, mu, step)
+    tau_xz = Tauxz(_u, _w, x, y, z, mu, 2, step)
+    tau_yz = Tauyz(_v, _w, x, y, z, mu, 2, step)
+    qz = Qz(_temp, x, y, z, kappa, step)
+    phiz = Phiz(_phi, x, y, z, D, step)
 
-    g.G[:, :, :, 0] = Rho * W
-    g.G[:, :, :, 1] = Rho * U * W - tau_xz
-    g.G[:, :, :, 2] = Rho * V * W - tau_yz
-    g.G[:, :, :, 3] = Rho * W**2 + P - tau_zz
-    g.G[:, :, :, 4] = (Q[:, :, :, 4] + P) * W - \
-        U * tau_xz - V * tau_yz - W * tau_zz + qz
-    g.G[:, :, :, 5] = Rho * W * Phi - phiz
+    g.G[:, :, :, 0] = _rho * _w
+    g.G[:, :, :, 1] = _rho * _u * _w - tau_xz
+    g.G[:, :, :, 2] = _rho * _v * _w - tau_yz
+    g.G[:, :, :, 3] = _rho * _w**2 + _p - tau_zz
+    g.G[:, :, :, 4] = (Q[:, :, :, 4] + _p) * _w - \
+        _u * tau_xz - _v * tau_yz - _w * tau_zz + qz
+    g.G[:, :, :, 5] = _rho * _w * _phi - phiz
 
 
 def compRHS(Q, x, y, z, step):
     """Compute RHS flux and forcing terms
 
     Alternate differencing direction every step, e.g.
-    In the predictor step use forward differences
-    In the corrector step use backward differences
+     - predictor step -> forward differences
+     - corrector step -> backward differences
 
-    Use opposite differencing direction to calculate flux terms
-    Use central differencing in directions not aligned with flux
+     - opposite differencing direction for aligned flux terms
+     - central differencing for non-aligned flux terms
     """
-    compE(Q, x, y, z, g.R_g, g.mu, g.k, g.D, g.gamma, step)
-    compF(Q, x, y, z, g.R_g, g.mu, g.k, g.D, g.gamma, step)
-    compG(Q, x, y, z, g.R_g, g.mu, g.k, g.D, g.gamma, step)
+    compE(Q, x, y, z, g.R_g, g.mu, g.k, g.D, step)
+    compF(Q, x, y, z, g.R_g, g.mu, g.k, g.D, step)
+    compG(Q, x, y, z, g.R_g, g.mu, g.k, g.D, step)
 
     sponge_rhs = comp_sponge_term(Q, g.Qref, g.sponge_fac)
 
@@ -457,13 +444,13 @@ def compRHS(Q, x, y, z, step):
     else:
         raise Exception('Invalid derivative dir_id')
 
-    for ii in range(g.NVARS):
-        g.dEdx[:, :, :, ii] = compute_x_deriv(g.E[:, :, :, ii],
-                                              x, y, z, dir_id)
-        g.dFdy[:, :, :, ii] = compute_y_deriv(g.F[:, :, :, ii],
-                                              x, y, z, dir_id)
-        g.dGdz[:, :, :, ii] = compute_z_deriv(g.G[:, :, :, ii],
-                                              x, y, z, dir_id)
+    for i in range(g.NVARS):
+        g.dEdx[:, :, :, i] = compute_x_deriv(g.E[:, :, :, i],
+                                             x, y, z, dir_id)
+        g.dFdy[:, :, :, i] = compute_y_deriv(g.F[:, :, :, i],
+                                             x, y, z, dir_id)
+        g.dGdz[:, :, :, i] = compute_z_deriv(g.G[:, :, :, i],
+                                             x, y, z, dir_id)
 
     rhs = -1 * (g.dEdx + g.dFdy + g.dGdz) + sponge_rhs
 
