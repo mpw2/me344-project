@@ -7,8 +7,6 @@ numerical boundary conditions including updating interior ghost planes
 between parallel tasks.
 """
 
-import numpy as np
-
 import common as g
 
 
@@ -17,7 +15,7 @@ def apply_boundary_conditions():
 
     # update internal ghost planes
     communicate_internal_planes()
-    
+
     # inlet boundary
     if g.myrank == 0:
         # base inlet boundary

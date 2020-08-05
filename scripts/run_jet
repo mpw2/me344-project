@@ -21,6 +21,7 @@ while getopts ":i:n:" flag; do
     case ${flag} in
     i )
         param_in=$OPTARG
+        ;;
     n ) 
         nprocs=$OPTARG
         ;;
@@ -45,9 +46,9 @@ fi
 
 # Run the code
 if [ $write_to_file == 0 ]; then
-    mpiexec -n $nprocs $PYR "$JET_DIR"src/main.py $param_in
+    mpiexec -n "$nprocs" $PYR "$JET_DIR"src/main.py "$param_in"
 else
-    mpiexec -n $nprocs $PYR "$JET_DIR"src/main.py $param_in \
+    mpiexec -n "$nprocs" $PYR "$JET_DIR"src/main.py "$param_in" \
         1>$std_out 2>$std_err
 fi
 

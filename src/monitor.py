@@ -63,11 +63,11 @@ def output_monitor():
 
 def output_final():
     """Print info upon program completion"""
-    
+
     # only print if rank 0
     if g.myrank != 0:
         return
-    
+
     print('Done!')
 
 
