@@ -26,6 +26,7 @@ def read_input_parameters():
         # get parameter input file
         g.fparam_path = sys.argv[1]
         print('Reading parameters from: {:s}'.format(g.fparam_path))
+        sys.stdout.flush()
 
         fil = open(g.fparam_path, 'r')
 
@@ -71,6 +72,7 @@ def read_input_parameters():
 
         print('Input data file: {:s}'.format(g.fin_path))
         print('Output data file: {:s}'.format(g.fout_path))
+        sys.stdout.flush()
 
         # Close parameter input file
         fil.close()

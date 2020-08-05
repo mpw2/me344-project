@@ -15,7 +15,7 @@ def output_monitor():
     # Check for NaNs
     check_q = np.sum(g.Q, axis=(0, 1, 2))
     if np.any(np.isnan(check_q)):
-        #raise Exception('Error: NaNs!!!')
+        # raise Exception('Error: NaNs!!!')
         g.comm.Abort()
 
     # Allocate MPI memory buffers
@@ -67,6 +67,7 @@ def output_monitor():
     print('')
     sys.stdout.flush()
 
+
 def output_final():
     """Print info upon program completion"""
 
@@ -75,6 +76,7 @@ def output_final():
         return
 
     print('Done!')
+    sys.stdout.flush()
 
 
 #
