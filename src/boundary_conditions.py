@@ -7,16 +7,13 @@ numerical boundary conditions including updating interior ghost planes
 between parallel tasks.
 """
 
+import numpy as np
+
 import common as g
 
 
 def apply_boundary_conditions():
     """Apply boundary conditions to transported variables"""
-
-    g.comm.Barrier()
-
-    # update internal ghost planes
-    communicate_internal_planes()
 
     # inlet boundary
     if g.myrank == 0:
@@ -52,25 +49,37 @@ def apply_boundary_conditions():
     # apply_pressure_bc('z0')
     # apply_pressure_bc('z1')
 
+    g.comm.Barrier()
+
+    # update internal ghost planes
+    communicate_internal_planes()
+
 
 def communicate_internal_planes():
     """Communicate internal ghost planes between MPI processes"""
 
+    sendbuf = np.zeros((1, g.ny+1, g.nz+1, g.NVARS), dtype=np.float64)
+    recvbuf = np.zeros((1, g.ny+1, g.nz+1, g.NVARS), dtype=np.float64)
+
     # all processes with a chunk ahead of them
     if g.myrank < g.nprocs-1:
-        g.comm.Isend(g.Q[g.nx-1, :, :, :], dest=g.myrank+1, tag=g.myrank)
+        sendbuf = g.Q[g.nx-1, :, :, :]
+        g.comm.Isend([sendbuf, g.MPI.DOUBLE], dest=g.myrank+1, tag=g.myrank)
 
     # zeroth process doesn't receive
     if g.myrank > 0:
-        g.comm.Recv(g.Q[0, :, :, :], source=g.myrank-1, tag=g.myrank-1)
+        g.comm.Recv([recvbuf, g.MPI.DOUBLE], source=g.myrank-1, tag=g.myrank-1)
+        g.Q[0, :, :, :] = recvbuf
 
     # all processes with a chunk behind them
     if g.myrank > 0:
-        g.comm.Isend(g.Q[1, :, :, :], dest=g.myrank-1, tag=g.myrank)
+        sendbuf = g.Q[1, :, :, :]
+        g.comm.Isend([sendbuf, g.MPI.DOUBLE], dest=g.myrank-1, tag=g.myrank)
 
     # nprocs-1 process doesn't receive
     if g.myrank < g.nprocs-1:
-        g.comm.Recv(g.Q[g.nx, :, :, :], source=g.myrank+1, tag=g.myrank+1)
+        g.comm.Recv([recvbuf, g.MPI.DOUBLE], source=g.myrank+1, tag=g.myrank+1)
+        g.Q[g.nx, :, :, :] = recvbuf
 
 
 def apply_extrapolation_bc(dirid):

@@ -280,15 +280,15 @@ def Tauxy(U, V, x, y, z, mu, flux_dir, step):
             tau_xy = mu * (compute_y_deriv(U, x, y, z, 2) +
                            compute_x_deriv(V, x, y, z, 1))
         elif flux_dir == 1:
-            tau_xy = mu * (compute_y_deriv(U, x, y, z, 2) +
-                           compute_x_deriv(V, x, y, z, 0))
+            tau_xy = mu * (compute_y_deriv(U, x, y, z, 1) +
+                           compute_x_deriv(V, x, y, z, 2))
         else:
             raise Exception('Invalid Flux Direction')
 
     elif step == 'corrector':
         if flux_dir == 0:
-            tau_xy = mu * (compute_y_deriv(U, x, y, z, 1) +
-                           compute_x_deriv(V, x, y, z, 2))
+            tau_xy = mu * (compute_y_deriv(U, x, y, z, 2) +
+                           compute_x_deriv(V, x, y, z, 0))
         elif flux_dir == 1:
             tau_xy = mu * (compute_y_deriv(U, x, y, z, 0) +
                            compute_x_deriv(V, x, y, z, 2))
@@ -308,15 +308,15 @@ def Tauxz(U, W, x, y, z, mu, flux_dir, step):
             tau_xz = mu * (compute_z_deriv(U, x, y, z, 2) +
                            compute_x_deriv(W, x, y, z, 1))
         elif flux_dir == 2:
-            tau_xz = mu * (compute_z_deriv(U, x, y, z, 2) +
-                           compute_x_deriv(W, x, y, z, 0))
+            tau_xz = mu * (compute_z_deriv(U, x, y, z, 1) +
+                           compute_x_deriv(W, x, y, z, 2))
         else:
             raise Exception('Invalid Flux Direction')
 
     elif step == 'corrector':
         if flux_dir == 0:
-            tau_xz = mu * (compute_z_deriv(U, x, y, z, 1) +
-                           compute_x_deriv(W, x, y, z, 2))
+            tau_xz = mu * (compute_z_deriv(U, x, y, z, 2) +
+                           compute_x_deriv(W, x, y, z, 0))
         elif flux_dir == 2:
             tau_xz = mu * (compute_z_deriv(U, x, y, z, 0) +
                            compute_x_deriv(W, x, y, z, 2))
@@ -333,18 +333,18 @@ def Tauyz(V, W, x, y, z, mu, flux_dir, step):
             tau_yz = mu * (compute_z_deriv(V, x, y, z, 2) +
                            compute_y_deriv(W, x, y, z, 1))
         elif flux_dir == 2:
-            tau_yz = mu * (compute_z_deriv(V, x, y, z, 2) +
-                           compute_x_deriv(W, x, y, z, 0))
+            tau_yz = mu * (compute_z_deriv(V, x, y, z, 1) +
+                           compute_y_deriv(W, x, y, z, 2))
         else:
             raise Exception('Invalid Flux Direction')
 
     elif step == 'corrector':
         if flux_dir == 1:
-            tau_yz = mu * (compute_z_deriv(V, x, y, z, 1) +
-                           compute_x_deriv(W, x, y, z, 2))
+            tau_yz = mu * (compute_z_deriv(V, x, y, z, 2) +
+                           compute_y_deriv(W, x, y, z, 0))
         elif flux_dir == 2:
             tau_yz = mu * (compute_z_deriv(V, x, y, z, 0) +
-                           compute_x_deriv(W, x, y, z, 2))
+                           compute_y_deriv(W, x, y, z, 2))
         else:
             raise Exception('Invalid Flux Direction')
 
@@ -452,7 +452,7 @@ def compRHS(Q, x, y, z, step):
         g.dGdz[:, :, :, i] = compute_z_deriv(g.G[:, :, :, i],
                                              x, y, z, dir_id)
 
-    rhs = -1 * (g.dEdx + g.dFdy + g.dGdz) + sponge_rhs
+    rhs = -1.0 * (g.dEdx + g.dFdy + g.dGdz) + sponge_rhs
 
     return rhs
 
