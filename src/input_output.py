@@ -12,6 +12,7 @@ Dependencies:
 
 import sys
 import pickle
+import numpy as np
 
 import common as g
 import equations as eq
@@ -173,16 +174,60 @@ def output_data():
     filename format: 'fout_path.{tstep}.{rank}'
     """
     # Specify the output file
-    fout_path = g.fout_path + \
-        '.{0:06d}.{1:03d}'.format(g.tstep, g.myrank)
+    fout_path = g.fout_path + '.{0:06d}'.format(g.tstep)
+
+    if g.myrank == 0:
+        print('')
+
+    # Collect the data to output
+    full_q = np.zeros((g.nx_global + 1,
+                       g.ny_global + 1,
+                       g.nz_global + 1,
+                       g.NVARS),
+                      dtype=np.float64)
+    # Send from rank > 0
+    if g.myrank != 0:
+        i0 = 1  # exclude first plane
+        i1 = g.nx  # exclude last plane
+        if g.myrank == g.nprocs-1:
+            i1 = i1 + 1
+        g.comm.Send([g.Q[i0:i1, :, :, :], g.MPI.DOUBLE],
+                    dest=0,
+                    tag=g.myrank)
+        return  # rank > 0 processes done
+
+    # Receive on rank == 0
+    i0 = g.i0_global[0]
+    i1 = g.i1_global[0]
+    full_q[i0:i1, :, :, :] = g.Q[:-1, :, :, :]
+    for src in range(1, g.nprocs):
+        i0 = g.i0_global[src] + 1  # exclude first plane
+        i1 = g.i1_global[src]  # exclude last plane
+        if src == g.nprocs-1:
+            i1 = i1 + 1
+        g.comm.Recv([full_q[i0:i1, :, :, :], g.MPI.DOUBLE],
+                    source=src,
+                    tag=src)
 
     # Variables to save
-    save_vars = [g.xg, g.yg, g.zg, g.Q]
+    save_vars = [g.xg_global, g.yg_global, g.zg_global, full_q]
 
     # Write binary output
     fil = open(fout_path, 'wb')
     pickle.dump(save_vars, fil)
     fil.close()
+
+    # # Specify the output file
+    # fout_path = g.fout_path + \
+    #     '.{0:06d}.{1:03d}'.format(g.tstep, g.myrank)
+
+    # # Variables to save
+    # save_vars = [g.xg, g.yg, g.zg, g.Q]
+
+    # # Write binary output
+    # fil = open(fout_path, 'wb')
+    # pickle.dump(save_vars, fil)
+    # fil.close()
 
 
 #

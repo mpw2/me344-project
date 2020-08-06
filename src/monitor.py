@@ -2,8 +2,8 @@
 Writes solver monitor output to std_out periodically.
 """
 
-import numpy as np
 import sys
+import numpy as np
 
 import common as g
 import equations as eq
@@ -15,7 +15,9 @@ def output_monitor():
     # Check for NaNs
     check_q = np.sum(g.Q, axis=(0, 1, 2))
     if np.any(np.isnan(check_q)):
-        # raise Exception('Error: NaNs!!!')
+        sys.stderr.write(
+            "[PROC {0:d}] Error: NaNs! \n".format(g.myrank))
+        sys.stderr.flush()
         g.comm.Abort()
 
     # Allocate MPI memory buffers

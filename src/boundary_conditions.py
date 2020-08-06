@@ -13,6 +13,8 @@ import common as g
 def apply_boundary_conditions():
     """Apply boundary conditions to transported variables"""
 
+    g.comm.Barrier()
+
     # update internal ghost planes
     communicate_internal_planes()
 
@@ -56,7 +58,7 @@ def communicate_internal_planes():
 
     # all processes with a chunk ahead of them
     if g.myrank < g.nprocs-1:
-        g.comm.Isend(g.Q[-2, :, :, :], dest=g.myrank+1, tag=g.myrank)
+        g.comm.Isend(g.Q[g.nx-1, :, :, :], dest=g.myrank+1, tag=g.myrank)
 
     # zeroth process doesn't receive
     if g.myrank > 0:
@@ -68,7 +70,7 @@ def communicate_internal_planes():
 
     # nprocs-1 process doesn't receive
     if g.myrank < g.nprocs-1:
-        g.comm.Recv(g.Q[-1, :, :, :], source=g.myrank+1, tag=g.myrank+1)
+        g.comm.Recv(g.Q[g.nx, :, :, :], source=g.myrank+1, tag=g.myrank+1)
 
 
 def apply_extrapolation_bc(dirid):

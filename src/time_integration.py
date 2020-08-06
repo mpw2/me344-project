@@ -19,6 +19,8 @@ def compute_timestep_maccormack():
     # Save state from previous time step
     g.Qo[:, :, :, :] = g.Q[:, :, :, :]
 
+    bc.apply_boundary_conditions()
+
     # Compute first RK step
     kv1 = eq.compRHS(g.Q, g.xg, g.yg, g.zg, g.rk_step_1)
     g.Q[:, :, :, :] = g.Q[:, :, :, :] + g.dt*kv1[:, :, :, :]
