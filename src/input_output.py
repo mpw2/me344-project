@@ -177,7 +177,8 @@ def output_data():
     fout_path = g.fout_path + '.{0:06d}'.format(g.tstep)
 
     if g.myrank == 0:
-        print('')
+        print('Writing to {0:s}'.format(fout_path))
+        sys.stdout.flush()
 
     # Collect the data to output
     full_q = np.zeros((g.nx_global + 1,
