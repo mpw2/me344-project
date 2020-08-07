@@ -1,4 +1,5 @@
-matplotlib
 numpy
 mpi4py
 numba
+matplotlib
+plotly
