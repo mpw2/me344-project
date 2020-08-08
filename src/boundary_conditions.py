@@ -42,6 +42,8 @@ def apply_boundary_conditions():
         apply_convective_bc('x1')
 
     # normal boundaries
+    # apply_convective_bc('y0')
+    # apply_convective_bc('y1')
     apply_pressure_bc('y0')
     apply_pressure_bc('y1')
     # apply_extrapolation_bc('y0')
@@ -112,9 +114,21 @@ def apply_convective_bc(dirid):
     if dirid == 'x1':
         _u = g.Qo[g.nx, :, :, 1] / g.Qo[g.nx, :, :, 0]
         factor = g.dt / (g.xg[g.nx, 0, 0] - g.xg[g.nx-1, 0, 0]) * _u
-        factor = factor.reshape(1, g.ny+1, g.nz+1, 1)
+        factor = factor.reshape(g.ny+1, g.nz+1, 1)
         g.Q[g.nx, :, :, :] = g.Qo[g.nx, :, :, :] - \
             factor * (g.Qo[g.nx, :, :, :] - g.Qo[g.nx-1, :, :, :])
+    elif dirid == 'y0':
+        _v = g.Qo[:, 0, :, 1] / g.Qo[:, 0, :, 0]
+        factor = g.dt / (g.yg[0, 0, 0] - g.yg[0, 1, 0]) * _v
+        factor = factor.reshape(g.nx+1, g.nz+1, 1)
+        g.Q[:, 0, :, :] = g.Qo[:, 0, :, :] - \
+            factor * (g.Qo[:, 0, :, :] - g.Qo[:, 1, :, :])
+    elif dirid == 'y1':
+        _v = g.Qo[:, g.ny, :, 1] / g.Qo[:, g.ny, :, 0]
+        factor = g.dt / (g.yg[0, g.ny, 0] - g.yg[0, g.ny-1, 0]) * _v
+        factor = factor.reshape(g.nx+1, g.nz+1, 1)
+        g.Q[:, g.ny, :, :] = g.Qo[:, g.ny, :, :] - \
+            factor * (g.Qo[:, g.ny, :, :] - g.Qo[:, g.ny-1, :, :])
     else:
         msg = "BC not implemented for dirid: {:s}".format(dirid)
         raise Exception(msg)
