@@ -29,7 +29,8 @@ def apply_boundary_conditions():
                 if (abs(g.yg[0, j, 0]) <= g.jet_height_y/2.0 and
                         abs(g.zg[0, 0, k]) <= g.jet_height_z/2.0):
                     g.Q[0, j, k, 0] = g.Rho_jet
-                    g.Q[0, j, k, 1] = g.Rho_jet * g.U_jet
+                    g.Q[0, j, k, 1] = g.Rho_jet * g.U_jet * \
+                        (1.0 - (g.yg[0, j, 0] / g.jet_height_y)**2.0)
                     g.Q[0, j, k, 2] = g.Rho_jet * g.V_jet
                     g.Q[0, j, k, 3] = g.Rho_jet * g.W_jet
                     g.Q[0, j, k, 4] = g.P_jet / (g.gamma-1.0) + \
