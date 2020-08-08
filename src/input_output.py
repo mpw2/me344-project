@@ -39,31 +39,31 @@ def read_input_parameters():
         # Read fluid properties
         lix = 0
         g.mu, g.gamma, g.Pr, g.R_g, g.k, g.D = \
-            map(float, lines[lix].split(', '))
+            map(np.float64, lines[lix].split(', '))
         # Read domain specification
         lix = 1
-        g.Lx, g.Ly, g.Lz = map(float, lines[lix].split(', '))
+        g.Lx, g.Ly, g.Lz = map(np.float64, lines[lix].split(', '))
         # Read inlet conditions
         lix = 2
-        g.jet_height_y, g.jet_height_z, g.U_jet, g.V_jet, g.W_jet, \
-            g.P_jet, g.T_jet, g.Phi_jet = \
-            map(float, lines[lix].split(', '))
+        g.jet_height_y, g.jet_height_z, g.U_jet, g.V_jet, g.W_jet,
+        g.P_jet, g.T_jet, g.Phi_jet = \
+            map(np.float64, lines[lix].split(', '))
 
         # Read ambient conditions
         lix = 3
         g.U_inf, g.V_inf, g.W_inf, g.P_inf, g.T_inf, g.Phi_inf = \
-            map(float, lines[lix].split(', '))
+            map(np.float64, lines[lix].split(', '))
 
         # Read grid parameters
         lix = 4
-        g.nx, g.ny, g.nz = map(int, lines[lix].split(', '))
+        g.nx, g.ny, g.nz = map(np.int32, lines[lix].split(', '))
 
         # Read timestep parameters
         lix = 5
-        g.CFL_ref, = map(float, lines[lix].split(', '))
+        g.CFL_ref, = map(np.float64, lines[lix].split(', '))
         lix = 6
         g.nsteps, g.nsave, g.nmonitor = \
-            map(int, lines[lix].split(', '))
+            map(np.int32, lines[lix].split(', '))
 
         # Read input/output parameters
         lix = 7
@@ -79,39 +79,36 @@ def read_input_parameters():
         fil.close()
 
     # Broadcast user input (MPI)
+    # intbuf = np.zeros((10), dtype=np.int32)
+    floatbuf = np.zeros((10), dtype=np.float64)
     # fluid properties
-    g.mu = g.comm.bcast(g.mu, root=0)
-    g.gamma = g.comm.bcast(g.gamma, root=0)
-    g.Pr = g.comm.bcast(g.Pr, root=0)
-    g.R_g = g.comm.bcast(g.R_g, root=0)
-    g.k = g.comm.bcast(g.k, root=0)
-    g.D = g.comm.bcast(g.D, root=0)
+    floatbuf[0:6] = [g.mu, g.gamma, g.Pr, g.R_g, g.k, g.D]
+    g.comm.Bcast([floatbuf, g.MPI.DOUBLE], root=0)
+    g.mu, g.gamma, g.Pr, g.R_g, g.k, g.D = floatbuf[0:6]
     # domain specification
-    g.Lx = g.comm.bcast(g.Lx, root=0)
-    g.Ly = g.comm.bcast(g.Ly, root=0)
-    g.Lz = g.comm.bcast(g.Lz, root=0)
+    floatbuf[0:3] = [g.Lx, g.Ly, g.Lz]
+    g.comm.Bcast([floatbuf, g.MPI.DOUBLE], root=0)
+    g.Lx, g.Ly, g.Lz = floatbuf[0:3]
     # inlet conditions
-    g.jet_height_y = g.comm.bcast(g.jet_height_y, root=0)
-    g.jet_height_z = g.comm.bcast(g.jet_height_z, root=0)
-    g.U_jet = g.comm.bcast(g.U_jet, root=0)
-    g.V_jet = g.comm.bcast(g.V_jet, root=0)
-    g.W_jet = g.comm.bcast(g.W_jet, root=0)
-    g.P_jet = g.comm.bcast(g.P_jet, root=0)
-    g.T_jet = g.comm.bcast(g.T_jet, root=0)
-    g.Phi_jet = g.comm.bcast(g.Phi_jet, root=0)
+    floatbuf[0:8] = [g.jet_height_y, g.jet_height_z, g.U_jet, g.V_jet,
+                     g.W_jet, g.P_jet, g.T_jet, g.Phi_jet]
+    g.comm.Bcast([floatbuf, g.MPI.DOUBLE], root=0)
+    g.jet_height_y, g.jet_height_z, g.U_jet, g.V_jet, g.W_jet, g.P_jet,
+    g.T_jet, g.Phi_jet = floatbuf[0:8]
     # ambient conditions
-    g.U_inf = g.comm.bcast(g.U_inf, root=0)
-    g.V_inf = g.comm.bcast(g.V_inf, root=0)
-    g.W_inf = g.comm.bcast(g.W_inf, root=0)
-    g.P_inf = g.comm.bcast(g.P_inf, root=0)
-    g.T_inf = g.comm.bcast(g.T_inf, root=0)
-    g.Phi_inf = g.comm.bcast(g.Phi_inf, root=0)
+    floatbuf[0:6] = [g.U_inf, g.V_inf, g.W_inf, g.P_inf, g.T_inf,
+                     g.Phi_inf]
+    g.comm.Bcast([floatbuf, g.MPI.DOUBLE], root=0)
+    g.U_inf, g.V_inf, g.W_inf, g.P_inf, g.T_inf, g.Phi_inf = \
+        floatbuf[0:6]
     # grid parameters
     g.nx = g.comm.bcast(g.nx, root=0)
     g.ny = g.comm.bcast(g.ny, root=0)
     g.nz = g.comm.bcast(g.nz, root=0)
     # timestep parameters
-    g.CFL_ref = g.comm.bcast(g.CFL_ref, root=0)
+    floatbuf[0] = g.CFL_ref
+    g.comm.Bcast([floatbuf, g.MPI.DOUBLE], root=0)
+    g.CFL_ref = floatbuf[0]
     g.nsteps = g.comm.bcast(g.nsteps, root=0)
     g.nsave = g.comm.bcast(g.nsave, root=0)
     g.nmonitor = g.comm.bcast(g.nmonitor, root=0)
@@ -132,11 +129,11 @@ def init_flow():
     else:
         # Default flow field initialization
         g.Rho[:, :, :] = g.Rho_inf
-        g.U[:, :, :] = 0
-        g.V[:, :, :] = 0
-        g.W[:, :, :] = 0
+        g.U[:, :, :] = 0.0
+        g.V[:, :, :] = 0.0
+        g.W[:, :, :] = 0.0
         g.P[:, :, :] = g.P_inf
-        g.Phi[:, :, :] = 0
+        g.Phi[:, :, :] = 0.0
         _rho, _rho_u, _rho_v, _rho_w, _e_tot, _rho_phi = \
             eq.PrimToCons(g.Rho, g.U, g.V, g.W, g.P, g.Phi)
         g.Q[:, :, :, 0] = _rho

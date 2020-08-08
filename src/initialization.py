@@ -43,37 +43,37 @@ def initialize():
 
     # --- Allocate Arrays ----------------------------------------------
     # Transport variable arrays
-    g.Q = np.zeros((g.nx+1, g.ny+1, g.nz+1, g.NVARS))
-    g.Qo = np.zeros((g.nx+1, g.ny+1, g.nz+1, g.NVARS))
+    g.Q = np.zeros((g.nx+1, g.ny+1, g.nz+1, g.NVARS), dtype=np.float64)
+    g.Qo = np.zeros((g.nx+1, g.ny+1, g.nz+1, g.NVARS), dtype=np.float64)
 
     # Primitive variable arrays
-    g.Rho = np.zeros((g.nx+1, g.ny+1, g.nz+1))
-    g.U = np.zeros((g.nx+1, g.ny+1, g.nz+1))
-    g.V = np.zeros((g.nx+1, g.ny+1, g.nz+1))
-    g.W = np.zeros((g.nx+1, g.ny+1, g.nz+1))
-    g.P = np.zeros((g.nx+1, g.ny+1, g.nz+1))
-    g.Phi = np.zeros((g.nx+1, g.ny+1, g.nz+1))
+    g.Rho = np.zeros((g.nx+1, g.ny+1, g.nz+1), dtype=np.float64)
+    g.U = np.zeros((g.nx+1, g.ny+1, g.nz+1), dtype=np.float64)
+    g.V = np.zeros((g.nx+1, g.ny+1, g.nz+1), dtype=np.float64)
+    g.W = np.zeros((g.nx+1, g.ny+1, g.nz+1), dtype=np.float64)
+    g.P = np.zeros((g.nx+1, g.ny+1, g.nz+1), dtype=np.float64)
+    g.Phi = np.zeros((g.nx+1, g.ny+1, g.nz+1), dtype=np.float64)
 
     # RHS variables
-    g.E = np.zeros((g.nx+1, g.ny+1, g.nz+1, g.NVARS))
-    g.F = np.zeros((g.nx+1, g.ny+1, g.nz+1, g.NVARS))
-    g.G = np.zeros((g.nx+1, g.ny+1, g.nz+1, g.NVARS))
-    g.dEdx = np.zeros((g.nx+1, g.ny+1, g.nz+1, g.NVARS))
-    g.dFdy = np.zeros((g.nx+1, g.ny+1, g.nz+1, g.NVARS))
-    g.dGdz = np.zeros((g.nx+1, g.ny+1, g.nz+1, g.NVARS))
+    g.E = np.zeros((g.nx+1, g.ny+1, g.nz+1, g.NVARS), dtype=np.float64)
+    g.F = np.zeros((g.nx+1, g.ny+1, g.nz+1, g.NVARS), dtype=np.float64)
+    g.G = np.zeros((g.nx+1, g.ny+1, g.nz+1, g.NVARS), dtype=np.float64)
+    g.dEdx = np.zeros((g.nx+1, g.ny+1, g.nz+1, g.NVARS), dtype=np.float64)
+    g.dFdy = np.zeros((g.nx+1, g.ny+1, g.nz+1, g.NVARS), dtype=np.float64)
+    g.dGdz = np.zeros((g.nx+1, g.ny+1, g.nz+1, g.NVARS), dtype=np.float64)
 
     # Grid Arrays
-    g.xg_global = np.ndarray((g.nx_global+1, 1, 1))
-    g.yg_global = np.ndarray((1, g.ny_global+1, 1))
-    g.zg_global = np.ndarray((1, 1, g.nz_global+1))
-    g.xg = np.ndarray((g.nx+1, 1, 1))
-    g.yg = np.ndarray((1, g.ny+1, 1))
-    g.zg = np.ndarray((1, 1, g.nz+1))
+    g.xg_global = np.ndarray((g.nx_global+1, 1, 1), dtype=np.float64)
+    g.yg_global = np.ndarray((1, g.ny_global+1, 1), dtype=np.float64)
+    g.zg_global = np.ndarray((1, 1, g.nz_global+1), dtype=np.float64)
+    g.xg = np.ndarray((g.nx+1, 1, 1), dtype=np.float64)
+    g.yg = np.ndarray((1, g.ny+1, 1), dtype=np.float64)
+    g.zg = np.ndarray((1, 1, g.nz+1), dtype=np.float64)
 
     # --- Time Variables -----------------------------------------------
-    g.t = 0.0  # simulation time
-    g.dt = 0.0  # timestep size
-    g.tstep = 0  # timestep index
+    g.t = np.float64(0.0)  # simulation time
+    g.dt = np.float64(0.0)  # timestep size
+    g.tstep = np.int32(0)  # timestep index
 
     # Runge Kutta Variables
     g.rk_step_1 = 'predictor'
@@ -81,16 +81,16 @@ def initialize():
 
     # --- Build Grids --------------------------------------------------
     # build the global grid arrays
-    xg_temp = np.linspace(0, g.Lx, g.nx_global+1)
-    if g.ny_global % 2 == 1:
-        yg_temp = np.linspace(-g.Ly/2, g.Ly/2, g.ny_global+1)
+    xg_temp = np.linspace(0, g.Lx, g.nx_global+1, dtype=np.float64)
+    if g.ny_global % 2 == 0:
+        yg_temp = np.linspace(-g.Ly/2, g.Ly/2, g.ny_global+1, dtype=np.float64)
     else:
-        raise Exception("Use odd values for ny")
+        raise Exception("Use even values for ny")
 
-    if g.nz_global % 2 == 1:
-        zg_temp = np.linspace(-g.Lz/2, g.Lz/2, g.nz_global+1)
+    if g.nz_global % 2 == 0:
+        zg_temp = np.linspace(-g.Lz/2, g.Lz/2, g.nz_global+1, dtype=np.float64)
     else:
-        raise Exception('Use odd values for nz')
+        raise Exception('Use even values for nz')
 
     # use shape to allow easy commuting with field variables
     g.xg_global[:, 0, 0] = xg_temp
@@ -112,9 +112,9 @@ def initialize():
     # --- Sponge -------------------------------------------------------
     # calculate the sponge damping factors
     x_sponge = g.x_sponge*g.Lx
-    y_sponge = g.y_sponge*g.Ly/2
-    z_sponge = g.z_sponge*g.Lz/2
-    wall_dist = np.zeros((g.nx+1, g.ny+1, g.nz+1, 1))
+    y_sponge = g.y_sponge*g.Ly/2.0
+    z_sponge = g.z_sponge*g.Lz/2.0
+    wall_dist = np.zeros((g.nx+1, g.ny+1, g.nz+1, 1), dtype=np.float64)
     for i in range(g.nx+1):
         for j in range(g.ny+1):
             for k in range(g.nz+1):
@@ -127,17 +127,17 @@ def initialize():
                 if x_sponge > 0:
                     x1 = abs(g.Lx - g.xg[i, 0, 0])/x_sponge
                 if y_sponge > 0:
-                    y0 = abs(g.yg[0, j, 0] + g.Ly/2)/y_sponge
-                    y1 = abs(g.Ly/2 - g.yg[0, j, 0])/y_sponge
+                    y0 = abs(g.yg[0, j, 0] + g.Ly/2.0)/y_sponge
+                    y1 = abs(g.Ly/2.0 - g.yg[0, j, 0])/y_sponge
                 if z_sponge > 0:
-                    z0 = abs(g.zg[0, 0, k] + g.Lz/2)/z_sponge
-                    z1 = abs(g.Lz/2 - g.zg[0, 0, k])/z_sponge
+                    z0 = abs(g.zg[0, 0, k] + g.Lz/2.0)/z_sponge
+                    z1 = abs(g.Lz/2.0 - g.zg[0, 0, k])/z_sponge
                 # take minimum distance within sponge length
                 wall_dist[i, j, k, 0] = np.min([x1, y0, y1, z0, z1, 1.0])
     g.sponge_fac = g.sponge_strength * (1.0 - wall_dist**g.a_sponge)
 
     # Calculate the reference condition
-    g.Qref = np.zeros((1, 1, 1, g.NVARS))
+    g.Qref = np.zeros((1, 1, 1, g.NVARS), dtype=np.float64)
     g.Qref[:, :, :, 0] = g.Rho_inf
     g.Qref[:, :, :, 1] = 0.0
     g.Qref[:, :, :, 2] = 0.0

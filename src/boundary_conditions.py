@@ -15,6 +15,9 @@ import common as g
 def apply_boundary_conditions():
     """Apply boundary conditions to transported variables"""
 
+    # update internal ghost planes
+    communicate_internal_planes(g.Q)
+
     # inlet boundary
     if g.myrank == 0:
         # base inlet boundary
@@ -28,8 +31,8 @@ def apply_boundary_conditions():
                     g.Q[0, j, k, 1] = g.Rho_jet * g.U_jet
                     g.Q[0, j, k, 2] = g.Rho_jet * g.V_jet
                     g.Q[0, j, k, 3] = g.Rho_jet * g.W_jet
-                    g.Q[0, j, k, 4] = g.P_jet / (g.gamma-1) + \
-                        0.5 * g.Rho_jet * g.U_jet**2
+                    g.Q[0, j, k, 4] = g.P_jet / (g.gamma-1.0) + \
+                        0.5 * g.Rho_jet * g.U_jet**2.0
                     g.Q[0, j, k, 5] = g.Rho_jet * g.Phi_jet
 
     # outlet boundary
@@ -49,13 +52,8 @@ def apply_boundary_conditions():
     # apply_pressure_bc('z0')
     # apply_pressure_bc('z1')
 
-    g.comm.Barrier()
 
-    # update internal ghost planes
-    communicate_internal_planes()
-
-
-def communicate_internal_planes():
+def communicate_internal_planes(f_arr):
     """Communicate internal ghost planes between MPI processes"""
 
     sendbuf = np.zeros((1, g.ny+1, g.nz+1, g.NVARS), dtype=np.float64)
@@ -63,23 +61,23 @@ def communicate_internal_planes():
 
     # all processes with a chunk ahead of them
     if g.myrank < g.nprocs-1:
-        sendbuf = g.Q[g.nx-1, :, :, :]
+        sendbuf = f_arr[g.nx-1, :, :, :]
         g.comm.Isend([sendbuf, g.MPI.DOUBLE], dest=g.myrank+1, tag=g.myrank)
 
     # zeroth process doesn't receive
     if g.myrank > 0:
         g.comm.Recv([recvbuf, g.MPI.DOUBLE], source=g.myrank-1, tag=g.myrank-1)
-        g.Q[0, :, :, :] = recvbuf
+        f_arr[0, :, :, :] = recvbuf
 
     # all processes with a chunk behind them
     if g.myrank > 0:
-        sendbuf = g.Q[1, :, :, :]
+        sendbuf = f_arr[1, :, :, :]
         g.comm.Isend([sendbuf, g.MPI.DOUBLE], dest=g.myrank-1, tag=g.myrank)
 
     # nprocs-1 process doesn't receive
     if g.myrank < g.nprocs-1:
         g.comm.Recv([recvbuf, g.MPI.DOUBLE], source=g.myrank+1, tag=g.myrank+1)
-        g.Q[g.nx, :, :, :] = recvbuf
+        f_arr[g.nx, :, :, :] = recvbuf
 
 
 def apply_extrapolation_bc(dirid):
@@ -133,7 +131,7 @@ def apply_pressure_bc(dirid):
         g.Q[:, 0, :, 1] = g.Rho_inf * _u
         g.Q[:, 0, :, 2] = g.Rho_inf * _v
         g.Q[:, 0, :, 3] = g.Rho_inf * _w
-        rho_u2 = 0.5 * g.Rho_inf * (_u**2 + _v**2 + _w**2)
+        rho_u2 = 0.5 * g.Rho_inf * (_u**2.0 + _v**2.0 + _w**2.0)
         g.Q[:, 0, :, 4] = g.P_inf / (g.gamma - 1.0) + rho_u2
     elif dirid == 'y1':
         _u = g.Q[:, g.ny, :, 1]/g.Q[:, g.ny, :, 0]
@@ -143,7 +141,7 @@ def apply_pressure_bc(dirid):
         g.Q[:, g.ny, :, 1] = g.Rho_inf * _u
         g.Q[:, g.ny, :, 2] = g.Rho_inf * _v
         g.Q[:, g.ny, :, 3] = g.Rho_inf * _w
-        rho_u2 = 0.5 * g.Rho_inf * (_u**2 + _v**2 + _w**2)
+        rho_u2 = 0.5 * g.Rho_inf * (_u**2.0 + _v**2.0 + _w**2.0)
         g.Q[:, g.ny, :, 4] = g.P_inf / (g.gamma - 1.0) + rho_u2
     elif dirid == 'z0':
         _u = g.Q[:, :, 0, 1]/g.Q[:, :, 0, 0]
@@ -153,7 +151,7 @@ def apply_pressure_bc(dirid):
         g.Q[:, :, 0, 1] = g.Rho_inf * _u
         g.Q[:, :, 0, 2] = g.Rho_inf * _v
         g.Q[:, :, 0, 3] = g.Rho_inf * _w
-        rho_u2 = 0.5 * g.Rho_inf * (_u**2 + _v**2 + _w**2)
+        rho_u2 = 0.5 * g.Rho_inf * (_u**2.0 + _v**2.0 + _w**2.0)
         g.Q[:, :, 0, 4] = g.P_inf / (g.gamma - 1.0) + rho_u2
     elif dirid == 'z1':
         _u = g.Q[:, :, g.nz, 1]/g.Q[:, :, g.nz, 0]
@@ -163,7 +161,7 @@ def apply_pressure_bc(dirid):
         g.Q[:, :, g.nz, 1] = g.Rho_inf * _u
         g.Q[:, :, g.nz, 2] = g.Rho_inf * _v
         g.Q[:, :, g.nz, 3] = g.Rho_inf * _w
-        rho_u2 = 0.5 * g.Rho_inf * (_u**2 + _v**2 + _w**2)
+        rho_u2 = 0.5 * g.Rho_inf * (_u**2.0 + _v**2.0 + _w**2.0)
         g.Q[:, :, g.nz, 4] = g.P_inf / (g.gamma - 1.0) + rho_u2
     else:
         msg = "BC not implemented for dirid: {:s}".format(dirid)
@@ -176,9 +174,9 @@ def apply_isothermal_wall(dirid):
         - T = const.
     """
     if dirid == 'x0':
-        g.Q[0, :, :, 1] = 0
-        g.Q[0, :, :, 2] = 0
-        g.Q[0, :, :, 3] = 0
+        g.Q[0, :, :, 1] = 0.0
+        g.Q[0, :, :, 2] = 0.0
+        g.Q[0, :, :, 3] = 0.0
         g.Q[0, :, :, 4] = g.Q[0, :, :, 0] * g.R_g / (g.gamma - 1.0) * g.T_inf
     else:
         msg = "BC not implemented for dirid: {:s}".format(dirid)

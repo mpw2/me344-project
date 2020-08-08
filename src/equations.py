@@ -10,6 +10,7 @@ Description:
 import numpy as np
 
 import common as g
+import boundary_conditions as bc
 
 
 # @nb.jit(nopython=True)
@@ -27,7 +28,7 @@ def compute_x_deriv(phi, x, y, z, dir_id):
     nx = x.shape[0]-1
     ny = y.shape[1]-1
     nz = z.shape[2]-1
-    dphi = np.zeros((nx+1, ny+1, nz+1))
+    dphi = np.zeros((nx+1, ny+1, nz+1), dtype=np.float64)
     if dir_id == 0:
         dphi[nx, :, :] = (phi[nx, :, :] - phi[nx-1, :, :]) / \
                          (x[nx, :, :] - x[nx-1, :, :])
@@ -63,7 +64,7 @@ def compute_y_deriv(phi, x, y, z, dir_id):
     nx = x.shape[0]-1
     ny = y.shape[1]-1
     nz = z.shape[2]-1
-    dphi = np.zeros((nx+1, ny+1, nz+1))
+    dphi = np.zeros((nx+1, ny+1, nz+1), dtype=np.float64)
     if dir_id == 0:
         dphi[:, ny, :] = (phi[:, ny, :] - phi[:, ny-1, :]) / \
                          (y[:, ny, :] - y[:, ny-1, :])
@@ -99,7 +100,7 @@ def compute_z_deriv(phi, x, y, z, dir_id):
     nx = x.shape[0]-1
     ny = y.shape[1]-1
     nz = z.shape[2]-1
-    dphi = np.zeros((nx+1, ny+1, nz+1))
+    dphi = np.zeros((nx+1, ny+1, nz+1), dtype=np.float64)
     if dir_id == 0:
         dphi[:, :, nz] = (phi[:, :, nz] - phi[:, :, nz-1]) / \
                          (z[:, :, nz] - z[:, :, nz-1])
@@ -136,7 +137,7 @@ def ConsToPrim(Q):
     _v = Q[:, :, :, 2] / Q[:, :, :, 0]
     _w = Q[:, :, :, 3] / Q[:, :, :, 0]
     _p = (g.gamma - 1) * (Q[:, :, :, 4] - 0.5 / Q[:, :, :, 0] *
-                          (Q[:, :, :, 1] + Q[:, :, :, 2] + Q[:, :, :, 3])**2)
+                          (Q[:, :, :, 1] + Q[:, :, :, 2] + Q[:, :, :, 3])**2.0)
     _phi = Q[:, :, :, 5] / Q[:, :, :, 0]
 
     return _rho, _u, _v, _w, _p, _phi
@@ -159,7 +160,7 @@ def PrimToCons(rho, u, v, w, p, phi):
     _rho_u = rho * u
     _rho_v = rho * v
     _rho_w = rho * w
-    _e_tot = p / (g.gamma - 1) + 0.5 * rho * (u**2 + v**2 + w**2)
+    _e_tot = p / (g.gamma - 1.0) + 0.5 * rho * (u**2.0 + v**2.0 + w**2.0)
     _rho_phi = rho * phi
 
     return rho, _rho_u, _rho_v, _rho_w, _e_tot, _rho_phi
@@ -168,9 +169,9 @@ def PrimToCons(rho, u, v, w, p, phi):
 def Tauxx(U, x, y, z, mu, step):
     """Calculate stress tensor component xx"""
     if step == 'predictor':
-        tau_xx = 2 * mu * compute_x_deriv(U, x, y, z, 1)
+        tau_xx = 2.0 * mu * compute_x_deriv(U, x, y, z, 1)
     elif step == 'corrector':
-        tau_xx = 2 * mu * compute_x_deriv(U, x, y, z, 0)
+        tau_xx = 2.0 * mu * compute_x_deriv(U, x, y, z, 0)
     else:
         raise Exception('Invalid Step')
 
@@ -180,9 +181,9 @@ def Tauxx(U, x, y, z, mu, step):
 def Tauyy(V, x, y, z, mu, step):
     """Calculate stress tensor component yy"""
     if step == 'predictor':
-        tau_yy = 2 * mu * compute_y_deriv(V, x, y, z, 1)
+        tau_yy = 2.0 * mu * compute_y_deriv(V, x, y, z, 1)
     elif step == 'corrector':
-        tau_yy = 2 * mu * compute_y_deriv(V, x, y, z, 0)
+        tau_yy = 2.0 * mu * compute_y_deriv(V, x, y, z, 0)
     else:
         raise Exception('Invalid Step')
 
@@ -192,9 +193,9 @@ def Tauyy(V, x, y, z, mu, step):
 def Tauzz(W, x, y, z, mu, step):
     """Calculate stress tensor component zz"""
     if step == 'predictor':
-        tau_zz = 2 * mu * compute_z_deriv(W, x, y, z, 1)
+        tau_zz = 2.0 * mu * compute_z_deriv(W, x, y, z, 1)
     elif step == 'corrector':
-        tau_zz = 2 * mu * compute_z_deriv(W, x, y, z, 0)
+        tau_zz = 2.0 * mu * compute_z_deriv(W, x, y, z, 0)
     else:
         raise Exception('Invalid Step')
 
@@ -204,9 +205,9 @@ def Tauzz(W, x, y, z, mu, step):
 def Qx(T, x, y, z, k, step):
     """Calculate temperature diffusion in x"""
     if step == 'predictor':
-        qx = -1 * k * compute_x_deriv(T, x, y, z, 1)
+        qx = -1.0 * k * compute_x_deriv(T, x, y, z, 1)
     elif step == 'corrector':
-        qx = -1 * k * compute_x_deriv(T, x, y, z, 0)
+        qx = -1.0 * k * compute_x_deriv(T, x, y, z, 0)
     else:
         raise Exception('Invalid Step')
 
@@ -216,9 +217,9 @@ def Qx(T, x, y, z, k, step):
 def Qy(T, x, y, z, k, step):
     """Calculate temperature diffusion in y"""
     if step == 'predictor':
-        qy = -1 * k * compute_y_deriv(T, x, y, z, 1)
+        qy = -1.0 * k * compute_y_deriv(T, x, y, z, 1)
     elif step == 'corrector':
-        qy = -1 * k * compute_y_deriv(T, x, y, z, 0)
+        qy = -1.0 * k * compute_y_deriv(T, x, y, z, 0)
     else:
         raise Exception('Invalid Step')
 
@@ -228,9 +229,9 @@ def Qy(T, x, y, z, k, step):
 def Qz(T, x, y, z, k, step):
     """Calculate temperature diffusion in z"""
     if step == 'predictor':
-        qz = -1 * k * compute_z_deriv(T, x, y, z, 1)
+        qz = -1.0 * k * compute_z_deriv(T, x, y, z, 1)
     elif step == 'corrector':
-        qz = -1 * k * compute_z_deriv(T, x, y, z, 0)
+        qz = -1.0 * k * compute_z_deriv(T, x, y, z, 0)
     else:
         raise Exception('Invalid Step')
 
@@ -371,7 +372,7 @@ def compE(Q, x, y, z, Rgas, mu, kappa, D, step):
     phix = Phix(_phi, x, y, z, D, step)
 
     g.E[:, :, :, 0] = _rho * _u
-    g.E[:, :, :, 1] = _rho * _u**2 + _p - tau_xx
+    g.E[:, :, :, 1] = _rho * _u**2.0 + _p - tau_xx
     g.E[:, :, :, 2] = _rho * _u * _v - tau_xy
     g.E[:, :, :, 3] = _rho * _u * _w - tau_xz
     g.E[:, :, :, 4] = (Q[:, :, :, 4] + _p) * _u - \
@@ -392,7 +393,7 @@ def compF(Q, x, y, z, Rgas, mu, kappa, D, step):
 
     g.F[:, :, :, 0] = _rho * _v
     g.F[:, :, :, 1] = _rho * _u * _v - tau_xy
-    g.F[:, :, :, 2] = _rho * _v**2 + _p - tau_yy
+    g.F[:, :, :, 2] = _rho * _v**2.0 + _p - tau_yy
     g.F[:, :, :, 3] = _rho * _v * _w - tau_yz
     g.F[:, :, :, 4] = (Q[:, :, :, 4] + _p) * _v - \
         _u * tau_xy - _v * tau_yy - _w * tau_yz + qy
@@ -413,7 +414,7 @@ def compG(Q, x, y, z, Rgas, mu, kappa, D, step):
     g.G[:, :, :, 0] = _rho * _w
     g.G[:, :, :, 1] = _rho * _u * _w - tau_xz
     g.G[:, :, :, 2] = _rho * _v * _w - tau_yz
-    g.G[:, :, :, 3] = _rho * _w**2 + _p - tau_zz
+    g.G[:, :, :, 3] = _rho * _w**2.0 + _p - tau_zz
     g.G[:, :, :, 4] = (Q[:, :, :, 4] + _p) * _w - \
         _u * tau_xz - _v * tau_yz - _w * tau_zz + qz
     g.G[:, :, :, 5] = _rho * _w * _phi - phiz
@@ -432,6 +433,10 @@ def compRHS(Q, x, y, z, step):
     compE(Q, x, y, z, g.R_g, g.mu, g.k, g.D, step)
     compF(Q, x, y, z, g.R_g, g.mu, g.k, g.D, step)
     compG(Q, x, y, z, g.R_g, g.mu, g.k, g.D, step)
+
+    bc.communicate_internal_planes(g.E)
+    bc.communicate_internal_planes(g.F)
+    bc.communicate_internal_planes(g.G)
 
     sponge_rhs = comp_sponge_term(Q, g.Qref, g.sponge_fac)
 
