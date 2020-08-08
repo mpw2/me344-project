@@ -40,7 +40,7 @@ def compute_dt():
     """Compute time step size based on CFL"""
 
     _rho, _u, _v, _w, _p, _ = eq.ConsToPrim(g.Q)
-    _a0 = np.sqrt(g.gamma*_p / _rho)
+    _a0 = np.sqrt(g.gamma * _p / _rho)
 
     _ur = np.abs(_u + _a0)
     _ul = np.abs(_u - _a0)
@@ -58,8 +58,13 @@ def compute_dt():
     _dy = np.gradient(g.yg, axis=1)
     _dz = np.gradient(g.zg, axis=2)
 
-    # Calculate dt from CFL
-    _dt = g.CFL_ref / (_u/_dx + _v/_dy + _w/_dz)
+    # Convective CFL
+    _dt_c = g.CFL_ref / (_u/_dx + _v/_dy + _w/_dz)
+    # Viscous CFL
+    _dt_v = g.CFL_ref * (_rho / g.mu) / \
+        (1.0/_dx**2.0 + 1.0/_dy**2.0 + 1.0/_dz**2.0)
+
+    _dt = np.minimum(_dt_c, _dt_v)
 
     # MPI buffers
     dt_local = np.empty((1), dtype=np.float64)

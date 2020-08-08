@@ -33,6 +33,8 @@ def initialize():
     strides = np.floor(strides)
     g.i0_global = np.int32(strides[:g.nprocs])
     g.i1_global = np.int32(np.minimum(strides[1:] + 1, g.nx))
+    g.i0_global[1:] = g.i0_global[1:]-1
+    g.i1_global[:-1] = g.i1_global[:-1]+1
     strides = g.i1_global - g.i0_global
     # save global and local grid size
     g.nx_global = g.nx
@@ -149,6 +151,7 @@ def initialize():
     io.init_flow()  # set the initial flow
     g.Qo[:, :, :, :] = g.Q[:, :, :, :]  # init prev flow state
     bc.apply_boundary_conditions()
+    g.Qo[:, :, :, :] = g.Q[:, :, :, :]
 
 
 #

@@ -434,6 +434,7 @@ def compRHS(Q, x, y, z, step):
     compF(Q, x, y, z, g.R_g, g.mu, g.k, g.D, step)
     compG(Q, x, y, z, g.R_g, g.mu, g.k, g.D, step)
 
+    # Workaround: E,F,G should be same but differ by 1e-8
     bc.communicate_internal_planes(g.E)
     bc.communicate_internal_planes(g.F)
     bc.communicate_internal_planes(g.G)
@@ -441,7 +442,6 @@ def compRHS(Q, x, y, z, step):
     sponge_rhs = comp_sponge_term(Q, g.Qref, g.sponge_fac)
 
     dir_id = None
-
     if step == 'predictor':
         dir_id = 0
     elif step == 'corrector':
@@ -456,6 +456,11 @@ def compRHS(Q, x, y, z, step):
                                              x, y, z, dir_id)
         g.dGdz[:, :, :, i] = compute_z_deriv(g.G[:, :, :, i],
                                              x, y, z, dir_id)
+
+    # Workaround:
+    bc.communicate_internal_planes(g.dEdx)
+    bc.communicate_internal_planes(g.dFdy)
+    bc.communicate_internal_planes(g.dGdz)
 
     rhs = -1.0 * (g.dEdx + g.dFdy + g.dGdz) + sponge_rhs
 

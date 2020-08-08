@@ -21,7 +21,8 @@ def apply_boundary_conditions():
     # inlet boundary
     if g.myrank == 0:
         # base inlet boundary
-        apply_pressure_bc('x0')
+        apply_isothermal_wall('x0')
+        # apply_pressure_bc('x0')
         # jet inlet condition
         for j in range(g.ny):
             for k in range(g.nz):
@@ -56,28 +57,28 @@ def apply_boundary_conditions():
 def communicate_internal_planes(f_arr):
     """Communicate internal ghost planes between MPI processes"""
 
-    sendbuf = np.zeros((1, g.ny+1, g.nz+1, g.NVARS), dtype=np.float64)
-    recvbuf = np.zeros((1, g.ny+1, g.nz+1, g.NVARS), dtype=np.float64)
+    sendbuf = np.zeros((2, g.ny+1, g.nz+1, g.NVARS), dtype=np.float64)
+    recvbuf = np.zeros((2, g.ny+1, g.nz+1, g.NVARS), dtype=np.float64)
 
     # all processes with a chunk ahead of them
     if g.myrank < g.nprocs-1:
-        sendbuf = f_arr[g.nx-1, :, :, :]
+        sendbuf = f_arr[g.nx-3:g.nx-1, :, :, :]
         g.comm.Isend([sendbuf, g.MPI.DOUBLE], dest=g.myrank+1, tag=g.myrank)
 
     # zeroth process doesn't receive
     if g.myrank > 0:
         g.comm.Recv([recvbuf, g.MPI.DOUBLE], source=g.myrank-1, tag=g.myrank-1)
-        f_arr[0, :, :, :] = recvbuf
+        f_arr[0:2, :, :, :] = recvbuf
 
     # all processes with a chunk behind them
     if g.myrank > 0:
-        sendbuf = f_arr[1, :, :, :]
+        sendbuf = f_arr[2:4, :, :, :]
         g.comm.Isend([sendbuf, g.MPI.DOUBLE], dest=g.myrank-1, tag=g.myrank)
 
     # nprocs-1 process doesn't receive
     if g.myrank < g.nprocs-1:
         g.comm.Recv([recvbuf, g.MPI.DOUBLE], source=g.myrank+1, tag=g.myrank+1)
-        f_arr[g.nx, :, :, :] = recvbuf
+        f_arr[g.nx-1:, :, :, :] = recvbuf
 
 
 def apply_extrapolation_bc(dirid):
