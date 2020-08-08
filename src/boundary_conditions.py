@@ -21,7 +21,7 @@ def apply_boundary_conditions():
     # inlet boundary
     if g.myrank == 0:
         # base inlet boundary
-        apply_isothermal_wall('x0')
+        apply_pressure_bc('x0')
         # jet inlet condition
         for j in range(g.ny):
             for k in range(g.nz):
@@ -163,6 +163,16 @@ def apply_pressure_bc(dirid):
         g.Q[:, :, g.nz, 3] = g.Rho_inf * _w
         rho_u2 = 0.5 * g.Rho_inf * (_u**2.0 + _v**2.0 + _w**2.0)
         g.Q[:, :, g.nz, 4] = g.P_inf / (g.gamma - 1.0) + rho_u2
+    elif dirid == 'x0':
+        _u = g.Q[0, :, :, 1]/g.Q[0, :, :, 0]
+        _v = g.Q[0, :, :, 2]/g.Q[0, :, :, 0]
+        _w = g.Q[0, :, :, 3]/g.Q[0, :, :, 0]
+        g.Q[0, :, :, 0] = g.Rho_inf
+        g.Q[0, :, :, 1] = g.Rho_inf * _u
+        g.Q[0, :, :, 2] = g.Rho_inf * _v
+        g.Q[0, :, :, 3] = g.Rho_inf * _w
+        rho_u2 = 0.5 * g.Rho_inf * (_u**2.0 + _v**2.0 + _w**2.0)
+        g.Q[0, :, :, 4] = g.P_inf / (g.gamma - 1.0) + rho_u2
     else:
         msg = "BC not implemented for dirid: {:s}".format(dirid)
         raise Exception(msg)

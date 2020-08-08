@@ -45,8 +45,8 @@ def read_input_parameters():
         g.Lx, g.Ly, g.Lz = map(np.float64, lines[lix].split(', '))
         # Read inlet conditions
         lix = 2
-        g.jet_height_y, g.jet_height_z, g.U_jet, g.V_jet, g.W_jet,
-        g.P_jet, g.T_jet, g.Phi_jet = \
+        g.jet_height_y, g.jet_height_z, g.U_jet, g.V_jet, g.W_jet, \
+            g.P_jet, g.T_jet, g.Phi_jet = \
             map(np.float64, lines[lix].split(', '))
 
         # Read ambient conditions
@@ -93,8 +93,8 @@ def read_input_parameters():
     floatbuf[0:8] = [g.jet_height_y, g.jet_height_z, g.U_jet, g.V_jet,
                      g.W_jet, g.P_jet, g.T_jet, g.Phi_jet]
     g.comm.Bcast([floatbuf, g.MPI.DOUBLE], root=0)
-    g.jet_height_y, g.jet_height_z, g.U_jet, g.V_jet, g.W_jet, g.P_jet,
-    g.T_jet, g.Phi_jet = floatbuf[0:8]
+    g.jet_height_y, g.jet_height_z, g.U_jet, g.V_jet, g.W_jet, g.P_jet, \
+        g.T_jet, g.Phi_jet = floatbuf[0:8]
     # ambient conditions
     floatbuf[0:6] = [g.U_inf, g.V_inf, g.W_inf, g.P_inf, g.T_inf,
                      g.Phi_inf]
