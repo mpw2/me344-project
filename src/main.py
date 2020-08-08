@@ -21,12 +21,14 @@ import input_output as io
 import monitor as mon
 import time_integration as ti
 import common as g
+import time
 
 
 def main():
     """main method: run time integration loop"""
 
     # initialize data structures
+    start = time.time()
     ini.initialize()
 
     # output initial condition to monitor
@@ -52,6 +54,10 @@ def main():
 
     # finish up
     mon.output_final()
+    end = time.time()
+    if g.myrank == 0:
+        print("Elapsed time = " + str(end - start))
+        sys.stdout.flush()
 
 
 if __name__ == "__main__":
