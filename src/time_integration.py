@@ -20,20 +20,21 @@ def compute_timestep_maccormack():
     g.Qo[:, :, :, :] = g.Q[:, :, :, :]
 
     # Compute first RK step
-    kv1 = eq.compRHS(g.Q, g.xg, g.yg, g.zg, g.rk_step_1)
+    kv1 = eq.compRHS(g.Q, g.xg, g.yg, g.zg, (g.rk_step_bits ^ 0b000))
     g.Q[:, :, :, :] = g.Q[:, :, :, :] + g.dt*kv1[:, :, :, :]
 
     bc.apply_boundary_conditions()
 
     # Compute second RK step
-    kv2 = eq.compRHS(g.Q, g.xg, g.yg, g.zg, g.rk_step_2)
+    kv2 = eq.compRHS(g.Q, g.xg, g.yg, g.zg, (g.rk_step_bits ^ 0b111))
     g.Q[:, :, :, :] = g.Qo[:, :, :, :] + \
         g.dt*(kv1[:, :, :, :] + kv2[:, :, :, :])/2.0
 
     bc.apply_boundary_conditions()
 
     # Switch differentiation directions between time steps
-    g.rk_step_1, g.rk_step_2 = g.rk_step_2, g.rk_step_1
+    # Use round robin style to permute direction combinations
+    g.rk_step_bits = g.rk_step_bits + 0b001
 
 
 def compute_dt():

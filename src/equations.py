@@ -168,9 +168,9 @@ def PrimToCons(rho, u, v, w, p, phi):
 
 def Tauxx(U, x, y, z, mu, step):
     """Calculate stress tensor component xx"""
-    if step == 'predictor':
+    if step == 0:
         tau_xx = 2.0 * mu * compute_x_deriv(U, x, y, z, 1)
-    elif step == 'corrector':
+    elif step == 1:
         tau_xx = 2.0 * mu * compute_x_deriv(U, x, y, z, 0)
     else:
         raise Exception('Invalid Step')
@@ -180,9 +180,9 @@ def Tauxx(U, x, y, z, mu, step):
 
 def Tauyy(V, x, y, z, mu, step):
     """Calculate stress tensor component yy"""
-    if step == 'predictor':
+    if step == 0:
         tau_yy = 2.0 * mu * compute_y_deriv(V, x, y, z, 1)
-    elif step == 'corrector':
+    elif step == 1:
         tau_yy = 2.0 * mu * compute_y_deriv(V, x, y, z, 0)
     else:
         raise Exception('Invalid Step')
@@ -192,9 +192,9 @@ def Tauyy(V, x, y, z, mu, step):
 
 def Tauzz(W, x, y, z, mu, step):
     """Calculate stress tensor component zz"""
-    if step == 'predictor':
+    if step == 0:
         tau_zz = 2.0 * mu * compute_z_deriv(W, x, y, z, 1)
-    elif step == 'corrector':
+    elif step == 1:
         tau_zz = 2.0 * mu * compute_z_deriv(W, x, y, z, 0)
     else:
         raise Exception('Invalid Step')
@@ -204,9 +204,9 @@ def Tauzz(W, x, y, z, mu, step):
 
 def Qx(T, x, y, z, k, step):
     """Calculate temperature diffusion in x"""
-    if step == 'predictor':
+    if step == 0:
         qx = -1.0 * k * compute_x_deriv(T, x, y, z, 1)
-    elif step == 'corrector':
+    elif step == 1:
         qx = -1.0 * k * compute_x_deriv(T, x, y, z, 0)
     else:
         raise Exception('Invalid Step')
@@ -216,9 +216,9 @@ def Qx(T, x, y, z, k, step):
 
 def Qy(T, x, y, z, k, step):
     """Calculate temperature diffusion in y"""
-    if step == 'predictor':
+    if step == 0:
         qy = -1.0 * k * compute_y_deriv(T, x, y, z, 1)
-    elif step == 'corrector':
+    elif step == 1:
         qy = -1.0 * k * compute_y_deriv(T, x, y, z, 0)
     else:
         raise Exception('Invalid Step')
@@ -228,9 +228,9 @@ def Qy(T, x, y, z, k, step):
 
 def Qz(T, x, y, z, k, step):
     """Calculate temperature diffusion in z"""
-    if step == 'predictor':
+    if step == 0:
         qz = -1.0 * k * compute_z_deriv(T, x, y, z, 1)
-    elif step == 'corrector':
+    elif step == 1:
         qz = -1.0 * k * compute_z_deriv(T, x, y, z, 0)
     else:
         raise Exception('Invalid Step')
@@ -240,9 +240,9 @@ def Qz(T, x, y, z, k, step):
 
 def Phix(Phi, x, y, z, D, step):
     """Calculate scalar diffusion in x"""
-    if step == 'predictor':
+    if step == 0:
         phix = D * compute_x_deriv(Phi, x, y, z, 1)
-    elif step == 'corrector':
+    elif step == 1:
         phix = D * compute_x_deriv(Phi, x, y, z, 0)
     else:
         raise Exception('Invalid Step')
@@ -252,9 +252,9 @@ def Phix(Phi, x, y, z, D, step):
 
 def Phiy(Phi, x, y, z, D, step):
     """Calculate scalar diffusion in y"""
-    if step == 'predictor':
+    if step == 0:
         phiy = D * compute_y_deriv(Phi, x, y, z, 1)
-    elif step == 'corrector':
+    elif step == 1:
         phiy = D * compute_y_deriv(Phi, x, y, z, 0)
     else:
         raise Exception('Invalid Step')
@@ -264,9 +264,9 @@ def Phiy(Phi, x, y, z, D, step):
 
 def Phiz(Phi, x, y, z, D, step):
     """Calculate scalar diffusion in z"""
-    if step == 'predictor':
+    if step == 0:
         phiz = D * compute_z_deriv(Phi, x, y, z, 1)
-    elif step == 'corrector':
+    elif step == 1:
         phiz = D * compute_z_deriv(Phi, x, y, z, 0)
     else:
         raise Exception('Invalid Step')
@@ -276,7 +276,7 @@ def Phiz(Phi, x, y, z, D, step):
 
 def Tauxy(U, V, x, y, z, mu, flux_dir, step):
     """Calculate stress tensor component xy"""
-    if step == 'predictor':
+    if step == 0:
         if flux_dir == 0:
             tau_xy = mu * (compute_y_deriv(U, x, y, z, 2) +
                            compute_x_deriv(V, x, y, z, 1))
@@ -286,7 +286,7 @@ def Tauxy(U, V, x, y, z, mu, flux_dir, step):
         else:
             raise Exception('Invalid Flux Direction')
 
-    elif step == 'corrector':
+    elif step == 1:
         if flux_dir == 0:
             tau_xy = mu * (compute_y_deriv(U, x, y, z, 2) +
                            compute_x_deriv(V, x, y, z, 0))
@@ -304,7 +304,7 @@ def Tauxy(U, V, x, y, z, mu, flux_dir, step):
 
 def Tauxz(U, W, x, y, z, mu, flux_dir, step):
     """Calculate stress tensor component xz"""
-    if step == 'predictor':
+    if step == 0:
         if flux_dir == 0:
             tau_xz = mu * (compute_z_deriv(U, x, y, z, 2) +
                            compute_x_deriv(W, x, y, z, 1))
@@ -314,7 +314,7 @@ def Tauxz(U, W, x, y, z, mu, flux_dir, step):
         else:
             raise Exception('Invalid Flux Direction')
 
-    elif step == 'corrector':
+    elif step == 1:
         if flux_dir == 0:
             tau_xz = mu * (compute_z_deriv(U, x, y, z, 2) +
                            compute_x_deriv(W, x, y, z, 0))
@@ -329,7 +329,7 @@ def Tauxz(U, W, x, y, z, mu, flux_dir, step):
 
 def Tauyz(V, W, x, y, z, mu, flux_dir, step):
     """Calculate stress tensor component yz"""
-    if step == 'predictor':
+    if step == 0:
         if flux_dir == 1:
             tau_yz = mu * (compute_z_deriv(V, x, y, z, 2) +
                            compute_y_deriv(W, x, y, z, 1))
@@ -339,7 +339,7 @@ def Tauyz(V, W, x, y, z, mu, flux_dir, step):
         else:
             raise Exception('Invalid Flux Direction')
 
-    elif step == 'corrector':
+    elif step == 1:
         if flux_dir == 1:
             tau_yz = mu * (compute_z_deriv(V, x, y, z, 2) +
                            compute_y_deriv(W, x, y, z, 0))
@@ -430,27 +430,25 @@ def compRHS(Q, x, y, z, step):
      - opposite differencing direction for aligned flux terms
      - central differencing for non-aligned flux terms
     """
-    compE(Q, x, y, z, g.R_g, g.mu, g.k, g.D, step)
-    compF(Q, x, y, z, g.R_g, g.mu, g.k, g.D, step)
-    compG(Q, x, y, z, g.R_g, g.mu, g.k, g.D, step)
+    # Check bits for differentiation direction
+    nor_bit = g.rk_step_bits >> 3 & 0b1
+    xdir_id = g.rk_step_bits >> 0 & 0b1
+    ydir_id = g.rk_step_bits >> 1 & 0b1 ^ nor_bit
+    zdir_id = g.rk_step_bits >> 2 & 0b1
+
+    compE(Q, x, y, z, g.R_g, g.mu, g.k, g.D, xdir_id)
+    compF(Q, x, y, z, g.R_g, g.mu, g.k, g.D, ydir_id)
+    compG(Q, x, y, z, g.R_g, g.mu, g.k, g.D, zdir_id)
 
     sponge_rhs = comp_sponge_term(Q, g.Qref, g.sponge_fac)
 
-    dir_id = None
-    if step == 'predictor':
-        dir_id = 0
-    elif step == 'corrector':
-        dir_id = 1
-    else:
-        raise Exception('Invalid derivative dir_id')
-
     for i in range(g.NVARS):
         g.dEdx[:, :, :, i] = compute_x_deriv(g.E[:, :, :, i],
-                                             x, y, z, dir_id)
+                                             x, y, z, xdir_id)
         g.dFdy[:, :, :, i] = compute_y_deriv(g.F[:, :, :, i],
-                                             x, y, z, dir_id)
+                                             x, y, z, ydir_id)
         g.dGdz[:, :, :, i] = compute_z_deriv(g.G[:, :, :, i],
-                                             x, y, z, dir_id)
+                                             x, y, z, zdir_id)
 
     rhs = -1.0 * (g.dEdx + g.dFdy + g.dGdz) + sponge_rhs
 

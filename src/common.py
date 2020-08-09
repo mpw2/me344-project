@@ -107,8 +107,7 @@ z_sponge = 0.0  # nondimensional sponge length
 Qref = None  # reference condition
 
 # Runge-Kutta steps
-rk_step_1 = None
-rk_step_2 = None
+rk_step_bits = np.int8(0b000)
 
 
 #

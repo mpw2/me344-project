@@ -75,10 +75,6 @@ def initialize():
     g.dt = np.float64(0.0)  # timestep size
     g.tstep = np.int32(0)  # timestep index
 
-    # Runge Kutta Variables
-    g.rk_step_1 = 'predictor'
-    g.rk_step_2 = 'corrector'
-
     # --- Build Grids --------------------------------------------------
     # build the global grid arrays
     xg_temp = np.linspace(0, g.Lx, g.nx_global+1, dtype=np.float64)
