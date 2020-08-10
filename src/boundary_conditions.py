@@ -31,9 +31,9 @@ def apply_boundary_conditions():
                     g.Q[0, j, k, 0] = g.Rho_jet
                     g.Q[0, j, k, 1] = g.Rho_jet * g.U_jet * \
                         (1.0 - (2.0 * g.yg[0, j, 0] / g.jet_height_y)**2.0) + \
-                        0.01 * g.U_jet * (2.0 * np.random.rand() - 1.0)
+                        0.00 * g.U_jet * (2.0 * np.random.rand() - 1.0)
                     g.Q[0, j, k, 2] = g.Rho_jet * g.V_jet + \
-                        0.005 * g.U_jet * (2.0 * np.random.rand() - 1.0)
+                        0.00 * g.U_jet * (2.0 * np.random.rand() - 1.0)
                     g.Q[0, j, k, 3] = g.Rho_jet * g.W_jet
                     g.Q[0, j, k, 4] = g.P_jet / (g.gamma-1.0) + \
                         0.5 * g.Rho_jet * g.U_jet**2.0
@@ -222,6 +222,10 @@ def apply_periodic_bc(dirid):
     else:
         msg = "BC not implemented for dirid: {:s}".format(dirid)
         raise Exception(msg)
+
+
+def apply_sponge(dirid):
+    g.Q[:, :, :, :] = g.Q*(1.0-g.sponge_fac) + g.Qref*(g.sponge_fac)
 
 
 #
