@@ -33,19 +33,19 @@ def compute_x_deriv(phi, x, y, z, dir_id):
         dphi[nx, :, :] = (phi[nx, :, :] - phi[nx-1, :, :]) / \
                          (x[nx, :, :] - x[nx-1, :, :])
         dphi[0:nx, :, :] = (phi[1:nx+1, :, :] - phi[0:nx, :, :]) / \
-                             (x[1:nx+1, :, :] - x[0:nx, :, :])
+                           (x[1:nx+1, :, :] - x[0:nx, :, :])
     if dir_id == 1:
         dphi[0, :, :] = (phi[1, :, :] - phi[0, :, :]) / \
                         (x[1, :, :] - x[0, :, :])
         dphi[1:nx+1, :, :] = (phi[1:nx+1, :, :] - phi[0:nx, :, :]) / \
-                           (x[1:nx+1, :, :] - x[0:nx, :, :])
+                             (x[1:nx+1, :, :] - x[0:nx, :, :])
     if dir_id == 2:
         dphi[0, :, :] = (phi[1, :, :] - phi[0, :, :]) / \
                         (x[1, :, :] - x[0, :, :])
         dphi[nx, :, :] = (phi[nx, :, :] - phi[nx-1, :, :]) / \
                          (x[nx, :, :] - x[nx-1, :, :])
         dphi[1:nx, :, :] = (phi[2:nx+1, :, :] - phi[0:nx-1, :, :]) / \
-                             (x[2:nx+1, :, :] - x[0:nx-1, :, :])
+                           (x[2:nx+1, :, :] - x[0:nx-1, :, :])
     return dphi
 
 
@@ -69,19 +69,19 @@ def compute_y_deriv(phi, x, y, z, dir_id):
         dphi[:, ny, :] = (phi[:, ny, :] - phi[:, ny-1, :]) / \
                          (y[:, ny, :] - y[:, ny-1, :])
         dphi[:, 0:ny, :] = (phi[:, 1:ny+1, :] - phi[:, 0:ny, :]) / \
-                             (y[:, 1:ny+1, :] - y[:, 0:ny, :])
+                           (y[:, 1:ny+1, :] - y[:, 0:ny, :])
     if dir_id == 1:
         dphi[:, 0, :] = (phi[:, 1, :] - phi[:, 0, :]) / \
                         (y[:, 1, :] - y[:, 0, :])
         dphi[:, 1:ny+1, :] = (phi[:, 1:ny+1, :] - phi[:, 0:ny, :]) / \
-                           (y[:, 1:ny+1, :] - y[:, 0:ny, :])
+                             (y[:, 1:ny+1, :] - y[:, 0:ny, :])
     if dir_id == 2:
         dphi[:, 0, :] = (phi[:, 1, :] - phi[:, 0, :]) / \
                         (y[:, 1, :] - y[:, 0, :])
         dphi[:, ny, :] = (phi[:, ny, :] - phi[:, ny-1, :]) / \
                          (y[:, ny, :] - y[:, ny-1, :])
         dphi[:, 1:ny, :] = (phi[:, 2:ny+1, :] - phi[:, 0:ny-1, :]) / \
-                             (y[:, 2:ny+1, :] - y[:, 0:ny-1, :])
+                           (y[:, 2:ny+1, :] - y[:, 0:ny-1, :])
     return dphi
 
 
@@ -105,19 +105,19 @@ def compute_z_deriv(phi, x, y, z, dir_id):
         dphi[:, :, nz] = (phi[:, :, nz] - phi[:, :, nz-1]) / \
                          (z[:, :, nz] - z[:, :, nz-1])
         dphi[:, :, 0:nz] = (phi[:, :, 1:nz+1] - phi[:, :, 0:nz]) / \
-                             (z[:, :, 1:nz+1] - z[:, :, 0:nz])
+                           (z[:, :, 1:nz+1] - z[:, :, 0:nz])
     if dir_id == 1:
         dphi[:, :, 0] = (phi[:, :, 1] - phi[:, :, 0]) / \
                         (z[:, :, 1] - z[:, :, 0])
         dphi[:, :, 1:nz+1] = (phi[:, :, 1:nz+1] - phi[:, :, 0:nz]) / \
-                           (z[:, :, 1:nz+1] - z[:, :, 0:nz])
+                             (z[:, :, 1:nz+1] - z[:, :, 0:nz])
     if dir_id == 2:
         dphi[:, :, 0] = (phi[:, :, 1] - phi[:, :, 0]) / \
                         (z[:, :, 1] - z[:, :, 0])
         dphi[:, :, nz] = (phi[:, :, nz] - phi[:, :, nz-1]) / \
                          (z[:, :, nz] - z[:, :, nz-1])
         dphi[:, :, 1:nz] = (phi[:, :, 2:nz+1] - phi[:, :, 0:nz-1]) / \
-                             (z[:, :, 2:nz+1] - z[:, :, 0:nz-1])
+                           (z[:, :, 2:nz+1] - z[:, :, 0:nz-1])
     return dphi
 
 
@@ -431,10 +431,9 @@ def compRHS(Q, x, y, z, step):
      - central differencing for non-aligned flux terms
     """
     # Check bits for differentiation direction
-    nor_bit = g.rk_step_bits >> 3 & 0b1
-    xdir_id = g.rk_step_bits >> 0 & 0b1
-    ydir_id = g.rk_step_bits >> 1 & 0b1 ^ nor_bit
-    zdir_id = g.rk_step_bits >> 2 & 0b1
+    xdir_id = (g.rk_step_bits >> 0) & 0b001
+    ydir_id = (g.rk_step_bits >> 1) & 0b001
+    zdir_id = (g.rk_step_bits >> 2) & 0b001
 
     compE(Q, x, y, z, g.R_g, g.mu, g.k, g.D, xdir_id)
     compF(Q, x, y, z, g.R_g, g.mu, g.k, g.D, ydir_id)

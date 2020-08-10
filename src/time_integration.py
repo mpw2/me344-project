@@ -25,9 +25,12 @@ def compute_timestep_maccormack():
 
     bc.apply_boundary_conditions()
 
+    Qavg = 0.5 * (g.Qo + g.Q)
+
     # Compute second RK step
     kv2 = eq.compRHS(g.Q, g.xg, g.yg, g.zg, (g.rk_step_bits ^ 0b111))
-    g.Q[:, :, :, :] = g.Qo[:, :, :, :] + \
+    
+    g.Q[:, :, :, :] = Qavg + \
         g.dt*(kv1[:, :, :, :] + kv2[:, :, :, :])/2.0
 
     bc.apply_boundary_conditions()

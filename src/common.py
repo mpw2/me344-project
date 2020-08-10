@@ -99,7 +99,7 @@ NVARS = 6  # number of transported variables
 
 # sponge
 sponge_fac = None
-sponge_strength = 100.0  # magnitude of sponge damping
+sponge_strength = 1.0  # magnitude of sponge damping
 a_sponge = 2.0  # order of damping func
 x_sponge = 0.2  # nondimensional sponge length
 y_sponge = 0.2  # nondimensional sponge length

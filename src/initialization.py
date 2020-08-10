@@ -108,8 +108,8 @@ def initialize():
     # --- Sponge -------------------------------------------------------
     # calculate the sponge damping factors
     x_sponge = g.x_sponge*g.Lx
-    y_sponge = g.y_sponge*g.Ly/2.0
-    z_sponge = g.z_sponge*g.Lz/2.0
+    y_sponge = g.y_sponge*g.Ly
+    z_sponge = g.z_sponge*g.Lz
     wall_dist = np.zeros((g.nx+1, g.ny+1, g.nz+1, 1), dtype=np.float64)
     for i in range(g.nx+1):
         for j in range(g.ny+1):
@@ -140,6 +140,9 @@ def initialize():
     g.Qref[:, :, :, 3] = 0.0
     g.Qref[:, :, :, 4] = g.P_inf / (g.gamma - 1.0)
     g.Qref[:, :, :, 5] = 0.0
+
+    # --- RK-Steps -----------------------------------------------------
+    g.rk_step_bits = 0b000
 
     # --- Initial Flow -------------------------------------------------
     io.init_flow()  # set the initial flow
