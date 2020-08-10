@@ -30,7 +30,7 @@ def apply_boundary_conditions():
                         abs(g.zg[0, 0, k]) <= g.jet_height_z/2.0):
                     g.Q[0, j, k, 0] = g.Rho_jet
                     g.Q[0, j, k, 1] = g.Rho_jet * g.U_jet * \
-                        (1.0 - (g.yg[0, j, 0] / g.jet_height_y)**2.0) + \
+                        (1.0 - (2.0 * g.yg[0, j, 0] / g.jet_height_y)**2.0) + \
                         0.01 * g.U_jet * (2.0 * np.random.rand() - 1.0)
                     g.Q[0, j, k, 2] = g.Rho_jet * g.V_jet + \
                         0.005 * g.U_jet * (2.0 * np.random.rand() - 1.0)

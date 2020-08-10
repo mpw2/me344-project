@@ -164,6 +164,15 @@ def read_input_data():
     g.zg = save_vars[2]
     g.Q = save_vars[3]
 
+    for i in range(g.nx):
+        for j in range(g.ny):
+            for k in range(g.nz):
+                if abs(g.yg[0,j,0]) < g.jet_height_y/2.0 and \
+                        abs(g.zg[0,0,k]) < g.jet_height_z/2.0 and \
+                        abs(g.xg[i,0,0]) < g.jet_height_y:
+                    _u = g.U_jet * (1.0 - (2.0*g.yg[0,j,0]/g.jet_height_y)**2.0)
+                    g.Q[i,j,k,1] = g.Q[i,j,k,0] * _u
+
 
 def output_data():
     """Write flow state to output file fout_path
