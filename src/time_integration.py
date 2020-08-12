@@ -32,8 +32,8 @@ def compute_timestep_maccormack():
                            g.dt*kv2[:, :, :, :])
     
     # Compute and apply flux limiter
-    flux_lim = eq.compute_flux_limiter(g.Qo, g.xg, g.yg, g.zg)
-    g.Q[:, :, :, :] = g.Q[:, :, :, :] + flux_lim
+    # flux_lim = eq.compute_flux_limiter(g.Qo, g.xg, g.yg, g.zg)
+    # g.Q[:, :, :, :] = g.Q[:, :, :, :] + flux_lim
     
     bc.apply_boundary_conditions()
 

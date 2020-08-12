@@ -79,15 +79,17 @@ def initialize():
     # --- Build Grids --------------------------------------------------
     # build the global grid arrays
     xg_temp = np.linspace(0, g.Lx, g.nx_global+1, dtype=np.float64)
-    if g.ny_global % 2 == 0:
-        yg_temp = np.linspace(-g.Ly/2, g.Ly/2, g.ny_global+1, dtype=np.float64)
-    else:
-        raise Exception("Use even values for ny")
+    #if g.ny_global % 2 == 0:
+    #    yg_temp = np.linspace(-g.Ly/2, g.Ly/2, g.ny_global+1, dtype=np.float64)
+    #else:
+    #    raise Exception("Use even values for ny")
+    yg_temp = np.linspace(-g.Ly/2, g.Ly/2, g.ny_global+1, dtype=np.float64)
 
-    if g.nz_global % 2 == 0:
-        zg_temp = np.linspace(-g.Lz/2, g.Lz/2, g.nz_global+1, dtype=np.float64)
-    else:
-        raise Exception('Use even values for nz')
+    #if g.nz_global % 2 == 0:
+    #    zg_temp = np.linspace(-g.Lz/2, g.Lz/2, g.nz_global+1, dtype=np.float64)
+    #else:
+    #    raise Exception('Use even values for nz')
+    zg_temp = np.linspace(-g.Lz/2, g.Lz/2, g.nz_global+1, dtype=np.float64)
 
     # use shape to allow easy commuting with field variables
     g.xg_global[:, 0, 0] = xg_temp
