@@ -135,13 +135,23 @@ def init_flow():
         g.P[:, :, :] = g.P_inf
         g.Phi[:, :, :] = 0.0
         _rho, _rho_u, _rho_v, _rho_w, _e_tot, _rho_phi = \
-            eq.PrimToCons(g.Rho, g.U, g.V, g.W, g.P, g.Phi)
+            eq.PrimToCons(g.Rho, g.U, g.V, g.W, g.P, g.Phi, g.gamma)
         g.Q[:, :, :, 0] = _rho
         g.Q[:, :, :, 1] = _rho_u
         g.Q[:, :, :, 2] = _rho_v
         g.Q[:, :, :, 3] = _rho_w
         g.Q[:, :, :, 4] = _e_tot
         g.Q[:, :, :, 5] = _rho_phi
+    
+        for i in range(g.nx):
+            for j in range(g.ny):
+                for k in range(g.nz):
+                    if abs(g.yg[0,j,0]) < g.jet_height_y/2.0 and \
+                            abs(g.zg[0,0,k]) < g.jet_height_z/2.0 and \
+                            abs(g.xg[i,0,0]) < g.jet_height_y:
+                        _u = g.U_jet * (1.0 - (2.0*g.yg[0,j,0]/g.jet_height_y)**2.0) * (1.0 - (g.xg[i,0,0]/g.jet_height_y))
+                        g.Q[i,j,k,1] = g.Q[i,j,k,0] * _u
+
 
 
 def read_input_data():
@@ -151,7 +161,7 @@ def read_input_data():
     Assumes exactly "nprocs" files exist
     """
     # Specify the input file(s)
-    fin_path = g.fin_path + '.{:03d}'.format(g.myrank)
+    fin_path = g.fin_path
 
     # Read from the input file(s)
     fil = open(fin_path, 'rb')
@@ -159,19 +169,17 @@ def read_input_data():
     fil.close()
 
     # Set the flow variables
-    g.xg = save_vars[0]
-    g.yg = save_vars[1]
-    g.zg = save_vars[2]
-    g.Q = save_vars[3]
+    g.xg_global = save_vars[0]
+    g.yg_global = save_vars[1]
+    g.zg_global = save_vars[2]
+    Q_global = save_vars[3]
 
-    for i in range(g.nx):
-        for j in range(g.ny):
-            for k in range(g.nz):
-                if abs(g.yg[0,j,0]) < g.jet_height_y/2.0 and \
-                        abs(g.zg[0,0,k]) < g.jet_height_z/2.0 and \
-                        abs(g.xg[i,0,0]) < g.jet_height_y:
-                    _u = g.U_jet * (1.0 - (2.0*g.yg[0,j,0]/g.jet_height_y)**2.0)
-                    g.Q[i,j,k,1] = g.Q[i,j,k,0] * _u
+    i0 = g.i0_global[g.myrank]
+    i1 = g.i1_global[g.myrank] + 1
+    g.xg = g.xg_global[i0:i1, 0, 0]
+    g.yg = g.yg_global[0, :, 0]
+    g.zg = g.zg_global[0, 0, :]
+    g.Q = Q_global[i0:i1, :, :, :]
 
 
 def output_data():

@@ -13,11 +13,11 @@ def output_monitor():
     """Write monitor output to stdout"""
 
     # Check for NaNs
-    check_q = np.sum(g.Q, axis=(0, 1, 2))
-    if np.any(np.isnan(check_q)):
+    if np.any(np.isnan(g.Q)):
         sys.stderr.write(
             "[PROC {0:d}] Error: NaNs! \n".format(g.myrank))
         sys.stderr.flush()
+        sys.stdout.flush()
         g.comm.Abort()
 
     # Allocate MPI memory buffers
@@ -25,7 +25,7 @@ def output_monitor():
     recvbuf = np.empty((g.NVARS), dtype=np.float64)
 
     # Compute primitive variables
-    _rho, _u, _v, _w, _p, _phi = eq.ConsToPrim(g.Q)
+    _rho, _u, _v, _w, _p, _phi = eq.ConsToPrim(g.Q, g.gamma)
 
     # Compute globally averaged variables
     rho_sum = np.sum(_rho)
@@ -35,8 +35,9 @@ def output_monitor():
     p_sum = np.sum(_p)
     phi_sum = np.sum(_phi)
 
-    sendbuf[:] = [rho_sum, u_sum, v_sum, w_sum, p_sum, phi_sum]
-    g.comm.Reduce(sendbuf, recvbuf, op=g.MPI.SUM, root=0)
+    sendbuf = np.array([rho_sum, u_sum, v_sum, w_sum, p_sum, phi_sum])
+    g.comm.Reduce([sendbuf, g.MPI.DOUBLE], [recvbuf, g.MPI.DOUBLE],
+                  op=g.MPI.SUM, root=0)
     recvbuf = recvbuf / (g.nx_global * g.ny_global * g.nz_global)
     rho_mean, u_mean, v_mean, w_mean, p_mean, phi_mean = recvbuf
 
@@ -48,8 +49,9 @@ def output_monitor():
     p_max = np.max(_p)
     phi_max = np.max(_phi)
 
-    sendbuf[:] = [rho_max, u_max, v_max, w_max, p_max, phi_max]
-    g.comm.Reduce(sendbuf, recvbuf, op=g.MPI.MAX, root=0)
+    sendbuf = np.array([rho_max, u_max, v_max, w_max, p_max, phi_max])
+    g.comm.Reduce([sendbuf, g.MPI.DOUBLE], [recvbuf, g.MPI.DOUBLE],
+                  op=g.MPI.MAX, root=0)
     rho_max, u_max, v_max, w_max, p_max, phi_max = recvbuf
 
     # only print monitor if rank 0

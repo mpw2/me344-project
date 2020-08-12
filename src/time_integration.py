@@ -20,56 +20,52 @@ def compute_timestep_maccormack():
     g.Qo[:, :, :, :] = g.Q[:, :, :, :]
 
     # Compute first RK step
-    kv1 = eq.compRHS(g.Q, g.xg, g.yg, g.zg, (g.rk_step_bits ^ 0b000))
+    kv1 = eq.compRHS(g.Q, g.xg, g.yg, g.zg, (g.rk_step_bits))
     g.Q[:, :, :, :] = g.Q[:, :, :, :] + g.dt*kv1[:, :, :, :]
 
     bc.apply_boundary_conditions()
 
-    Qavg = 0.5 * (g.Qo + g.Q)
-
     # Compute second RK step
     kv2 = eq.compRHS(g.Q, g.xg, g.yg, g.zg, (g.rk_step_bits ^ 0b111))
     
-    g.Q[:, :, :, :] = Qavg + \
-        g.dt*(kv1[:, :, :, :] + kv2[:, :, :, :])/2.0
-
+    g.Q[:, :, :, :] = 0.5*(g.Qo[:, :, :, :] + g.Q[:, :, :, :] + \
+                           g.dt*kv2[:, :, :, :])
+    
+    # Compute and apply flux limiter
+    flux_lim = eq.compute_flux_limiter(g.Qo, g.xg, g.yg, g.zg)
+    g.Q[:, :, :, :] = g.Q[:, :, :, :] + flux_lim
+    
     bc.apply_boundary_conditions()
 
     # Switch differentiation directions between time steps
     # Use round robin style to permute direction combinations
     g.rk_step_bits = g.rk_step_bits + 0b001
 
+    g.comm.Barrier()
 
 def compute_dt():
     """Compute time step size based on CFL"""
 
-    _rho, _u, _v, _w, _p, _ = eq.ConsToPrim(g.Q)
-    _a0 = np.sqrt(g.gamma * _p / _rho)
+    _rho, _u, _v, _w, _p, _ = eq.ConsToPrim(g.Q, g.gamma)
+    _sos = np.sqrt(g.gamma * _p / _rho)
 
-    _ur = np.abs(_u + _a0)
-    _ul = np.abs(_u - _a0)
-    _u = np.maximum(_ur, _ul)
-
-    _vr = np.abs(_v + _a0)
-    _vl = np.abs(_v - _a0)
-    _v = np.maximum(_vr, _vl)
-
-    _wr = np.abs(_w + _a0)
-    _wl = np.abs(_w - _a0)
-    _w = np.maximum(_wr, _wl)
+    _u = np.abs(_u)
+    _v = np.abs(_v)
+    _w = np.abs(_w)
 
     _dx = np.gradient(g.xg, axis=0)
     _dy = np.gradient(g.yg, axis=1)
     _dz = np.gradient(g.zg, axis=2)
 
-    # Convective CFL
-    _dt_c = g.CFL_ref / (_u/_dx + _v/_dy + _w/_dz)
-    # Viscous CFL
-    _dt_v = g.CFL_ref * (_rho / g.mu) / \
-        (1.0/_dx**2.0 + 1.0/_dy**2.0 + 1.0/_dz**2.0)
+    _dixyz = 1.0/(_dx**2.0) + 1.0/(_dy**2.0) + 1.0/(_dz**2.0)
+    
+    _nuprime = (4.0 * (g.mu + g.mu_sgs)**2.0 * g.gamma) / (3.0 * g.Pr * _rho)
 
-    _dt = np.minimum(_dt_c, _dt_v)
-
+    _dt = _u / _dx + _v / _dy + _w / _dz + _sos * np.sqrt(_dixyz) + \
+        2.0 * _nuprime * _dixyz
+    _dt = 1.0 / _dt
+    _dt = _dt * g.CFL_ref
+    
     # MPI buffers
     dt_local = np.empty((1), dtype=np.float64)
     dt_global = np.empty((1), dtype=np.float64)

@@ -22,18 +22,18 @@ def apply_boundary_conditions():
     if g.myrank == 0:
         # base inlet boundary
         apply_isothermal_wall('x0')
-        apply_pressure_bc('x0')
         # jet inlet condition
         for j in range(g.ny):
             for k in range(g.nz):
                 if (abs(g.yg[0, j, 0]) <= g.jet_height_y/2.0 and
                         abs(g.zg[0, 0, k]) <= g.jet_height_z/2.0):
                     g.Q[0, j, k, 0] = g.Rho_jet
-                    g.Q[0, j, k, 1] = g.Rho_jet * g.U_jet * \
-                        (1.0 - (2.0 * g.yg[0, j, 0] / g.jet_height_y)**2.0) + \
-                        0.00 * g.U_jet * (2.0 * np.random.rand() - 1.0)
-                    g.Q[0, j, k, 2] = g.Rho_jet * g.V_jet + \
-                        0.00 * g.U_jet * (2.0 * np.random.rand() - 1.0)
+                    #g.Q[0, j, k, 1] = g.Rho_jet * g.U_jet
+                    g.Q[0, j, k, 1] = g.Rho_jet * g.U_jet * (1.0-(2.0*g.yg[0,j,0]/g.jet_height_y)**2.0)
+                    g.Q[0, j, k, 1] = g.Q[0, j, k, 1]*(1.0 + 0.1*(2.0*np.random.rand() - 1.0))
+                    g.Q[0, j, k, 2] = g.Rho_jet * g.V_jet
+                    #g.Q[0, j, k, 2] = g.Rho_jet * g.V_jet + \
+                    #    0.00 * g.U_jet * (2.0 * np.random.rand() - 1.0)
                     g.Q[0, j, k, 3] = g.Rho_jet * g.W_jet
                     g.Q[0, j, k, 4] = g.P_jet / (g.gamma-1.0) + \
                         0.5 * g.Rho_jet * g.U_jet**2.0
@@ -61,29 +61,54 @@ def apply_boundary_conditions():
 
 def communicate_internal_planes(f_arr):
     """Communicate internal ghost planes between MPI processes"""
+    nx = f_arr.shape[0]
+    ny = f_arr.shape[1]
+    nz = f_arr.shape[2]
+    if len(f_arr.shape) > 3:
+        nvars = f_arr.shape[3]
+    else:
+        nvars = 1
 
-    sendbuf = np.zeros((1, g.ny+1, g.nz+1, g.NVARS), dtype=np.float64)
-    recvbuf = np.zeros((1, g.ny+1, g.nz+1, g.NVARS), dtype=np.float64)
+    if nvars > 1:
+        sendbuf = np.zeros((ny, nz, nvars), dtype=np.float64)
+        recvbuf = np.zeros((ny, nz, nvars), dtype=np.float64)
+    else:
+        sendbuf = np.zeros((ny, nz), dtype=np.float64)
+        recvbuf = np.zeros((ny, nz), dtype=np.float64)
+
+    g.comm.Barrier()
 
     # all processes with a chunk ahead of them
     if g.myrank < g.nprocs-1:
-        sendbuf = f_arr[g.nx-1:g.nx, :, :, :]
+        if nvars > 1:
+            sendbuf = f_arr[nx-2:nx-1, :, :, :]
+        else:
+            sendbuf = f_arr[nx-2:nx-1, :, :]
         g.comm.Isend([sendbuf, g.MPI.DOUBLE], dest=g.myrank+1, tag=g.myrank)
 
     # zeroth process doesn't receive
     if g.myrank > 0:
         g.comm.Recv([recvbuf, g.MPI.DOUBLE], source=g.myrank-1, tag=g.myrank-1)
-        f_arr[0:1, :, :, :] = recvbuf
+        if nvars > 1:
+            f_arr[0:1, :, :, :] = recvbuf
+        else:
+            f_arr[0:1, :, :] = recvbuf
 
     # all processes with a chunk behind them
     if g.myrank > 0:
-        sendbuf = f_arr[1:2, :, :, :]
+        if nvars > 1:
+            sendbuf = f_arr[1:2, :, :, :]
+        else:
+            sendbuf = f_arr[1:2, :, :]
         g.comm.Isend([sendbuf, g.MPI.DOUBLE], dest=g.myrank-1, tag=g.myrank)
 
     # nprocs-1 process doesn't receive
     if g.myrank < g.nprocs-1:
         g.comm.Recv([recvbuf, g.MPI.DOUBLE], source=g.myrank+1, tag=g.myrank+1)
-        f_arr[g.nx:g.nx+1, :, :, :] = recvbuf
+        if nvars > 1:
+            f_arr[nx-1:nx, :, :, :] = recvbuf
+        else:
+            f_arr[nx-1:nx, :, :] = recvbuf
 
 
 def apply_extrapolation_bc(dirid):
@@ -120,13 +145,13 @@ def apply_convective_bc(dirid):
         g.Q[g.nx, :, :, :] = g.Qo[g.nx, :, :, :] - \
             factor * (g.Qo[g.nx, :, :, :] - g.Qo[g.nx-1, :, :, :])
     elif dirid == 'y0':
-        _v = g.Qo[:, 0, :, 1] / g.Qo[:, 0, :, 0]
+        _v = g.Qo[:, 0, :, 2] / g.Qo[:, 0, :, 0]
         factor = g.dt / (g.yg[0, 0, 0] - g.yg[0, 1, 0]) * _v
         factor = factor.reshape(g.nx+1, g.nz+1, 1)
         g.Q[:, 0, :, :] = g.Qo[:, 0, :, :] - \
             factor * (g.Qo[:, 0, :, :] - g.Qo[:, 1, :, :])
     elif dirid == 'y1':
-        _v = g.Qo[:, g.ny, :, 1] / g.Qo[:, g.ny, :, 0]
+        _v = g.Qo[:, g.ny, :, 2] / g.Qo[:, g.ny, :, 0]
         factor = g.dt / (g.yg[0, g.ny, 0] - g.yg[0, g.ny-1, 0]) * _v
         factor = factor.reshape(g.nx+1, g.nz+1, 1)
         g.Q[:, g.ny, :, :] = g.Qo[:, g.ny, :, :] - \
@@ -202,10 +227,12 @@ def apply_isothermal_wall(dirid):
         - T = const.
     """
     if dirid == 'x0':
-        g.Q[0, :, :, 1] = 0.0
+        g.Q[0, :, :, 0] = g.Rho_inf
+        g.Q[0, :, :, 1] = 0.1 * g.U_jet * g.Rho_inf
         g.Q[0, :, :, 2] = 0.0
         g.Q[0, :, :, 3] = 0.0
         g.Q[0, :, :, 4] = g.Q[0, :, :, 0] * g.R_g / (g.gamma - 1.0) * g.T_inf
+        g.Q[0, :, :, 5] = 0.0
     else:
         msg = "BC not implemented for dirid: {:s}".format(dirid)
         raise Exception(msg)

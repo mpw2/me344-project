@@ -15,8 +15,10 @@ Package Requirements:
         - numba
     Post-processing:
         - matplotlib
+        - plotly
 """
 import sys
+import numpy as np
 
 import initialization as ini
 import input_output as io
@@ -32,10 +34,10 @@ def main():
     # initialize data structures
     start = time.time()
     ini.initialize()
-
+    
     # output initial condition to monitor
     mon.output_monitor()
-
+    
     # start time integration loop
     for tstep in range(1, g.nsteps+1):
         g.tstep = tstep

@@ -85,6 +85,7 @@ W = None  # spanwise velocity
 P = None  # pressure
 E_t = None  # total energy
 Phi = None  # scalar concentration
+mu_sgs = None # sgs viscosity
 
 # rhs terms
 E = None
@@ -100,8 +101,8 @@ NVARS = 6  # number of transported variables
 # sponge
 sponge_fac = None
 sponge_strength = 1.0  # magnitude of sponge damping
-a_sponge = 2.0  # order of damping func
-x_sponge = 0.2  # nondimensional sponge length
+a_sponge = 3.0  # order of damping func
+x_sponge = 0.3  # nondimensional sponge length
 y_sponge = 0.2  # nondimensional sponge length
 z_sponge = 0.0  # nondimensional sponge length
 Qref = None  # reference condition
