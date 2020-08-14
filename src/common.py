@@ -1,11 +1,14 @@
-# ------------------------------------------
-#
-# common.py
-#
-#  - contains global variables
-#
-# ------------------------------------------
+"""common.py
+Contains global variables
+"""
+import numpy as np
 
+
+# MPI objects/parameters
+MPI = None
+comm = None
+nprocs = None
+myrank = None
 
 # input/output parameters
 fout_path = None
@@ -13,53 +16,64 @@ fin_path = None
 fparam_path = None
 
 # physical parameters
-mu = None  # dynamic viscosity
-gamma = None  # cp/cv ratio
-# Ma = None  # Mach number
-# Re = None  # Reynolds number
-Pr = None  # Prandtl number
-R_g = None  # gas constant
-k = None  # heat transfer coefficient
-D = None  # scalar diffusivity coefficient
+mu = np.float64(0.0)  # dynamic viscosity
+gamma = np.float64(0.0)  # cp/cv ratio
+Pr = np.float64(0.0)  # Prandtl number
+R_g = np.float64(0.0)  # gas constant
+k = np.float64(0.0)  # heat transfer coefficient
+D = np.float64(0.0)  # scalar diffusivity coefficient
 
 # domain parameters
-Lx = None
-Ly = None
-Lz = None
+Lx = np.float64(0.0)
+Ly = np.float64(0.0)
+Lz = np.float64(0.0)
 
 # inlet conditions
-jet_height_y = None  # extent of jet in y-dim
-jet_height_z = None  # extent of jet in z-dim
-U_jet = None  # jet inlet streamwise velocity
-V_jet = None  # jet inlet normal velocity
-W_jet = None  # jet inlet spanwise velocity
-P_jet = None  # jet inlet pressure
-T_jet = None  # jet inlet temperature
-Rho_jet = None  # jet inlet density
-Phi_jet = None  # jet inlet scalar concentration
+jet_height_y = np.float64(0.0)  # extent of jet in y-dim
+jet_height_z = np.float64(0.0)  # extent of jet in z-dim
+U_jet = np.float64(0.0)  # jet inlet streamwise velocity
+V_jet = np.float64(0.0)  # jet inlet normal velocity
+W_jet = np.float64(0.0)  # jet inlet spanwise velocity
+P_jet = np.float64(0.0)  # jet inlet pressure
+T_jet = np.float64(0.0)  # jet inlet temperature
+Rho_jet = np.float64(0.0)  # jet inlet density
+Phi_jet = np.float64(0.0)  # jet inlet scalar concentration
 
 # ambient conditions
-U_inf = None
-V_inf = None
-W_inf = None
-P_inf = None  # reference pressure
-T_inf = None
-Rho_inf = None  # reference density
-Phi_inf = None  # reference scalar concentration
+U_inf = np.float64(0.0)  # reference streamwise velocity
+V_inf = np.float64(0.0)  # reference normal velocity
+W_inf = np.float64(0.0)  # reference spanwise velocity
+P_inf = np.float64(0.0)  # reference pressure
+T_inf = np.float64(0.0)  # reference temperature
+Rho_inf = np.float64(0.0)  # reference density
+Phi_inf = np.float64(0.0)  # reference scalar concentration
 
 # grid parameters
-nx = None
+nx_global = None  # global grid size
+ny_global = None
+nz_global = None
+xg_global = None  # global grid coordinates
+yg_global = None
+zg_global = None
+
+i0_global = None  # lower extent streamwise index
+i1_global = None  # upper extent streamwise index
+
+nx = None  # local grid size
 ny = None
 nz = None
-xg = None
+xg = None  # local grid coordinates
 yg = None
 zg = None
 
 # timestep parameters
-CFL_ref = None
-dt = None
-t = None
+CFL_ref = np.float64(0.0)
+dt = np.float64(0.0)
+t = np.float64(0.0)
 tstep = None
+nsteps = None
+nsave = None
+nmonitor = None
 
 # variable arrays
 Q = None  # conserved variable vector
@@ -85,16 +99,15 @@ NVARS = 6  # number of transported variables
 
 # sponge
 sponge_fac = None
-sponge_strength = 100  # magnitude of sponge damping
-a_sponge = 2  # order of damping func
+sponge_strength = 1.0  # magnitude of sponge damping
+a_sponge = 2.0  # order of damping func
 x_sponge = 0.2  # nondimensional sponge length
 y_sponge = 0.2  # nondimensional sponge length
 z_sponge = 0.0  # nondimensional sponge length
 Qref = None  # reference condition
 
 # Runge-Kutta steps
-rk_step_1 = None
-rk_step_2 = None
+rk_step_bits = np.int8(0b000)
 
 
 #

@@ -1,23 +1,54 @@
 #!/bin/bash
 
-# --- System Configuration ----------------------
-PYR=python3           # command to run code
-JET_DIR='/path/to/jet/code/' # path to jet code
+# Usage:
+# run_jet [-n num_procs] [-i param_in]
 
-# --- Run Configuration -------------------------
-PARAM_IN='./params.in'  # input parameters file
+# --- System Configuration ---------------------------------------------
+PYR=python  # command to run code
+JET_DIR="/path/to/jet/code/"  # path to jet code
 
-STD_OUT='./run_jet.o' # stdout redirect
-STD_ERR='./run_jet.e' # stderr redirect
+# --- Run Configuration ------------------------------------------------
+param_in='./params.in'  # input parameters file (default params.in)
 
-WRITE_TO_FILE=0       # redirect code output
+std_out=''  # stdout redirect
+std_err=''  # stderr redirect
 
-# -----------------------------------------------
+# ----------------------------------------------------------------------
+
+# check number of processors
+nprocs=1
+while getopts ":i:n:" flag; do
+    case ${flag} in
+    i )
+        param_in=$OPTARG
+        ;;
+    n ) 
+        nprocs=$OPTARG
+        ;;
+    \? ) 
+        echo "Usage: run_jet [-n num_procs] [-i param_in]" 1>&2
+        exit 1
+        ;;
+    : ) 
+        echo "Usage: -$OPTARG requires an argument" 1>&2
+        exit 1
+        ;;
+    esac
+done
+
+# check if redirect output
+write_to_file=1
+if [ -z $std_out ]; then
+    write_to_file=0
+fi
+
+# ----------------------------------------------------------------------
 
 # Run the code
-if [ $WRITE_TO_FILE == 0 ]; then
-    $PYR "$JET_DIR"src/main.py $PARAM_IN
+if [ $write_to_file == 0 ]; then
+    mpiexec -n "$nprocs" $PYR "$JET_DIR"src/main.py "$param_in"
 else
-    $PYR "$JET_DIR"src/main.py $PARAM_IN 1>$STD_OUT 2>$STD_ERR
+    mpiexec -n "$nprocs" $PYR "$JET_DIR"src/main.py "$param_in" \
+        1>$std_out 2>$std_err
 fi
 

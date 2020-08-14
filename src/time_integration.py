@@ -1,52 +1,87 @@
+"""time_integration.py
+Compute time step advancement.
+
+Contains MacCormack time step implementation.
+"""
+
+import numpy as np
+
 import common as g
 import equations as eq
 import boundary_conditions as bc
-import numpy as np
 
 
 def compute_timestep_maccormack():
-    g.t = g.t + g.dt
+    """Advance time step using MacCormack scheme time advancement"""
 
+    # Update simulation time
+    g.t = g.t + g.dt
+    # Save state from previous time step
     g.Qo[:, :, :, :] = g.Q[:, :, :, :]
 
-    k1 = eq.compRHS(g.Q, g.xg, g.yg, g.zg, g.rk_step_1)
-    g.Q[:, :, :, :] = g.Q[:, :, :, :] + g.dt*k1[:, :, :, :]
+    # Compute first RK step
+    kv1 = eq.compRHS(g.Q, g.xg, g.yg, g.zg, (g.rk_step_bits ^ 0b000))
+    g.Q[:, :, :, :] = g.Q[:, :, :, :] + g.dt*kv1[:, :, :, :]
 
     bc.apply_boundary_conditions()
 
-    k2 = eq.compRHS(g.Q, g.xg, g.yg, g.zg, g.rk_step_2)
-    g.Q[:, :, :, :] = g.Qo[:, :, :, :] + \
-        g.dt*(k1[:, :, :, :] + k2[:, :, :, :])/2.0
+    Qavg = 0.5 * (g.Qo + g.Q)
+
+    # Compute second RK step
+    kv2 = eq.compRHS(g.Q, g.xg, g.yg, g.zg, (g.rk_step_bits ^ 0b111))
+    
+    g.Q[:, :, :, :] = Qavg + \
+        g.dt*(kv1[:, :, :, :] + kv2[:, :, :, :])/2.0
 
     bc.apply_boundary_conditions()
 
-    g.rk_step_1, g.rk_step_2 = g.rk_step_2, g.rk_step_1
+    # Switch differentiation directions between time steps
+    # Use round robin style to permute direction combinations
+    g.rk_step_bits = g.rk_step_bits + 0b001
 
 
 def compute_dt():
+    """Compute time step size based on CFL"""
 
-    Rho_, U_, V_, W_, P_, Phi_ = eq.ConsToPrim(g.Q)
-    a0 = np.sqrt(g.gamma*g.P / g.Rho)
+    _rho, _u, _v, _w, _p, _ = eq.ConsToPrim(g.Q)
+    _a0 = np.sqrt(g.gamma * _p / _rho)
 
-    Ur = np.abs(U_ + a0)
-    Ul = np.abs(U_ - a0)
-    U_ = np.maximum(Ur, Ul)
+    _ur = np.abs(_u + _a0)
+    _ul = np.abs(_u - _a0)
+    _u = np.maximum(_ur, _ul)
 
-    Vr = np.abs(V_ + a0)
-    Vl = np.abs(V_ - a0)
-    V_ = np.maximum(Vr, Vl)
+    _vr = np.abs(_v + _a0)
+    _vl = np.abs(_v - _a0)
+    _v = np.maximum(_vr, _vl)
 
-    Wr = np.abs(W_ + a0)
-    Wl = np.abs(W_ - a0)
-    W_ = np.maximum(Wr, Wl)
+    _wr = np.abs(_w + _a0)
+    _wl = np.abs(_w - _a0)
+    _w = np.maximum(_wr, _wl)
 
-    dx = np.gradient(g.xg, axis=0)
-    dy = np.gradient(g.yg, axis=1)
-    dz = np.gradient(g.zg, axis=2)
+    _dx = np.gradient(g.xg, axis=0)
+    _dy = np.gradient(g.yg, axis=1)
+    _dz = np.gradient(g.zg, axis=2)
 
-    dt = g.CFL_ref / (U_/dx + V_/dy + W_/dz)
+    # Convective CFL
+    _dt_c = g.CFL_ref / (_u/_dx + _v/_dy + _w/_dz)
+    # Viscous CFL
+    _dt_v = g.CFL_ref * (_rho / g.mu) / \
+        (1.0/_dx**2.0 + 1.0/_dy**2.0 + 1.0/_dz**2.0)
 
-    g.dt = np.min(dt)
+    _dt = np.minimum(_dt_c, _dt_v)
+
+    # MPI buffers
+    dt_local = np.empty((1), dtype=np.float64)
+    dt_global = np.empty((1), dtype=np.float64)
+
+    # Find the minimum dt across processes
+    dt_local[0] = np.min(_dt)
+    g.comm.Reduce([dt_local, g.MPI.DOUBLE], [dt_global, g.MPI.DOUBLE],
+                  op=g.MPI.MIN, root=0)
+
+    # broadcast time step size
+    g.comm.Bcast(dt_global, root=0)
+    g.dt = dt_global[0]
 
 
 #
